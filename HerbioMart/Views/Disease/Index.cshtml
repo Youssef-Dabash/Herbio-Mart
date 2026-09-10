@@ -1,0 +1,34 @@
+﻿@model IEnumerable<HerbioMart.ViewModels.Diseases.DiseaseVM>
+
+@{
+    ViewData["Title"] = "Health Directory";
+}
+
+<div class="container-fluid fruite py-5">
+    <div class="container py-5">
+        <div class="text-center mx-auto mb-5" style="max-width: 700px;">
+            <h4 class="text-primary text-uppercase">Health Directory</h4>
+            <h1 class="display-5 mb-3 text-dark fw-bold">Browse Conditions</h1>
+            <p class="text-muted">Select a health condition to explore verified organic herbal formulations tailored to your symptoms.</p>
+        </div>
+
+        <div class="row g-4">
+            @foreach (var disease in Model)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm rounded p-4 text-center">
+                        <div class="mb-3">
+                            <i class="fas fa-heartbeat fa-3x text-primary"></i>
+                        </div>
+                        <h4 class="card-title text-dark fw-bold">@disease.DiseaseName</h4>
+                        <p class="card-text text-muted">@disease.Description</p>
+                        <div class="bg-light p-2 rounded mb-3">
+                            <small class="text-secondary fw-semibold">Symptoms: @disease.Symptoms</small>
+                        </div>
+                        <a asp-controller="Recipe" asp-action="ByDisease" asp-route-id="@disease.DiseaseId" class="btn btn-outline-primary rounded-pill px-4 mt-auto">View Formulations</a>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

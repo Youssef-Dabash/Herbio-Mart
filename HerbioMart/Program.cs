@@ -1,4 +1,6 @@
 using HerbioMart.Data;
+using HerbioMart.Services.Implementations;
+using HerbioMart.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace HerbioMart;
@@ -10,18 +12,22 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
 
         builder.Services.AddControllersWithViews();
+        builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(Program).Assembly));
         builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+        builder.Services.AddScoped<IDiseaseService, DiseaseService>();
+
         var app = builder.Build();
 
         if (!app.Environment.IsDevelopment())
         {
             app.UseExceptionHandler("/Home/Error");
-            app.UseHsts();
+            app.UseHsts(); 
         }
 
         app.UseHttpsRedirection();
-        app.UseRouting();
+        app.UseRouting(); 
 
         app.UseAuthorization();
 
