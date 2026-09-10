@@ -6,15 +6,15 @@ namespace HerbioMart.Controllers;
 
 public class HomeController : Controller
 {
-    public IActionResult Index()
-    {
-        return View();
-    }
+    public IActionResult Index() => View();
 
-    public IActionResult Privacy()
-    {
-        return View();
-    }
+    public IActionResult Contact() => View();
+
+    public IActionResult Testimonials() => View();
+
+    public IActionResult Privacy() => View();
+
+    public IActionResult NotFoundPage() => View();
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()

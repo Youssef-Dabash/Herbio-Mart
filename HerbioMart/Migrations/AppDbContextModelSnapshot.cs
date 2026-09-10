@@ -44,7 +44,7 @@ namespace HerbioMart.Migrations
 
                     b.HasKey("DiseaseId");
 
-                    b.ToTable("Diseases");
+                    b.ToTable("Diseases", (string)null);
 
                     b.HasData(
                         new
@@ -113,7 +113,7 @@ namespace HerbioMart.Migrations
 
                     b.HasIndex("RecipeId");
 
-                    b.ToTable("Feedbacks");
+                    b.ToTable("Feedbacks", (string)null);
                 });
 
             modelBuilder.Entity("HerbioMart.Models.Entities.Herb", b =>
@@ -157,7 +157,7 @@ namespace HerbioMart.Migrations
 
                     b.HasIndex("AddedByHerbalistId");
 
-                    b.ToTable("Herbs");
+                    b.ToTable("Herbs", (string)null);
                 });
 
             modelBuilder.Entity("HerbioMart.Models.Entities.Herbalist", b =>
@@ -183,7 +183,7 @@ namespace HerbioMart.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Herbalists");
+                    b.ToTable("Herbalists", (string)null);
                 });
 
             modelBuilder.Entity("HerbioMart.Models.Entities.HerbalistHerb", b =>
@@ -204,7 +204,7 @@ namespace HerbioMart.Migrations
 
                     b.HasIndex("HerbId");
 
-                    b.ToTable("HerbalistHerbs");
+                    b.ToTable("HerbalistHerbs", (string)null);
                 });
 
             modelBuilder.Entity("HerbioMart.Models.Entities.MedicalHistory", b =>
@@ -247,7 +247,7 @@ namespace HerbioMart.Migrations
                     b.HasIndex("PatientId")
                         .IsUnique();
 
-                    b.ToTable("MedicalHistories");
+                    b.ToTable("MedicalHistories", (string)null);
                 });
 
             modelBuilder.Entity("HerbioMart.Models.Entities.Order", b =>
@@ -284,7 +284,7 @@ namespace HerbioMart.Migrations
 
                     b.HasIndex("PatientId");
 
-                    b.ToTable("Orders");
+                    b.ToTable("Orders", (string)null);
                 });
 
             modelBuilder.Entity("HerbioMart.Models.Entities.OrderHerb", b =>
@@ -316,7 +316,7 @@ namespace HerbioMart.Migrations
 
                     b.HasIndex("SubOrderId");
 
-                    b.ToTable("OrderHerbs");
+                    b.ToTable("OrderHerbs", (string)null);
                 });
 
             modelBuilder.Entity("HerbioMart.Models.Entities.OrderRecipe", b =>
@@ -348,7 +348,7 @@ namespace HerbioMart.Migrations
 
                     b.HasIndex("SubOrderId");
 
-                    b.ToTable("OrderRecipes");
+                    b.ToTable("OrderRecipes", (string)null);
                 });
 
             modelBuilder.Entity("HerbioMart.Models.Entities.Patient", b =>
@@ -373,7 +373,7 @@ namespace HerbioMart.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Patients");
+                    b.ToTable("Patients", (string)null);
                 });
 
             modelBuilder.Entity("HerbioMart.Models.Entities.Recipe", b =>
@@ -418,7 +418,7 @@ namespace HerbioMart.Migrations
 
                     b.HasIndex("HerbalistId");
 
-                    b.ToTable("Recipes");
+                    b.ToTable("Recipes", (string)null);
                 });
 
             modelBuilder.Entity("HerbioMart.Models.Entities.RecipeDisease", b =>
@@ -441,7 +441,7 @@ namespace HerbioMart.Migrations
 
                     b.HasIndex("RecipeId");
 
-                    b.ToTable("RecipeDiseases");
+                    b.ToTable("RecipeDiseases", (string)null);
                 });
 
             modelBuilder.Entity("HerbioMart.Models.Entities.RecipeHerb", b =>
@@ -467,7 +467,7 @@ namespace HerbioMart.Migrations
 
                     b.HasIndex("RecipeId");
 
-                    b.ToTable("RecipeHerbs");
+                    b.ToTable("RecipeHerbs", (string)null);
                 });
 
             modelBuilder.Entity("HerbioMart.Models.Entities.SubOrder", b =>
@@ -496,7 +496,7 @@ namespace HerbioMart.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("SubOrders");
+                    b.ToTable("SubOrders", (string)null);
                 });
 
             modelBuilder.Entity("HerbioMart.Models.Entities.User", b =>
@@ -550,7 +550,7 @@ namespace HerbioMart.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("HerbioMart.Models.Entities.Feedback", b =>

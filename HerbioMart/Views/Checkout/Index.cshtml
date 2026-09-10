@@ -1,0 +1,176 @@
+﻿@{
+    ViewData["Title"] = "Order Checkout";
+}
+
+<!-- Single Page Header start -->
+<div class="container-fluid page-header py-5">
+    <h1 class="text-center text-white display-6">Dispatch Checkout</h1>
+    <ol class="breadcrumb justify-content-center mb-0">
+        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-white">Home</a></li>
+        <li class="breadcrumb-item"><a asp-controller="Cart" asp-action="Index" class="text-white">Cart</a></li>
+        <li class="breadcrumb-item active text-white">Checkout</li>
+    </ol>
+</div>
+<!-- Single Page Header End -->
+<!-- Checkout Page Start -->
+<div class="container-fluid py-5">
+    <div class="container py-5">
+        <h1 class="mb-4">Shipping & Prescription Billing</h1>
+        <form asp-controller="Checkout" asp-action="Index" method="post">
+            <div class="row g-5">
+                <div class="col-md-12 col-lg-6 col-xl-7">
+                    <div class="row">
+                        <div class="col-md-12 col-lg-6">
+                            <div class="form-item w-100 mb-3">
+                                <label class="form-label my-3">Recipient Full Name<sup>*</sup></label>
+                                <input type="text" name="FullName" class="form-control" placeholder="Full name">
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-lg-6">
+                            <div class="form-item w-100 mb-3">
+                                <label class="form-label my-3">Contact Phone<sup>*</sup></label>
+                                <input type="tel" name="Phone" class="form-control" placeholder="01012345678">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12 col-lg-6">
+                            <div class="form-item w-100 mb-3">
+                                <label class="form-label my-3">Governorate<sup>*</sup></label>
+                                <input type="text" name="Governorate" class="form-control" placeholder="Cairo">
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-lg-6">
+                            <div class="form-item w-100 mb-3">
+                                <label class="form-label my-3">City / District<sup>*</sup></label>
+                                <input type="text" name="City" class="form-control" placeholder="Nasr City">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-item mb-3">
+                        <label class="form-label my-3">Street Address / Building Details<sup>*</sup></label>
+                        <input type="text" name="Street" class="form-control" placeholder="Building no., Street name, Apartment">
+                    </div>
+
+                    <div class="form-item mb-3">
+                        <label class="form-label my-3">Email Address (For Invoicing)<sup>*</sup></label>
+                        <input type="email" name="Email" class="form-control" placeholder="patient@example.com">
+                    </div>
+
+                    <div class="form-item mt-4">
+                        <label class="form-label mb-2">Delivery & Health Notes (Optional)</label>
+                        <textarea name="Notes" class="form-control" spellcheck="false" cols="30" rows="6" placeholder="Special delivery instructions or herbal packaging requests..."></textarea>
+                    </div>
+                </div>
+
+                <div class="col-md-12 col-lg-6 col-xl-5">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Remedy</th>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Price</th>
+                                    <th scope="col">Qty</th>
+                                    <th scope="col">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th scope="row">
+                                        <div class="d-flex align-items-center mt-2">
+                                            <img src="~/img/vegetable-item-3.png" class="img-fluid rounded-circle" style="width: 60px; height: 60px;" alt="Chamomile">
+                                        </div>
+                                    </th>
+                                    <td class="py-4">Chamomile Pack</td>
+                                    <td class="py-4">45.00 EGP</td>
+                                    <td class="py-4">1</td>
+                                    <td class="py-4">45.00 EGP</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">
+                                        <div class="d-flex align-items-center mt-2">
+                                            <img src="~/img/vegetable-item-5.jpg" class="img-fluid rounded-circle" style="width: 60px; height: 60px;" alt="Digestive Blend">
+                                        </div>
+                                    </th>
+                                    <td class="py-4">Digestive Blend</td>
+                                    <td class="py-4">120.00 EGP</td>
+                                    <td class="py-4">1</td>
+                                    <td class="py-4">120.00 EGP</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row"></th>
+                                    <td class="py-4"></td>
+                                    <td class="py-4"></td>
+                                    <td class="py-4">
+                                        <p class="mb-0 text-dark py-2 fw-semibold">Subtotal</p>
+                                    </td>
+                                    <td class="py-4">
+                                        <div class="py-2">
+                                            <p class="mb-0 text-dark">165.00 EGP</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row"></th>
+                                    <td class="py-4"></td>
+                                    <td class="py-4"></td>
+                                    <td class="py-4">
+                                        <p class="mb-0 text-dark py-2 fw-semibold">Shipping</p>
+                                    </td>
+                                    <td class="py-4">
+                                        <div class="py-2">
+                                            <p class="mb-0 text-dark">30.00 EGP</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row"></th>
+                                    <td class="py-4"></td>
+                                    <td class="py-4"></td>
+                                    <td class="py-4">
+                                        <p class="mb-0 text-dark text-uppercase py-3 fw-bold">TOTAL</p>
+                                    </td>
+                                    <td class="py-4">
+                                        <div class="py-3 border-bottom border-top">
+                                            <p class="mb-0 text-dark fw-bold fs-5">195.00 EGP</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="row g-4 text-center align-items-center justify-content-center border-bottom py-3">
+                        <div class="col-12">
+                            <div class="form-check text-start my-2">
+                                <input type="radio" class="form-check-input bg-primary border-0" id="Payment-COD" name="PaymentMethod" value="CashOnDelivery" checked>
+                                <label class="form-check-label fw-semibold" for="Payment-COD">Cash On Delivery (COD)</label>
+                            </div>
+                            <p class="text-start text-muted small">Pay in cash directly to the delivery representative upon inspecting the herbal products.</p>
+                        </div>
+                    </div>
+
+                    <div class="row g-4 text-center align-items-center justify-content-center border-bottom py-3">
+                        <div class="col-12">
+                            <div class="form-check text-start my-2">
+                                <input type="radio" class="form-check-input bg-primary border-0" id="Payment-Card" name="PaymentMethod" value="OnlineCard">
+                                <label class="form-check-label fw-semibold" for="Payment-Card">Credit / Debit Card</label>
+                            </div>
+                            <p class="text-start text-muted small">Secure online checkout via Visa, Mastercard, or Meeza payment cards.</p>
+                        </div>
+                    </div>
+
+                    <div class="row g-4 text-center align-items-center justify-content-center pt-4">
+                        <button type="submit" class="btn border-secondary py-3 px-4 text-uppercase w-100 text-primary fw-bold">
+                            <i class="fas fa-check-circle me-2"></i>Place Order
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- Checkout Page End -->
