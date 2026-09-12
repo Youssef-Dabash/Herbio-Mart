@@ -1,0 +1,134 @@
+﻿@model IEnumerable<HerbioMart.ViewModels.Recipes.RecipeListItemVM>
+
+@{
+    var pageTitle = ViewBag.ViewTitle as string ?? "Formulated Recipes";
+    var isOwner = ViewBag.IsOwnerView as bool? ?? false;
+    ViewData["Title"] = pageTitle;
+}
+
+<!-- Single Page Header start -->
+<div class="container-fluid page-header py-5">
+    <h1 class="text-center text-white display-6">@pageTitle</h1>
+    <ol class="breadcrumb justify-content-center mb-0">
+        <li class="breadcrumb-item"><a asp-controller="Herbalist" asp-action="Index" class="text-white">Dashboard</a></li>
+        <li class="breadcrumb-item active text-white">Recipes</li>
+    </ol>
+</div>
+<!-- Single Page Header End -->
+
+<div class="container-fluid py-5">
+    <div class="container py-4">
+
+        <!-- Header Actions -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="fw-bold text-dark mb-1">@pageTitle</h3>
+                <p class="text-muted small mb-0">
+                    @(isOwner
+                        ? "Manage your copyrighted formulations and review proprietary compounding recipes."
+                        : "Browse prepared medicinal herbal remedies compounded by certified apothecaries.")
+                </p>
+            </div>
+            <!-- Top Action Button -->
+            @if (User.IsInRole("Herbalist"))
+            {
+                <a asp-controller="Recipe" asp-action="Create" class="btn btn-success rounded-pill px-4 py-2 text-white fw-bold shadow-sm">
+                    <i class="fas fa-plus me-1"></i> Formulate New Recipe
+                </a>
+            }
+        </div>
+
+        @if (!Model.Any())
+        {
+            <div class="card border-0 shadow-sm rounded-4 p-5 text-center bg-white">
+                <i class="fas fa-mortar-pestle fa-4x text-muted mb-3"></i>
+                <h4 class="fw-bold text-dark">No Formulations Available</h4>
+                <p class="text-muted mb-4">No therapeutic blends matching this criteria yet.</p>
+                @if (User.IsInRole("Herbalist"))
+                {
+                    <div class="d-flex justify-content-center">
+                        <a asp-controller="Recipe" asp-action="Create" class="btn btn-success rounded-pill px-4 py-2">
+                            Create First Recipe
+                        </a>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="row g-4">
+                @foreach (var item in Model)
+                {
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card border-0 shadow-sm rounded-4 p-4 h-100 bg-white d-flex flex-column position-relative border-top border-4 border-success">
+
+                            <!-- Top: Author & Rating -->
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge bg-light text-secondary border rounded-pill px-3 py-1 small">
+                                    <i class="fas fa-user-check text-success me-1"></i> @item.HerbalistName
+                                </span>
+                                <div class="d-flex align-items-center text-warning small">
+                                    <i class="fas fa-star me-1"></i>
+                                    <strong class="text-dark">@item.AverageRating.ToString("0.0")</strong>
+                                    <span class="text-muted ms-1 small">(@item.TotalRatings)</span>
+                                </div>
+                            </div>
+
+                            <!-- Title -->
+                            <h5 class="fw-bold text-dark my-2" style="min-height: 48px; line-height: 1.4;">
+                                @item.RecipeName
+                            </h5>
+
+                            <!-- Targeted Diseases Badges -->
+                            <div class="mb-3">
+                                <small class="text-muted fw-semibold d-block mb-1">
+                                    <i class="fas fa-heartbeat text-danger me-1"></i> Indicated For:
+                                </small>
+                                <div class="d-flex flex-wrap gap-1" style="min-height: 32px;">
+                                    @foreach (var condition in item.TargetedDiseases)
+                                    {
+                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2 py-1 small fw-normal">
+                                            @condition
+                                        </span>
+                                    }
+                                </div>
+                            </div>
+
+                            <!-- Ingredients Counter (Without exposing the quantities) -->
+                            <div class="text-muted small mb-4">
+                                <i class="fas fa-leaf text-success me-1"></i> Proprietary blend of <strong>@item.IngredientsCount</strong> medicinal herbs
+                            </div>
+
+                            <!-- Bottom Row: Price & Conditional Action -->
+                            <!-- Bottom Row: Price & Role-based Action -->
+                            <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center">
+                                <div>
+                                    <small class="text-muted d-block" style="font-size: 0.75rem;">PRICE</small>
+                                    <span class="fw-bold text-success fs-5">@item.Price.ToString("N2") <small class="fs-6">EGP</small></span>
+                                </div>
+
+                                @if (User.IsInRole("Herbalist"))
+                                {
+                                    <a asp-controller="Recipe" asp-action="Details" asp-route-id="@item.RecipeId" class="btn btn-outline-success rounded-pill px-4 py-2 fw-bold btn-sm shadow-sm">
+                                        <i class="fas fa-eye me-1"></i> View Details
+                                    </a>
+                                }
+                                else
+                                {
+                                    <form asp-controller="Cart" asp-action="AddToCart" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="recipeId" value="@item.RecipeId" />
+                                        <button type="submit" class="btn btn-success rounded-pill px-4 py-2 fw-bold btn-sm shadow-sm text-white">
+                                            <i class="fas fa-shopping-basket me-1"></i> Add to Cart
+                                        </button>
+                                    </form>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
+    </div>
+</div>

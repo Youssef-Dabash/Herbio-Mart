@@ -1,0 +1,153 @@
+﻿@model HerbioMart.ViewModels.Recipes.RecipeDetailsVM
+
+@{
+    ViewData["Title"] = $"{Model.RecipeName} - Formulation Details";
+}
+
+<!-- Single Page Header start -->
+<div class="container-fluid page-header py-5">
+    <h1 class="text-center text-white display-6">Therapeutic Formulation</h1>
+    <ol class="breadcrumb justify-content-center mb-0">
+        <li class="breadcrumb-item"><a asp-controller="Herbalist" asp-action="Index" class="text-white">Dashboard</a></li>
+        <li class="breadcrumb-item"><a asp-controller="Recipe" asp-action="MyRecipes" class="text-white">My Recipes</a></li>
+        <li class="breadcrumb-item active text-white">Formulation Details</li>
+    </ol>
+</div>
+<!-- Single Page Header End -->
+
+<div class="container-fluid py-5">
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white">
+
+                    <!-- Header Section: Title, Author, Price & Rating -->
+                    <div class="d-flex flex-wrap justify-content-between align-items-start pb-4 mb-4 border-bottom gap-3">
+                        <div>
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <span class="badge bg-success-subtle text-success border border-success px-3 py-1 rounded-pill fw-bold">
+                                    <i class="fas fa-shield-alt me-1"></i> Proprietary Master Formulation
+                                </span>
+                                <div class="text-warning small ms-2">
+                                    <i class="fas fa-star"></i>
+                                    <strong class="text-dark">@Model.AverageRating.ToString("0.0")</strong>
+                                    <span class="text-muted">(@Model.TotalRatings reviews)</span>
+                                </div>
+                            </div>
+                            <h2 class="fw-bold text-dark mb-1">@Model.RecipeName</h2>
+                            <small class="text-muted">
+                                Compounded by: <span class="fw-bold text-dark">@Model.HerbalistName</span> • Published on @Model.CreatedDate.ToString("MMMM dd, yyyy")
+                            </small>
+                        </div>
+                        <div class="text-md-end">
+                            <span class="text-muted small d-block">Retail Price</span>
+                            <h3 class="fw-bold text-success mb-2">@Model.Price.ToString("N2") EGP</h3>
+                            <a asp-controller="Recipe" asp-action="MyRecipes" class="btn btn-outline-secondary rounded-pill px-4 btn-sm">
+                                <i class="fas fa-arrow-left me-1"></i> Back to Recipes
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Targeted Conditions -->
+                    <div class="mb-5">
+                        <h6 class="fw-bold text-dark text-uppercase small tracking-wide mb-3">
+                            <i class="fas fa-heartbeat text-danger me-1"></i> Targeted Health Conditions
+                        </h6>
+                        <div class="d-flex flex-wrap gap-2">
+                            @if (Model.TargetedDiseases != null && Model.TargetedDiseases.Any())
+                            {
+                                foreach (var condition in Model.TargetedDiseases)
+                                {
+                                    <span class="badge bg-light text-dark border px-3 py-2 rounded-pill fs-6 fw-normal shadow-sm">
+                                        <i class="fas fa-check-circle text-success me-1"></i> @condition
+                                    </span>
+                                }
+                            }
+                            else
+                            {
+                                <span class="text-muted small">No specific disease linked.</span>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Ingredients Table (Secret Proportions Protected) -->
+                    <div class="mb-5">
+                        <h5 class="fw-bold text-dark mb-3">
+                            <i class="fas fa-mortar-pestle text-success me-2"></i> Botanical Specimen Composition
+                        </h5>
+                        <div class="card border rounded-4 overflow-hidden shadow-sm">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th class="ps-4" style="width: 90px;">Specimen</th>
+                                            <th>Botanical Herb</th>
+                                            <th>Scientific Name (Latin)</th>
+                                            <th class="text-end pe-4">Catalog Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (Model.Ingredients != null && Model.Ingredients.Any())
+                                        {
+                                            foreach (var ing in Model.Ingredients)
+                                            {
+                                                <tr>
+                                                    <td class="ps-4">
+                                                        <img src="@ing.ImageURL" class="rounded-3 border shadow-sm" style="width: 50px; height: 50px; object-fit: cover;" alt="@ing.HerbName" />
+                                                    </td>
+                                                    <td>
+                                                        <span class="fw-bold text-dark">@ing.HerbName</span>
+                                                    </td>
+                                                    <td>
+                                                        <span class="font-monospace text-primary small"><em>@ing.ScientificName</em></span>
+                                                    </td>
+                                                    <td class="text-end pe-4">
+                                                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1 small">
+                                                            <i class="fas fa-check me-1"></i> Active Compound
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <tr>
+                                                <td colspan="4" class="text-center text-muted py-4">No ingredients linked to this recipe.</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Clinical Description & Preparation Instructions -->
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="bg-light rounded-4 p-4 h-100 border">
+                                <h6 class="fw-bold text-dark mb-2">
+                                    <i class="fas fa-info-circle text-primary me-2"></i> Clinical Rationale & Purpose
+                                </h6>
+                                <p class="text-muted small mb-0" style="line-height: 1.7;">
+                                    @Model.Description
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="bg-light rounded-4 p-4 h-100 border border-success-subtle">
+                                <h6 class="fw-bold text-success mb-2">
+                                    <i class="fas fa-prescription text-success me-2"></i> Preparation & Patient Instructions
+                                </h6>
+                                <p class="text-dark small mb-0" style="line-height: 1.7;">
+                                    @Model.Instructions
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,109 @@
+﻿@model HerbioMart.ViewModels.Herbalist.CreateHerbVM
+
+@{
+    ViewData["Title"] = "Register Botanical Herb";
+}
+
+<!-- Single Page Header start -->
+<div class="container-fluid page-header py-5">
+    <h1 class="text-center text-white display-6">Register New Herb</h1>
+    <ol class="breadcrumb justify-content-center mb-0">
+        <li class="breadcrumb-item"><a asp-controller="Herbalist" asp-action="Index" class="text-white">Dashboard</a></li>
+        <li class="breadcrumb-item active text-white">Botanical Registration</li>
+    </ol>
+</div>
+<!-- Single Page Header End -->
+
+<div class="container-fluid py-5">
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white">
+                    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+                        <div>
+                            <h3 class="fw-bold text-dark mb-1">New Botanical Entry</h3>
+                            <p class="text-muted small mb-0">Single global entry verified via Latin taxonomy to prevent catalog duplication.</p>
+                        </div>
+                        <a asp-controller="Herbalist" asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">
+                            <i class="fas fa-arrow-left me-1"></i> Hub
+                        </a>
+                    </div>
+
+                    <form asp-controller="Herb" asp-action="Create" method="post" enctype="multipart/form-data">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small mb-4" role="alert"></div>
+
+                        <div class="row g-4">
+                            <!-- Herb Common Name -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold text-secondary small">Common Local Name</label>
+                                <input asp-for="HerbName" class="form-control rounded-pill py-2 px-3 border" placeholder="e.g. German Chamomile" />
+                                <span asp-validation-for="HerbName" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Scientific Name -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold text-secondary small">Scientific Botanical Name (Latin)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0 rounded-start-pill text-muted">
+                                        <i class="fas fa-dna text-primary"></i>
+                                    </span>
+                                    <input asp-for="ScientificName" class="form-control rounded-end-pill py-2 px-3 border border-start-0 font-monospace" placeholder="e.g. Matricaria chamomilla" />
+                                </div>
+                                <span asp-validation-for="ScientificName" class="text-danger small fw-bold"></span>
+                            </div>
+
+                            <!-- Herb Image File -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold text-secondary small">Botanical Specimen Image</label>
+                                <input asp-for="ImageFile" type="file" accept="image/*" class="form-control rounded-pill py-2 px-3 border" />
+                                <span asp-validation-for="ImageFile" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Description -->
+                            <div class="col-12">
+                                <label class="form-label fw-semibold text-secondary small">Plant Description & Habitat</label>
+                                <textarea asp-for="Description" class="form-control rounded-4 p-3 border" rows="3" placeholder="General botanical description, habitat, physical form..."></textarea>
+                                <span asp-validation-for="Description" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Medical Benefits -->
+                            <div class="col-12">
+                                <label class="form-label fw-semibold text-secondary small">Therapeutic Efficacy & Clinical Benefits</label>
+                                <textarea asp-for="Benefits" class="form-control rounded-4 p-3 border" rows="3" placeholder="Documented healing effects, primary medical indications..."></textarea>
+                                <span asp-validation-for="Benefits" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Safe Dosage -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold text-secondary small">Recommended Daily Dosage & Preparation</label>
+                                <textarea asp-for="Dosage" class="form-control rounded-4 p-3 border" rows="3" placeholder="Infusion ratio, steeping time, max daily consumption..."></textarea>
+                                <span asp-validation-for="Dosage" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Contraindications -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold text-danger small">
+                                    <i class="fas fa-exclamation-triangle me-1"></i> Contraindications & Cautions
+                                </label>
+                                <textarea asp-for="Warnings" class="form-control rounded-4 p-3 border border-warning" rows="3" placeholder="Drug interactions, chronic cautions, pregnancy warnings..."></textarea>
+                                <span asp-validation-for="Warnings" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="col-12 text-end mt-4">
+                                <button type="submit" class="btn btn-primary rounded-pill px-5 py-3 text-white fw-bold shadow-sm">
+                                    <i class="fas fa-check-circle me-2"></i> Submit & Register Specimen
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

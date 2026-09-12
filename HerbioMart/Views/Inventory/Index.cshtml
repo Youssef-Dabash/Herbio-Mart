@@ -1,0 +1,162 @@
+﻿@model IEnumerable<HerbioMart.ViewModels.Inventory.InventoryItemVM>
+
+@{
+    ViewData["Title"] = "My Herbal Stock & Pricing";
+}
+
+<!-- Single Page Header start -->
+<div class="container-fluid page-header py-5">
+    <h1 class="text-center text-white display-6">My Store Inventory</h1>
+    <ol class="breadcrumb justify-content-center mb-0">
+        <li class="breadcrumb-item"><a asp-controller="Herbalist" asp-action="Index" class="text-white">Dashboard</a></li>
+        <li class="breadcrumb-item active text-white">Stock Management</li>
+    </ol>
+</div>
+<!-- Single Page Header End -->
+
+<div class="container-fluid py-5">
+    <div class="container py-4">
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show rounded-4 mb-4" role="alert">
+                <i class="fas fa-check-circle me-2"></i> @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show rounded-4 mb-4" role="alert">
+                <i class="fas fa-exclamation-triangle me-2"></i> @TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="fw-bold text-dark mb-1">Stocked Botanical Herbs</h3>
+                <p class="text-muted small mb-0">Manage retail pricing per kilogram and instant availability for items in your apothecary.</p>
+            </div>
+            <a asp-controller="Inventory" asp-action="Add" class="btn btn-primary rounded-pill px-4 py-2 text-white fw-bold shadow-sm">
+                <i class="fas fa-plus me-1"></i> Stock An Herb From Catalog
+            </a>
+        </div>
+
+        @if (!Model.Any())
+        {
+            <div class="card border-0 shadow-sm rounded-4 p-5 text-center bg-white">
+                <i class="fas fa-boxes fa-4x text-muted mb-3"></i>
+                <h4 class="fw-bold text-dark">Your Inventory is Empty</h4>
+                <p class="text-muted mb-4">You haven't added any medicinal herbs to your retail stock yet.</p>
+                <div class="d-flex justify-content-center">
+                    <a asp-controller="Inventory" asp-action="Add" class="btn btn-primary rounded-pill px-4 py-2">
+                        Browse & Stock Herbs
+                    </a>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4">Specimen</th>
+                                <th>Herb Name</th>
+                                <th>Scientific Name</th>
+                                <th>Selling Price (Per 1 Kg)</th>
+                                <th>Availability</th>
+                                <th class="text-end pe-4">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="ps-4">
+                                        <img src="@item.ImageURL" class="rounded-3 shadow-sm border" style="width: 55px; height: 55px; object-fit: cover;" alt="@item.HerbName" />
+                                    </td>
+                                    <td>
+                                        <span class="fw-bold text-dark">@item.HerbName</span>
+                                    </td>
+                                    <td>
+                                        <span class="font-monospace text-primary small"><em>@item.ScientificName</em></span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-success-subtle text-success border border-success px-3 py-2 rounded-pill fw-bold">
+                                            @item.Price.ToString("N2") EGP / kg
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <form asp-controller="Inventory" asp-action="ToggleStatus" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="herbId" value="@item.HerbId" />
+                                            @if (item.IsActive)
+                                            {
+                                                <button type="submit" class="btn btn-sm btn-outline-success rounded-pill px-3" title="Click to hide from store">
+                                                    <i class="fas fa-check-circle me-1"></i> Active
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <button type="submit" class="btn btn-sm btn-outline-secondary rounded-pill px-3" title="Click to show in store">
+                                                    <i class="fas fa-eye-slash me-1"></i> Hidden
+                                                </button>
+                                            }
+                                        </form>
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <!-- Edit Price Trigger -->
+                                        <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3 me-1"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#editPriceModal-@item.HerbId">
+                                            <i class="fas fa-edit me-1"></i> Price
+                                        </button>
+
+                                        <!-- Remove Trigger -->
+                                        <form asp-controller="Inventory" asp-action="Remove" method="post" class="d-inline" onsubmit="return confirm('Remove this herb from your active store inventory?');">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="herbId" value="@item.HerbId" />
+                                            <button type="submit" class="btn btn-outline-danger btn-sm rounded-circle p-2" title="Delete from inventory">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </form>
+
+                                        <!-- Price Edit Modal -->
+                                        <div class="modal fade" id="editPriceModal-@item.HerbId" tabindex="-1" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered modal-sm">
+                                                <div class="modal-content rounded-4 border-0 shadow">
+                                                    <form asp-controller="Inventory" asp-action="UpdateItem" method="post">
+                                                        @Html.AntiForgeryToken()
+                                                        <input type="hidden" name="HerbId" value="@item.HerbId" />
+                                                        <input type="hidden" name="IsActive" value="@item.IsActive.ToString().ToLower()" />
+                                                        <div class="modal-header border-0 pb-0">
+                                                            <h6 class="modal-title fw-bold">Edit Retail Price (Per Kg)</h6>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                        </div>
+                                                        <div class="modal-body text-start">
+                                                            <p class="text-muted small mb-2">@item.HerbName</p>
+                                                            <div class="input-group">
+                                                                <input type="number" step="1" min="1" name="Price" value="@item.Price" class="form-control rounded-start-pill py-2 px-3 border border-end-0" />
+                                                                <span class="input-group-text bg-light rounded-end-pill text-muted fw-bold">EGP / kg</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer border-0 pt-0">
+                                                            <button type="submit" class="btn btn-primary rounded-pill w-100 fw-bold">Update</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+
+    </div>
+</div>

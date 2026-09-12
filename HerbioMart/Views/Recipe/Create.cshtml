@@ -1,0 +1,232 @@
+﻿@model HerbioMart.ViewModels.Recipes.CreateRecipeVM
+
+@{
+    ViewData["Title"] = "Formulate Medicinal Recipe";
+}
+
+<!-- Single Page Header start -->
+<div class="container-fluid page-header py-5">
+    <h1 class="text-center text-white display-6">Formulate New Recipe</h1>
+    <ol class="breadcrumb justify-content-center mb-0">
+        <li class="breadcrumb-item"><a asp-controller="Herbalist" asp-action="Index" class="text-white">Dashboard</a></li>
+        <li class="breadcrumb-item active text-white">Compound Recipe</li>
+    </ol>
+</div>
+<!-- Single Page Header End -->
+
+<div class="container-fluid py-5">
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white">
+                    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+                        <div>
+                            <h3 class="fw-bold text-dark mb-1">Botanical Compounding</h3>
+                            <p class="text-muted small mb-0">Combine registered herbs with measured dosages to treat designated health conditions.</p>
+                        </div>
+                        <a asp-controller="Herbalist" asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">
+                            <i class="fas fa-arrow-left me-1"></i> Dashboard
+                        </a>
+                    </div>
+
+                    <form asp-controller="Recipe" asp-action="Create" method="post" id="recipeForm">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small mb-4" role="alert"></div>
+
+                        <div class="row g-4">
+                            <!-- Recipe Name -->
+                            <div class="col-md-8">
+                                <label class="form-label fw-semibold text-secondary small">Recipe Commercial Name</label>
+                                <input asp-for="RecipeName" class="form-control rounded-pill py-2 px-3 border" placeholder="e.g. Soothing Digestive & IBS Relief Tea" />
+                                <span asp-validation-for="RecipeName" class="text-danger small fw-bold"></span>
+                            </div>
+
+                            <!-- Retail Price -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold text-secondary small">Formulation Price (EGP)</label>
+                                <div class="input-group">
+                                    <input asp-for="Price" type="number" step="0.5" class="form-control rounded-start-pill py-2 px-3 border border-end-0" placeholder="0.00" />
+                                    <span class="input-group-text bg-light rounded-end-pill text-muted fw-bold">EGP</span>
+                                </div>
+                                <span asp-validation-for="Price" class="text-danger small fw-bold"></span>
+                            </div>
+
+                            <!-- Targeted Conditions Section (Dynamic Rows Like Herbs) -->
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <label class="form-label fw-semibold text-secondary small mb-0">
+                                        <i class="fas fa-notes-medical text-danger me-1"></i> Targeted Health Conditions
+                                    </label>
+                                    <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3" onclick="addDiseaseRow()">
+                                        <i class="fas fa-plus me-1"></i> Add Another Condition
+                                    </button>
+                                </div>
+
+                                <div id="diseasesContainer" class="d-flex flex-column gap-3">
+                                    @for (int i = 0; i < (Model.SelectedDiseaseIds.Any() ? Model.SelectedDiseaseIds.Count : 1); i++)
+                                    {
+                                        var selectedVal = Model.SelectedDiseaseIds.ElementAtOrDefault(i);
+                                        <div class="row g-2 align-items-center disease-row bg-light p-3 rounded-4 border">
+                                            <div class="col-11">
+                                                <select name="SelectedDiseaseIds[@i]" class="form-select rounded-pill py-2 px-3 border disease-select">
+                                                    <option value="">-- Choose Targeted Condition / Disease --</option>
+                                                    @foreach (var disease in Model.AvailableDiseases)
+                                                    {
+                                                        <option value="@disease.Value" selected="@(disease.Value == selectedVal.ToString() ? "selected" : null)">
+                                                            @disease.Text
+                                                        </option>
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div class="col-1 text-end">
+                                                <button type="button" class="btn btn-outline-danger btn-sm rounded-circle p-2" onclick="removeDiseaseRow(this)">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                                <span asp-validation-for="SelectedDiseaseIds" class="text-danger small fw-bold"></span>
+                            </div>
+
+                            <!-- Recipe Herb Ingredients Section -->
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <label class="form-label fw-semibold text-secondary small mb-0">
+                                        <i class="fas fa-mortar-pestle text-success me-1"></i> Botanical Ingredients & Dosages (Grams)
+                                    </label>
+                                    <button type="button" class="btn btn-outline-success btn-sm rounded-pill px-3" onclick="addHerbRow()">
+                                        <i class="fas fa-plus me-1"></i> Add Another Herb
+                                    </button>
+                                </div>
+
+                                <div id="herbsContainer" class="d-flex flex-column gap-3">
+                                    @for (int i = 0; i < Model.Herbs.Count; i++)
+                                    {
+                                        <div class="row g-2 align-items-center herb-row bg-light p-3 rounded-4 border">
+                                            <div class="col-md-7">
+                                                <select name="Herbs[@i].HerbId" class="form-select rounded-pill py-2 px-3 border herb-select">
+                                                    <option value="">-- Choose Herb Specimen --</option>
+                                                    @foreach (var herb in Model.AvailableHerbs)
+                                                    {
+                                                        <option value="@herb.Value" selected="@(herb.Value == Model.Herbs[i].HerbId.ToString() ? "selected" : null)">
+                                                            @herb.Text
+                                                        </option>
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="input-group">
+                                                    <input type="number" step="0.5" name="Herbs[@i].Quantity" value="@Model.Herbs[i].Quantity" class="form-control rounded-start-pill py-2 px-3 border border-end-0" placeholder="Weight" />
+                                                    <span class="input-group-text bg-white rounded-end-pill text-muted small fw-bold">Grams</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-1 text-end">
+                                                <button type="button" class="btn btn-outline-danger btn-sm rounded-circle p-2" onclick="removeHerbRow(this)">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                                <span asp-validation-for="Herbs" class="text-danger small fw-bold"></span>
+                            </div>
+
+                            <!-- Instructions -->
+                            <div class="col-12">
+                                <label class="form-label fw-semibold text-secondary small">Preparation & Patient Instructions</label>
+                                <textarea asp-for="Instructions" class="form-control rounded-4 p-3 border" rows="3" placeholder="Step-by-step blending and preparation instructions, boiling ratio, intake frequency..."></textarea>
+                                <span asp-validation-for="Instructions" class="text-danger small fw-bold"></span>
+                            </div>
+
+                            <!-- Description -->
+                            <div class="col-12">
+                                <label class="form-label fw-semibold text-secondary small">Clinical Benefits & Description</label>
+                                <textarea asp-for="Description" class="form-control rounded-4 p-3 border" rows="3" placeholder="Summary of intended health outcomes, synergistic interactions of ingredients..."></textarea>
+                                <span asp-validation-for="Description" class="text-danger small fw-bold"></span>
+                            </div>
+
+                            <!-- Submit -->
+                            <div class="col-12 text-end mt-4">
+                                <button type="submit" class="btn btn-success rounded-pill px-5 py-3 text-white fw-bold shadow-sm">
+                                    <i class="fas fa-check-circle me-2"></i> Register & Publish Formulation
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // --- Herbs Dynamic Rows ---
+        function addHerbRow() {
+            const container = document.getElementById('herbsContainer');
+            const index = container.querySelectorAll('.herb-row').length;
+            const firstRow = container.querySelector('.herb-row');
+            const newRow = firstRow.cloneNode(true);
+
+            const select = newRow.querySelector('select');
+            select.name = `Herbs[${index}].HerbId`;
+            select.selectedIndex = 0;
+
+            const input = newRow.querySelector('input');
+            input.name = `Herbs[${index}].Quantity`;
+            input.value = '';
+
+            container.appendChild(newRow);
+        }
+
+        function removeHerbRow(button) {
+            const container = document.getElementById('herbsContainer');
+            const rows = container.querySelectorAll('.herb-row');
+            if (rows.length > 1) {
+                button.closest('.herb-row').remove();
+                reindexHerbRows();
+            }
+        }
+
+        function reindexHerbRows() {
+            const container = document.getElementById('herbsContainer');
+            const rows = container.querySelectorAll('.herb-row');
+            rows.forEach((row, i) => {
+                row.querySelector('select').name = `Herbs[${i}].HerbId`;
+                row.querySelector('input').name = `Herbs[${i}].Quantity`;
+            });
+        }
+
+        // --- Diseases Dynamic Rows ---
+        function addDiseaseRow() {
+            const container = document.getElementById('diseasesContainer');
+            const index = container.querySelectorAll('.disease-row').length;
+            const firstRow = container.querySelector('.disease-row');
+            const newRow = firstRow.cloneNode(true);
+
+            const select = newRow.querySelector('select');
+            select.name = `SelectedDiseaseIds[${index}]`;
+            select.selectedIndex = 0;
+
+            container.appendChild(newRow);
+        }
+
+        function removeDiseaseRow(button) {
+            const container = document.getElementById('diseasesContainer');
+            const rows = container.querySelectorAll('.disease-row');
+            if (rows.length > 1) {
+                button.closest('.disease-row').remove();
+                reindexDiseaseRows();
+            }
+        }
+
+        function reindexDiseaseRows() {
+            const container = document.getElementById('diseasesContainer');
+            const rows = container.querySelectorAll('.disease-row');
+            rows.forEach((row, i) => {
+                row.querySelector('select').name = `SelectedDiseaseIds[${i}]`;
+            });
+        }
+    </script>
+}
