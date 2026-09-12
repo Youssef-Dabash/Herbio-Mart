@@ -10,7 +10,11 @@ public class DiseaseProfile : Profile
     {
         // Map from database entity to client ViewModel
         CreateMap<Disease, DiseaseVM>();
-
+        CreateMap<CreateDiseaseVM, Disease>()
+                .ForMember(dest => dest.DiseaseName, opt => opt.MapFrom(src => src.DiseaseName.Trim()))
+                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description.Trim()))
+                .ForMember(dest => dest.Symptoms, opt => opt.MapFrom(src => src.Symptoms.Trim()))
+                .ForMember(dest => dest.DiseaseId, opt => opt.Ignore());
 
     }
 }

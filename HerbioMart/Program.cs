@@ -17,6 +17,9 @@ public class Program
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
         builder.Services.AddScoped<IDiseaseService, DiseaseService>();
+        builder.Services.AddScoped<IHerbService, HerbService>();
+        builder.Services.AddScoped<IRecipeService, RecipeService>();
+        builder.Services.AddScoped<IInventoryService, InventoryService>();
 
         var app = builder.Build();
 
