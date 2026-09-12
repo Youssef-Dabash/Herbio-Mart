@@ -1,0 +1,46 @@
+﻿@{
+    ViewData["Title"] = "Patient Portal";
+    var username = User.Identity?.Name;
+    var fullName = User.FindFirst("FullName")?.Value ?? username;
+}
+
+<!-- Single Page Header start -->
+<div class="container-fluid page-header py-5">
+    <h1 class="text-center text-white display-6">Patient Portal</h1>
+    <ol class="breadcrumb justify-content-center mb-0">
+        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-white">Home</a></li>
+        <li class="breadcrumb-item active text-white">Patient Profile</li>
+    </ol>
+</div>
+<!-- Single Page Header End -->
+
+<div class="container-fluid py-5">
+    <div class="container py-5">
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm rounded-4 p-4 text-center bg-white">
+                    <div class="mb-3 text-primary">
+                        <i class="fas fa-user-circle fa-6x"></i>
+                    </div>
+                    <h4 class="fw-bold text-dark mb-1">@fullName</h4>
+                    <p class="text-muted small mb-2">@@@username</p>
+                    <span class="badge bg-light text-primary border border-primary px-3 py-2 rounded-pill mb-3">Registered Patient</span>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+                    <h5 class="fw-bold text-dark mb-3">Quick Actions</h5>
+                    <div class="d-flex flex-wrap gap-3">
+                        <a asp-controller="Shop" asp-action="Index" class="btn btn-primary rounded-pill px-4 py-2">
+                            <i class="fas fa-leaf me-1"></i> Browse Remedies
+                        </a>
+                        <a asp-controller="Cart" asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4 py-2">
+                            <i class="fas fa-shopping-cart me-1"></i> Open Cart
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
