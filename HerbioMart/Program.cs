@@ -30,6 +30,8 @@ public class Program
         builder.Services.AddScoped<IHerbService, HerbService>();
         builder.Services.AddScoped<IRecipeService, RecipeService>();
         builder.Services.AddScoped<IInventoryService, InventoryService>();
+        builder.Services.AddScoped<IShopService, ShopService>();
+        builder.Services.AddScoped<IPatientProfileService, PatientProfileService>();
 
         var app = builder.Build();
 

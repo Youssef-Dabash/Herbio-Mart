@@ -1,12 +1,25 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
-namespace HerbioMart.Controllers;
+﻿namespace HerbioMart.Controllers;
+using HerbioMart.Services.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 
 public class ShopController : Controller
 {
-    // عرض كاتالوج الأعشاب والوصفات
-    public IActionResult Index() => View();
+    private readonly IShopService _shopService;
 
-    // تفاصيل العشب أو الوصفة
-    public IActionResult Details(int? id) => View();
+    public ShopController(IShopService shopService)
+    {
+        _shopService = shopService;
+    }
+
+    public async Task<IActionResult> Index(string? searchQuery, string? disease, string? sortBy)
+    {
+        var viewModel = await _shopService.GetCatalogAsync(searchQuery, disease, sortBy);
+        return View(viewModel);
+    }
+
+    public IActionResult Details(int? id, string type = "Herb")
+    {
+        if (id == null) return NotFound();
+        return View();
+    }
 }

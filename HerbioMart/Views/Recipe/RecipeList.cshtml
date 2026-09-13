@@ -52,7 +52,7 @@
                         </a>
                     </div>
                 }
-            </div>
+            </div> 
         }
         else
         {
@@ -115,7 +115,7 @@
                                 }
                                 else
                                 {
-                                    <form asp-controller="Cart" asp-action="AddToCart" method="post" class="d-inline">
+                                    <form asp-controller="Cart" asp-action="Index" method="post" class="d-inline">
                                         @Html.AntiForgeryToken()
                                         <input type="hidden" name="recipeId" value="@item.RecipeId" />
                                         <button type="submit" class="btn btn-success rounded-pill px-4 py-2 fw-bold btn-sm shadow-sm text-white">

@@ -16,11 +16,11 @@ namespace HerbioMart.Services.Implementations
             _context = context;
         }
 
-        public async Task<PatientProfileVM?> GetProfileAsync(int patientId)
+        public async Task<PatientProfileVM?> GetProfileAsync(int userId)
         {
             var patient = await _context.Patients
                 .Include(p => p.User)
-                .FirstOrDefaultAsync(p => p.PatientId == patientId);
+                .FirstOrDefaultAsync(p => p.UserId == userId);
 
             if (patient == null || patient.User == null)
                 return null;
@@ -33,15 +33,37 @@ namespace HerbioMart.Services.Implementations
                 Phone = patient.User.Phone,
                 Address = $"{patient.User.Street}, {patient.User.City}, {patient.User.Governorate}",
                 BirthDate = patient.BirthDate,
-                Gender = patient.Gender.ToString() 
+                Gender = patient.Gender.ToString()
             };
         }
 
-        public async Task<bool> UpdateProfileAsync(EditPatientProfileVM model, int patientId)
+        public async Task<EditPatientProfileVM?> GetProfileForEditAsync(int userId)
         {
             var patient = await _context.Patients
                 .Include(p => p.User)
-                .FirstOrDefaultAsync(p => p.PatientId == patientId);
+                .FirstOrDefaultAsync(p => p.UserId == userId);
+
+            if (patient == null || patient.User == null)
+                return null;
+
+            return new EditPatientProfileVM
+            {
+                FullName = patient.User.FullName,
+                Phone = patient.User.Phone,
+                Street = patient.User.Street,
+                City = patient.User.City,
+                Governorate = patient.User.Governorate,
+                BirthDate = patient.BirthDate,
+                Gender = patient.Gender.ToString()
+            };
+        }
+
+        public async Task<bool> UpdateProfileAsync(EditPatientProfileVM model, int userId)
+        {
+            // Lookup using UserId from authentication claims
+            var patient = await _context.Patients
+                .Include(p => p.User)
+                .FirstOrDefaultAsync(p => p.UserId == userId);
 
             if (patient == null || patient.User == null)
                 return false;
@@ -52,7 +74,6 @@ namespace HerbioMart.Services.Implementations
             patient.User.City = model.City;
             patient.User.Governorate = model.Governorate;
 
-            
             if (model.BirthDate.HasValue)
             {
                 patient.BirthDate = model.BirthDate.Value;
@@ -70,11 +91,11 @@ namespace HerbioMart.Services.Implementations
             return true;
         }
 
-        public async Task<bool> DeleteAccountAsync(int patientId)
+        public async Task<bool> DeleteAccountAsync(int userId)
         {
             var patient = await _context.Patients
                 .Include(p => p.User)
-                .FirstOrDefaultAsync(p => p.PatientId == patientId);
+                .FirstOrDefaultAsync(p => p.UserId == userId);
 
             if (patient == null)
                 return false;

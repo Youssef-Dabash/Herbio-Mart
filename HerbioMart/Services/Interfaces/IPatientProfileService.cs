@@ -5,8 +5,9 @@ namespace HerbioMart.Services.Interfaces
 {
     public interface IPatientProfileService
     {
-        Task<PatientProfileVM?> GetProfileAsync(int patientId);
-        Task<bool> UpdateProfileAsync(EditPatientProfileVM model, int patientId);
-        Task<bool> DeleteAccountAsync(int patientId); 
+        Task<PatientProfileVM?> GetProfileAsync(int userId);
+        Task<EditPatientProfileVM?> GetProfileForEditAsync(int userId);
+        Task<bool> UpdateProfileAsync(EditPatientProfileVM model, int userId);
+        Task<bool> DeleteAccountAsync(int userId);
     }
 }

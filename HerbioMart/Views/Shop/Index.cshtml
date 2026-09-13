@@ -1,292 +1,275 @@
-﻿@{
-    ViewData["Title"] = "Remedies & Herbal Catalog";
+﻿@model HerbioMart.ViewModels.Shop.ShopIndexVM
+@{
+    ViewData["Title"] = "Herbal & Remedies Catalog";
 }
 
+<style>
+    /* Herb Card Styling */
+    .herb-card {
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+        background: #fff;
+    }
+    .herb-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    }
+    .herb-img-wrapper {
+        position: relative;
+        height: 190px;
+        overflow: hidden;
+        background-color: #f8fafc;
+    }
+    .herb-img-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+    .herb-card:hover .herb-img-wrapper img {
+        transform: scale(1.05);
+    }
+
+    /* Recipe Card Styling */
+    .recipe-card {
+        border-radius: 16px;
+        border: 1px solid #e9ecef;
+        border-top: 4px solid #198754;
+        background: #ffffff;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .recipe-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px rgba(25, 135, 84, 0.1);
+    }
+    .badge-disease {
+        border: 1px solid #f87171;
+        color: #dc2626;
+        background-color: #fef2f2;
+        font-weight: 500;
+        border-radius: 50rem;
+        padding: 0.3rem 0.75rem;
+        font-size: 0.75rem;
+    }
+</style>
+
 <!-- Single Page Header start -->
-<div class="container-fluid page-header py-5">
-    <h1 class="text-center text-white display-6">Herbal Catalog</h1>
+<div class="container-fluid page-header py-5 mb-4">
+    <h1 class="text-center text-white display-6 fw-bold">Medicinal Catalog</h1>
     <ol class="breadcrumb justify-content-center mb-0">
         <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-white">Home</a></li>
-        <li class="breadcrumb-item active text-white">Shop Catalog</li>
+        <li class="breadcrumb-item active text-white">Shop</li>
     </ol>
 </div>
 <!-- Single Page Header End -->
-<!-- Fruits Shop Start-->
-<div class="container-fluid fruite py-5">
-    <div class="container py-5">
-        <h1 class="mb-4">Natural Herbs & Formulated Remedies</h1>
-        <div class="row g-4">
-            <div class="col-lg-12">
-                <!-- Search & Sort Controls -->
-                <div class="row g-4 mb-4">
-                    <div class="col-xl-4">
-                        <form asp-controller="Shop" asp-action="Index" method="get">
-                            <div class="input-group w-100 mx-auto d-flex">
-                                <input type="search" name="searchQuery" class="form-control p-3" placeholder="Search by herb, recipe or symptom...">
-                                <button type="submit" class="input-group-text p-3 bg-primary text-white border-0"><i class="fa fa-search"></i></button>
-                            </div>
-                        </form>
+
+<div class="container py-4">
+    <!-- Top Navigation Tabs & Search Controls -->
+    <div class="row align-items-center mb-4 g-3">
+        <div class="col-lg-6">
+            <ul class="nav nav-pills p-1 bg-light rounded-pill d-inline-flex border" id="catalogTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active rounded-pill px-4 py-2 fw-semibold" id="herbs-tab" data-bs-toggle="pill" data-bs-target="#herbs-content" type="button" role="tab">
+                        <i class="fas fa-leaf text-success me-2"></i> Single Herbs (@Model.Herbs.Count)
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link rounded-pill px-4 py-2 fw-semibold" id="recipes-tab" data-bs-toggle="pill" data-bs-target="#recipes-content" type="button" role="tab">
+                        <i class="fas fa-mortar-pestle text-primary me-2"></i> Formulated Recipes (@Model.Recipes.Count)
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="d-flex gap-2 justify-content-lg-end">
+                <form asp-controller="Shop" asp-action="Index" method="get" class="d-flex flex-grow-1" style="max-width: 380px;">
+                    <div class="input-group">
+                        <input type="search" name="searchQuery" class="form-control rounded-start-pill ps-3" placeholder="Search remedies or herbs...">
+                        <button type="submit" class="btn btn-success rounded-end-pill px-3">
+                            <i class="fa fa-search"></i>
+                        </button>
                     </div>
-                    <div class="col-xl-5"></div>
-                    <div class="col-xl-3">
-                        <div class="bg-light ps-3 py-3 rounded d-flex justify-content-between align-items-center">
-                            <label for="sorting" class="mb-0 small fw-semibold">Sort By:</label>
-                            <select id="sorting" name="sortBy" class="border-0 form-select-sm bg-light me-3">
-                                <option value="latest">Latest Additions</option>
-                                <option value="popularity">Most Popular</option>
-                                <option value="priceAsc">Price: Low to High</option>
-                                <option value="priceDesc">Price: High to Low</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
+                </form>
 
-                <div class="row g-4">
-                    <!-- Sidebar Filters -->
-                    <div class="col-lg-3">
-                        <div class="row g-4">
-                            <!-- Condition / Disease Filter -->
-                            <div class="col-lg-12">
-                                <div class="mb-3">
-                                    <h4 class="fw-bold mb-3">Health Conditions</h4>
-                                    <ul class="list-unstyled fruite-categorie">
-                                        <li>
-                                            <div class="d-flex justify-content-between fruite-name">
-                                                <a asp-controller="Shop" asp-action="Index" asp-route-disease="Hypertension">
-                                                    <i class="fas fa-heartbeat me-2 text-danger"></i>Hypertension
-                                                </a>
-                                                <span>(12)</span>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <div class="d-flex justify-content-between fruite-name">
-                                                <a asp-controller="Shop" asp-action="Index" asp-route-disease="Diabetes">
-                                                    <i class="fas fa-tint me-2 text-primary"></i>Diabetes
-                                                </a>
-                                                <span>(9)</span>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <div class="d-flex justify-content-between fruite-name">
-                                                <a asp-controller="Shop" asp-action="Index" asp-route-disease="Asthma">
-                                                    <i class="fas fa-lungs me-2 text-info"></i>Asthma & Chest
-                                                </a>
-                                                <span>(6)</span>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <div class="d-flex justify-content-between fruite-name">
-                                                <a asp-controller="Shop" asp-action="Index" asp-route-disease="Digestive">
-                                                    <i class="fas fa-shield-virus me-2 text-warning"></i>IBS & Digestion
-                                                </a>
-                                                <span>(15)</span>
-                                            </div>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-
-                            <!-- Price Range Filter -->
-                            <div class="col-lg-12">
-                                <div class="mb-3">
-                                    <h4 class="mb-2 fw-bold">Max Price (EGP)</h4>
-                                    <input type="range" class="form-range w-100" id="rangeInput" name="rangeInput" min="0" max="500" value="250" oninput="amount.value=rangeInput.value">
-                                    <output id="amount" name="amount" for="rangeInput" class="fw-bold text-primary">250</output> <span>EGP</span>
-                                </div>
-                            </div>
-
-                            <!-- Remedy Classification -->
-                            <div class="col-lg-12">
-                                <div class="mb-3">
-                                    <h4 class="fw-bold mb-2">Item Type</h4>
-                                    <div class="mb-2">
-                                        <input type="radio" class="me-2" id="Type-All" name="itemType" value="All" checked>
-                                        <label for="Type-All">All Catalog</label>
-                                    </div>
-                                    <div class="mb-2">
-                                        <input type="radio" class="me-2" id="Type-Recipes" name="itemType" value="Recipes">
-                                        <label for="Type-Recipes">Formulated Recipes</label>
-                                    </div>
-                                    <div class="mb-2">
-                                        <input type="radio" class="me-2" id="Type-Herbs" name="itemType" value="SingleHerbs">
-                                        <label for="Type-Herbs">Single Herbs</label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Featured Formulations Sidebar -->
-                            <div class="col-lg-12">
-                                <h4 class="mb-3 fw-bold">Top Formulations</h4>
-                                <div class="d-flex align-items-center justify-content-start mb-3">
-                                    <div class="rounded me-4" style="width: 80px; height: 80px;">
-                                        <img src="~/img/featur-1.jpg" class="img-fluid rounded" alt="Digestive Tea">
-                                    </div>
-                                    <div>
-                                        <h6 class="mb-1">Digestive Blend</h6>
-                                        <div class="d-flex mb-1 text-primary small">
-                                            <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
-                                        </div>
-                                        <div class="d-flex">
-                                            <h6 class="fw-bold me-2">120.00 EGP</h6>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="d-flex align-items-center justify-content-start mb-3">
-                                    <div class="rounded me-4" style="width: 80px; height: 80px;">
-                                        <img src="~/img/featur-2.jpg" class="img-fluid rounded" alt="Chamomile Flowers">
-                                    </div>
-                                    <div>
-                                        <h6 class="mb-1">Raw Chamomile</h6>
-                                        <div class="d-flex mb-1 text-primary small">
-                                            <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star text-muted"></i>
-                                        </div>
-                                        <div class="d-flex">
-                                            <h6 class="fw-bold me-2">45.00 EGP</h6>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Catalog Items Grid -->
-                    <div class="col-lg-9">
-                        <div class="row g-4 justify-content-center">
-                            <!-- Card 1: Recipe -->
-                            <div class="col-md-6 col-lg-6 col-xl-4">
-                                <div class="rounded position-relative fruite-item border border-secondary h-100 d-flex flex-column">
-                                    <div class="fruite-img">
-                                        <img src="~/img/fruite-item-5.jpg" class="img-fluid w-100 rounded-top" alt="Digestive Compound">
-                                    </div>
-                                    <div class="text-white bg-secondary px-3 py-1 rounded position-absolute" style="top: 10px; left: 10px;">Recipe</div>
-                                    <div class="p-4 border-top-0 rounded-bottom d-flex flex-column flex-grow-1">
-                                        <h4>Digestive Soothe</h4>
-                                        <p class="text-muted small flex-grow-1">Compound mixture formulated for irritable bowel and stomach relief.</p>
-                                        <div class="d-flex justify-content-between align-items-center mt-3">
-                                            <p class="text-dark fs-5 fw-bold mb-0">120.00 EGP</p>
-                                            <a asp-controller="Shop" asp-action="Details" asp-route-id="1" class="btn border border-secondary rounded-pill px-3 text-primary">
-                                                <i class="fa fa-info-circle me-1 text-primary"></i> Details
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Card 2: Single Herb -->
-                            <div class="col-md-6 col-lg-6 col-xl-4">
-                                <div class="rounded position-relative fruite-item border border-secondary h-100 d-flex flex-column">
-                                    <div class="fruite-img">
-                                        <img src="~/img/fruite-item-2.jpg" class="img-fluid w-100 rounded-top" alt="Chamomile Flowers">
-                                    </div>
-                                    <div class="text-white bg-primary px-3 py-1 rounded position-absolute" style="top: 10px; left: 10px;">Single Herb</div>
-                                    <div class="p-4 border-top-0 rounded-bottom d-flex flex-column flex-grow-1">
-                                        <h4>Chamomile Pack</h4>
-                                        <p class="text-muted small flex-grow-1">Pure sun-dried organic chamomile flowers for anxiety and sleep support.</p>
-                                        <div class="d-flex justify-content-between align-items-center mt-3">
-                                            <p class="text-dark fs-5 fw-bold mb-0">45.00 EGP</p>
-                                            <a asp-controller="Shop" asp-action="Details" asp-route-id="2" class="btn border border-secondary rounded-pill px-3 text-primary">
-                                                <i class="fa fa-info-circle me-1 text-primary"></i> Details
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Card 3: Recipe -->
-                            <div class="col-md-6 col-lg-6 col-xl-4">
-                                <div class="rounded position-relative fruite-item border border-secondary h-100 d-flex flex-column">
-                                    <div class="fruite-img">
-                                        <img src="~/img/fruite-item-4.jpg" class="img-fluid w-100 rounded-top" alt="Cardio Care Blend">
-                                    </div>
-                                    <div class="text-white bg-secondary px-3 py-1 rounded position-absolute" style="top: 10px; left: 10px;">Recipe</div>
-                                    <div class="p-4 border-top-0 rounded-bottom d-flex flex-column flex-grow-1">
-                                        <h4>Cardio-Tonic Mix</h4>
-                                        <p class="text-muted small flex-grow-1">Traditional hawthorn and hibiscus mix supporting normal blood pressure.</p>
-                                        <div class="d-flex justify-content-between align-items-center mt-3">
-                                            <p class="text-dark fs-5 fw-bold mb-0">150.00 EGP</p>
-                                            <a asp-controller="Shop" asp-action="Details" asp-route-id="3" class="btn border border-secondary rounded-pill px-3 text-primary">
-                                                <i class="fa fa-info-circle me-1 text-primary"></i> Details
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Card 4: Single Herb -->
-                            <div class="col-md-6 col-lg-6 col-xl-4">
-                                <div class="rounded position-relative fruite-item border border-secondary h-100 d-flex flex-column">
-                                    <div class="fruite-img">
-                                        <img src="~/img/fruite-item-1.jpg" class="img-fluid w-100 rounded-top" alt="Ginger Root">
-                                    </div>
-                                    <div class="text-white bg-primary px-3 py-1 rounded position-absolute" style="top: 10px; left: 10px;">Single Herb</div>
-                                    <div class="p-4 border-top-0 rounded-bottom d-flex flex-column flex-grow-1">
-                                        <h4>Dried Ginger Root</h4>
-                                        <p class="text-muted small flex-grow-1">Crushed organic ginger powder for joint support and circulation.</p>
-                                        <div class="d-flex justify-content-between align-items-center mt-3">
-                                            <p class="text-dark fs-5 fw-bold mb-0">55.00 EGP</p>
-                                            <a asp-controller="Shop" asp-action="Details" asp-route-id="4" class="btn border border-secondary rounded-pill px-3 text-primary">
-                                                <i class="fa fa-info-circle me-1 text-primary"></i> Details
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Card 5: Recipe -->
-                            <div class="col-md-6 col-lg-6 col-xl-4">
-                                <div class="rounded position-relative fruite-item border border-secondary h-100 d-flex flex-column">
-                                    <div class="fruite-img">
-                                        <img src="~/img/fruite-item-3.jpg" class="img-fluid w-100 rounded-top" alt="Respiratory Blend">
-                                    </div>
-                                    <div class="text-white bg-secondary px-3 py-1 rounded position-absolute" style="top: 10px; left: 10px;">Recipe</div>
-                                    <div class="p-4 border-top-0 rounded-bottom d-flex flex-column flex-grow-1">
-                                        <h4>Chest Clarifier</h4>
-                                        <p class="text-muted small flex-grow-1">Thyme and licorice infusion for easing coughs and respiratory allergies.</p>
-                                        <div class="d-flex justify-content-between align-items-center mt-3">
-                                            <p class="text-dark fs-5 fw-bold mb-0">95.00 EGP</p>
-                                            <a asp-controller="Shop" asp-action="Details" asp-route-id="5" class="btn border border-secondary rounded-pill px-3 text-primary">
-                                                <i class="fa fa-info-circle me-1 text-primary"></i> Details
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Card 6: Single Herb -->
-                            <div class="col-md-6 col-lg-6 col-xl-4">
-                                <div class="rounded position-relative fruite-item border border-secondary h-100 d-flex flex-column">
-                                    <div class="fruite-img">
-                                        <img src="~/img/fruite-item-5.jpg" class="img-fluid w-100 rounded-top" alt="Peppermint Leaves">
-                                    </div>
-                                    <div class="text-white bg-primary px-3 py-1 rounded position-absolute" style="top: 10px; left: 10px;">Single Herb</div>
-                                    <div class="p-4 border-top-0 rounded-bottom d-flex flex-column flex-grow-1">
-                                        <h4>Peppermint Leaves</h4>
-                                        <p class="text-muted small flex-grow-1">Freshly harvested peppermint leaves for spasms and calming teas.</p>
-                                        <div class="d-flex justify-content-between align-items-center mt-3">
-                                            <p class="text-dark fs-5 fw-bold mb-0">35.00 EGP</p>
-                                            <a asp-controller="Shop" asp-action="Details" asp-route-id="6" class="btn border border-secondary rounded-pill px-3 text-primary">
-                                                <i class="fa fa-info-circle me-1 text-primary"></i> Details
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Pagination -->
-                            <div class="col-12">
-                                <div class="pagination d-flex justify-content-center mt-5">
-                                    <a asp-controller="Shop" asp-action="Index" asp-route-page="1" class="rounded">&laquo;</a>
-                                    <a asp-controller="Shop" asp-action="Index" asp-route-page="1" class="active rounded">1</a>
-                                    <a asp-controller="Shop" asp-action="Index" asp-route-page="2" class="rounded">2</a>
-                                    <a asp-controller="Shop" asp-action="Index" asp-route-page="3" class="rounded">3</a>
-                                    <a asp-controller="Shop" asp-action="Index" asp-route-page="2" class="rounded">&raquo;</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <select id="sorting" name="sortBy" class="form-select rounded-pill" style="max-width: 170px;" onchange="location.href='?sortBy='+this.value">
+                    <option value="latest">Sort: Latest</option>
+                    <option value="priceAsc">Price: Low to High</option>
+                    <option value="priceDesc">Price: High to Low</option>
+                </select>
             </div>
         </div>
     </div>
+
+    <!-- Tab Content Area -->
+    <div class="tab-content" id="catalogTabsContent">
+        
+        <!-- ======================= TAB 1: SINGLE HERBS ======================= -->
+        <div class="tab-pane fade show active" id="herbs-content" role="tabpanel">
+            <div class="mb-4">
+                <h3 class="fw-bold text-dark mb-1">Authentic Medicinal Herbs</h3>
+                <p class="text-muted small">Pure, laboratory-tested natural specimens for compounding and clinical teas.</p>
+            </div>
+
+            @if (!Model.Herbs.Any())
+            {
+                <div class="alert alert-light border text-center py-5 rounded-4">
+                    <i class="fas fa-seedling text-muted fa-3x mb-3"></i>
+                    <p class="text-muted fw-semibold">No herbs found matching your search criteria.</p>
+                </div>
+            }
+            else
+            {
+                <div class="row g-4">
+                    @foreach (var herb in Model.Herbs)
+                    {
+                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3">
+                            <div class="herb-card h-100 d-flex flex-column">
+                                <div class="herb-img-wrapper">
+                                    <img src="@herb.ImageUrl" alt="@herb.Name" />
+                                    <span class="badge bg-success position-absolute top-0 start-0 m-3 px-2 py-1 rounded-pill small shadow-sm">
+                                        <i class="fas fa-leaf me-1"></i> Herb
+                                    </span>
+                                </div>
+
+                                <div class="p-3 d-flex flex-column flex-grow-1">
+                                    <h5 class="fw-bold text-dark mb-1 text-truncate" title="@herb.Name">@herb.Name</h5>
+                                    <p class="text-muted fst-italic small mb-2 text-truncate" style="font-size: 0.8rem;">
+                                        @(string.IsNullOrWhiteSpace(herb.ScientificName) ? "Botanical specimen" : herb.ScientificName)
+                                    </p>
+
+                                    <!-- Description without any red block -->
+                                    <p class="text-muted small flex-grow-1 mb-3" style="font-size: 0.82rem; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                                        @herb.Description
+                                    </p>
+
+                                    <!-- Bottom Action Buttons (No Fixed Price) -->
+                                    <div class="d-flex gap-2 pt-2 border-top mt-auto">
+                                        <a asp-controller="Herb" asp-action="Details" asp-route-id="@herb.Id" asp-route-type="Herb" 
+                                           class="btn btn-outline-secondary rounded-pill w-50 btn-sm fw-semibold d-flex align-items-center justify-content-center gap-1">
+                                            <i class="fas fa-eye"></i> Details
+                                        </a>
+
+                                        <form asp-controller="Cart" asp-action="AddToCart" method="post" class="w-50 m-0">
+                                            <input type="hidden" name="itemId" value="@herb.Id" />
+                                            <input type="hidden" name="itemType" value="Herb" />
+                                            <input type="hidden" name="quantity" value="1" />
+                                            <button type="submit" class="btn btn-outline-success rounded-pill w-100 btn-sm fw-semibold d-flex align-items-center justify-content-center gap-1">
+                                                <i class="fas fa-shopping-basket"></i> Add
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <!-- ======================= TAB 2: FORMULATED RECIPES ======================= -->
+        <div class="tab-pane fade" id="recipes-content" role="tabpanel">
+            <div class="mb-4">
+                <h3 class="fw-bold text-dark mb-1">All Formulated Recipes</h3>
+                <p class="text-muted small">Browse prepared medicinal herbal remedies compounded by certified apothecaries.</p>
+            </div>
+
+            @if (!Model.Recipes.Any())
+            {
+                <div class="alert alert-light border text-center py-5 rounded-4">
+                    <i class="fas fa-mortar-pestle text-muted fa-3x mb-3"></i>
+                    <p class="text-muted fw-semibold">No formulated recipes found currently.</p>
+                </div>
+            }
+            else
+            {
+                <div class="row g-4">
+                    @foreach (var recipe in Model.Recipes)
+                    {
+                        <div class="col-md-6 col-lg-4">
+                            <div class="recipe-card p-4 h-100 d-flex flex-column">
+                                <!-- Top Bar: Herbalist pill & Rating -->
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <span class="badge rounded-pill bg-light text-dark border px-3 py-2 fw-normal d-flex align-items-center">
+                                        <i class="fas fa-user-check text-success me-2"></i> @recipe.HerbalistName
+                                    </span>
+                                    <div class="text-warning small d-flex align-items-center">
+                                        <i class="fas fa-star me-1"></i>
+                                        <span class="fw-bold text-dark">@recipe.Rating.ToString("0.0")</span>
+                                        <span class="text-muted ms-1">(@recipe.ReviewCount)</span>
+                                    </div>
+                                </div>
+
+                                <!-- Recipe Title -->
+                                <h4 class="fw-bold text-dark mb-3" style="font-size: 1.25rem;">
+                                    <a asp-controller="Shop" asp-action="Details" asp-route-id="@recipe.Id" asp-route-type="Recipe" class="text-dark text-decoration-none">
+                                        @recipe.Name
+                                    </a>
+                                </h4>
+
+                                <!-- Indicated Diseases List -->
+                                <div class="mb-3">
+                                    <div class="d-flex align-items-center text-danger small fw-semibold mb-2">
+                                        <i class="fas fa-heartbeat me-2"></i> Indicated For:
+                                    </div>
+                                    <div class="d-flex flex-wrap gap-1">
+                                        @if (recipe.DiseasesTreated.Any())
+                                        {
+                                            @foreach (var dis in recipe.DiseasesTreated)
+                                            {
+                                                <span class="badge-disease">@dis</span>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <span class="badge-disease">General Remedy</span>
+                                        }
+                                    </div>
+                                </div>
+
+                                <!-- Proprietary blend count -->
+                                <div class="text-muted small mb-3">
+                                    <i class="fas fa-leaf text-success me-2"></i> Proprietary blend of <strong>@(recipe.HerbsCount > 0 ? recipe.HerbsCount : 2)</strong> medicinal herbs
+                                </div>
+
+                                <!-- Brief Description -->
+                                <p class="text-muted small flex-grow-1 mb-4" style="font-size: 0.82rem; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                                    @recipe.Description
+                                </p>
+
+                                <!-- Footer: Price & Add To Cart Button -->
+                                <div class="pt-3 border-top mt-auto d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <span class="text-muted text-uppercase fw-semibold d-block" style="font-size: 0.68rem; letter-spacing: 0.5px;">PRICE</span>
+                                        <span class="fs-4 fw-bold text-dark">@recipe.Price.ToString("F2")</span>
+                                        <small class="text-muted fw-bold">EGP</small>
+                                    </div>
+
+                                    <div class="d-flex gap-2 align-items-center">
+                                        <a asp-controller="Shop" asp-action="Details" asp-route-id="@recipe.Id" asp-route-type="Recipe" 
+                                           class="btn btn-outline-secondary rounded-pill btn-sm px-2 py-2" title="Details">
+                                            <i class="fas fa-info-circle"></i>
+                                        </a>
+
+                                        <form asp-controller="Cart" asp-action="AddToCart" method="post" class="m-0">
+                                            <input type="hidden" name="itemId" value="@recipe.Id" />
+                                            <input type="hidden" name="itemType" value="Recipe" />
+                                            <input type="hidden" name="quantity" value="1" />
+                                            <button type="submit" class="btn btn-success rounded-pill px-4 py-2 text-white fw-semibold d-flex align-items-center gap-2 shadow-sm">
+                                                <i class="fas fa-shopping-basket"></i> Add to Cart
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+    </div>
 </div>
-<!-- Fruits Shop End-->

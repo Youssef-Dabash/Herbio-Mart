@@ -8,99 +8,88 @@ using HerbioMart.ViewModels.PatientProfile;
 namespace HerbioMart.Controllers
 {
     [Authorize(Roles = "Patient")]
-    public class PatientProfileController : Controller
+    public class PatientController : Controller
     {
         private readonly IPatientProfileService _profileService;
 
-        public PatientProfileController(IPatientProfileService profileService)
+        public PatientController(IPatientProfileService profileService)
         {
             _profileService = profileService;
         }
 
-        private int GetCurrentPatientId()
+        private int GetCurrentUserId()
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             return int.TryParse(userIdClaim, out var id) ? id : 0;
         }
 
-        // GET: PatientProfile/Index
+        // GET: Patient/Index
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            int patientId = GetCurrentPatientId();
-            var profile = await _profileService.GetProfileAsync(patientId);
+            int userId = GetCurrentUserId();
+            var profile = await _profileService.GetProfileAsync(userId);
 
             if (profile == null)
             {
-                return NotFound("لم يتم العثور على بيانات البروفايل.");
+                return NotFound("Patient profile not found.");
             }
 
             return View(profile);
         }
 
-        // GET: PatientProfile/Update
+        // GET: Patient/Update
         [HttpGet]
         public async Task<IActionResult> Update()
         {
-            int patientId = GetCurrentPatientId();
-            var profile = await _profileService.GetProfileAsync(patientId);
+            int userId = GetCurrentUserId();
+            var editModel = await _profileService.GetProfileForEditAsync(userId);
 
-            if (profile == null)
+            if (editModel == null)
             {
                 return NotFound();
             }
 
-           
-            var editModel = new EditPatientProfileVM
-            {
-                FullName = profile.FullName,
-                Phone = profile.Phone,
-                BirthDate = profile.BirthDate,
-                Gender = profile.Gender
-                
-            };
-
-            return View(editModel);
+            return View("Edit", editModel);
         }
 
-        // POST: PatientProfile/Update
+        // POST: Patient/Update
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Update(EditPatientProfileVM model)
         {
             if (!ModelState.IsValid)
             {
-                return View(model);
+                return View("Edit", model); // Explicitly render Edit.cshtml
             }
 
-            int patientId = GetCurrentPatientId();
-            var success = await _profileService.UpdateProfileAsync(model, patientId);
+            int userId = GetCurrentUserId();
+            var success = await _profileService.UpdateProfileAsync(model, userId);
 
             if (!success)
             {
-                ModelState.AddModelError(string.Empty, "حدث خطأ أثناء تحديث البيانات.");
-                return View(model);
+                ModelState.AddModelError(string.Empty, "An error occurred while updating the profile.");
+                return View("Edit", model); // Explicitly render Edit.cshtml
             }
 
-            TempData["SuccessMessage"] = "تم تحديث بيانات البروفايل بنجاح.";
+            TempData["SuccessMessage"] = "Profile updated successfully.";
             return RedirectToAction(nameof(Index));
         }
 
-        
+        // POST: Patient/Delete
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete()
         {
-            int patientId = GetCurrentPatientId();
-            var success = await _profileService.DeleteAccountAsync(patientId);
+            int userId = GetCurrentUserId();
+            var success = await _profileService.DeleteAccountAsync(userId);
 
             if (!success)
             {
-                TempData["ErrorMessage"] = "تعذر تعطيل/حذف الحساب حالياً.";
+                TempData["ErrorMessage"] = "Unable to delete account at this moment.";
                 return RedirectToAction(nameof(Index));
             }
 
-   
             return RedirectToAction("Logout", "Account");
         }
     }
