@@ -1,0 +1,33 @@
+﻿@{
+    ViewData["Title"] = "404 Not Found";
+}
+
+<!-- Single Page Header start -->
+<div class="container-fluid page-header py-5">
+    <h1 class="text-center text-white display-6">404 Error</h1>
+    <ol class="breadcrumb justify-content-center mb-0">
+        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-white">Home</a></li>
+        <li class="breadcrumb-item"><a asp-controller="Shop" asp-action="Index" class="text-white">Shop</a></li>
+        <li class="breadcrumb-item active text-white">404</li>
+    </ol>
+</div>
+<!-- Single Page Header End -->
+<!-- 404 Start -->
+<div class="container-fluid py-5">
+    <div class="container py-5 text-center">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <i class="bi bi-exclamation-triangle display-1 text-secondary"></i>
+                <h1 class="display-1 fw-bold text-dark">404</h1>
+                <h2 class="mb-4 text-dark">Page Not Found</h2>
+                <p class="mb-4 text-muted">
+                    We're sorry, the herbal remedy, formulation, or page you were looking for doesn't exist or has been moved by the apothecary.
+                </p>
+                <a asp-controller="Home" asp-action="Index" class="btn border-secondary rounded-pill py-3 px-5 text-primary fw-semibold">
+                    <i class="fas fa-home me-2"></i>Go Back To Home
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 404 End -->

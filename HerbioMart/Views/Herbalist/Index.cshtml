@@ -1,0 +1,94 @@
+﻿@{
+    ViewData["Title"] = "Herbalist Dashboard";
+    var username = User.Identity?.Name;
+    var fullName = User.FindFirst("FullName")?.Value ?? username;
+}
+
+<!-- Single Page Header start -->
+<div class="container-fluid page-header py-5">
+    <h1 class="text-center text-white display-6">Herbalist Dashboard</h1>
+    <ol class="breadcrumb justify-content-center mb-0">
+        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-white">Home</a></li>
+        <li class="breadcrumb-item active text-white">Vendor Control Panel</li>
+    </ol>
+</div>
+<!-- Single Page Header End -->
+
+<div class="container-fluid py-5">
+    <div class="container py-5">
+        <!-- Welcome Card -->
+        <div class="bg-light rounded p-4 mb-5 shadow-sm border">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h2 class="fw-bold text-dark mb-1">Welcome back, @fullName!</h2>
+                    <p class="text-muted mb-0">
+                        Username: <span class="badge bg-primary font-monospace">@@@username</span> |
+                        Role: <span class="badge bg-success">Herbalist</span>
+                    </p>
+                </div>
+                <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                    <a asp-controller="Shop" asp-action="Index" class="btn btn-outline-primary rounded-pill px-4 py-2">
+                        <i class="fas fa-store me-1"></i> View Catalog
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Metrics Cards -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm rounded-4 p-4 text-center bg-white border-top border-4 border-success">
+                    <i class="fas fa-leaf fa-3x text-success mb-3"></i>
+                    <h3 class="fw-bold text-dark">0</h3>
+                    <span class="text-muted fw-semibold">My Catalog Herbs</span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm rounded-4 p-4 text-center bg-white border-top border-4 border-primary">
+                    <i class="fas fa-mortar-pestle fa-3x text-primary mb-3"></i>
+                    <h3 class="fw-bold text-dark">0</h3>
+                    <span class="text-muted fw-semibold">Created Recipes</span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm rounded-4 p-4 text-center bg-white border-top border-4 border-warning">
+                    <i class="fas fa-box-open fa-3x text-warning mb-3"></i>
+                    <h3 class="fw-bold text-dark">0</h3>
+                    <span class="text-muted fw-semibold">Pending Orders</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Operations -->
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm rounded-4 p-4 h-100 bg-white">
+                    <h5 class="fw-bold text-dark mb-3"><i class="fas fa-plus-circle text-primary me-2"></i>Direct Management</h5>
+                    <div class="d-grid gap-3">
+                        <a asp-controller="Shop" asp-action="Index" class="btn btn-outline-success rounded-pill py-3 text-start px-4">
+                            <i class="fas fa-seedling me-2"></i> Browse All Store Herbs
+                        </a>
+                        <a asp-controller="Home" asp-action="Contact" class="btn btn-outline-secondary rounded-pill py-3 text-start px-4">
+                            <i class="fas fa-headset me-2"></i> Support Desk
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm rounded-4 p-4 h-100 bg-white">
+                    <h5 class="fw-bold text-dark mb-3"><i class="fas fa-user-shield text-success me-2"></i>Vendor Info</h5>
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item d-flex justify-content-between align-items-center py-3">
+                            <span class="text-muted">Registered Name:</span>
+                            <span class="fw-bold text-dark">@fullName</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center py-3">
+                            <span class="text-muted">Account Access:</span>
+                            <span class="badge bg-success">Verified Apothecary</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
