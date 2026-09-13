@@ -1,0 +1,89 @@
+﻿@model HerbioMart.ViewModels.Diseases.CreateDiseaseVM
+
+@{
+    ViewData["Title"] = "Register Health Condition";
+}
+
+<!-- Single Page Header start -->
+<div class="container-fluid page-header py-5">
+    <h1 class="text-center text-white display-6">Register Health Condition</h1>
+    <ol class="breadcrumb justify-content-center mb-0">
+        <li class="breadcrumb-item"><a asp-controller="Herbalist" asp-action="Index" class="text-white">Dashboard</a></li>
+        <li class="breadcrumb-item active text-white">Add Condition</li>
+    </ol>
+</div>
+<!-- Single Page Header End -->
+
+<div class="container-fluid py-5">
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white">
+                    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+                        <div>
+                            <h3 class="fw-bold text-dark mb-1">New Health Condition</h3>
+                            <p class="text-muted small mb-0">Register diseases with concise symptom tags for accurate recipe targeting.</p>
+                        </div>
+                        <a asp-controller="Disease" asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">
+                            <i class="fas fa-arrow-left me-1"></i> Conditions
+                        </a>
+                    </div>
+
+                    <form asp-controller="Disease" asp-action="Create" method="post">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small mb-4" role="alert"></div>
+
+                        <div class="row g-4">
+                            <!-- Disease Name -->
+                            <div class="col-12">
+                                <label class="form-label fw-semibold text-secondary small">Condition / Disease Name</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0 rounded-start-pill text-muted">
+                                        <i class="fas fa-heartbeat text-danger"></i>
+                                    </span>
+                                    <input asp-for="DiseaseName" class="form-control rounded-end-pill py-2 px-3 border border-start-0" placeholder="e.g. Hypertension or Chronic Migraine" />
+                                </div>
+                                <span asp-validation-for="DiseaseName" class="text-danger small fw-bold"></span>
+                            </div>
+
+                            <!-- Single Line Symptoms (Comma-Separated) -->
+                            <div class="col-12">
+                                <label class="form-label fw-semibold text-secondary small">
+                                    Key Symptoms <span class="text-muted fw-normal">(Comma-separated words)</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0 rounded-start-pill text-muted">
+                                        <i class="fas fa-tags text-warning"></i>
+                                    </span>
+                                    <input asp-for="Symptoms" class="form-control rounded-end-pill py-2 px-3 border border-start-0" placeholder="e.g. Headache, Dizziness, Shortness of breath" />
+                                </div>
+                                <small class="text-muted d-block mt-1 ps-2">
+                                    <i class="fas fa-info-circle me-1"></i> Add 2 to 6 brief symptoms separated by commas.
+                                </small>
+                                <span asp-validation-for="Symptoms" class="text-danger small fw-bold"></span>
+                            </div>
+
+                            <!-- Concise Description -->
+                            <div class="col-12">
+                                <label class="form-label fw-semibold text-secondary small">Short Clinical Summary</label>
+                                <textarea asp-for="Description" class="form-control rounded-4 p-3 border" rows="3" placeholder="Brief 1-2 sentence description of the medical condition..."></textarea>
+                                <span asp-validation-for="Description" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="col-12 text-end mt-4">
+                                <button type="submit" class="btn btn-primary rounded-pill px-5 py-3 text-white fw-bold shadow-sm">
+                                    <i class="fas fa-check-circle me-2"></i> Register Condition
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

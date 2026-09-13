@@ -1,0 +1,80 @@
+﻿@model HerbioMart.ViewModels.Herb.HerbDetailsVM
+
+@{
+    ViewData["Title"] = $"{Model.HerbName} - Botanical Details";
+}
+
+<!-- Single Page Header start -->
+<div class="container-fluid page-header py-5">
+    <h1 class="text-center text-white display-6">Botanical Monograph</h1>
+    <ol class="breadcrumb justify-content-center mb-0">
+        <li class="breadcrumb-item"><a asp-controller="Herbalist" asp-action="Index" class="text-white">Dashboard</a></li>
+        <li class="breadcrumb-item"><a asp-controller="Herb" asp-action="Index" class="text-white">Herbs Catalog</a></li>
+        <li class="breadcrumb-item active text-white">@Model.HerbName</li>
+    </ol>
+</div>
+<!-- Single Page Header End -->
+
+<div class="container-fluid py-5">
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white">
+
+                    <!-- Top Bar -->
+                    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+                        <div>
+                            <span class="badge bg-success px-3 py-2 rounded-pill mb-2">Verified Botanical Entry</span>
+                            <h2 class="fw-bold text-dark mb-1">@Model.HerbName</h2>
+                            <h6 class="text-primary font-monospace"><em>@Model.ScientificName</em></h6>
+                        </div>
+                        <a asp-controller="Herb" asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">
+                            <i class="fas fa-arrow-left me-1"></i> Catalog
+                        </a>
+                    </div>
+
+                    <div class="row g-4 mb-4">
+                        <!-- Image Column -->
+                        <div class="col-md-5">
+                            <img src="@Model.ImageURL" class="img-fluid rounded-4 shadow-sm border w-100" style="max-height: 350px; object-fit: cover;" alt="@Model.HerbName" />
+                            <div class="card bg-light border-0 rounded-4 p-3 mt-3">
+                                <small class="text-muted d-block mb-1">Registered Contributor:</small>
+                                <span class="fw-bold text-dark"><i class="fas fa-award text-warning me-1"></i> @Model.AddedByHerbalistName</span>
+                            </div>
+                        </div>
+
+                        <!-- General & Therapeutic Info -->
+                        <div class="col-md-7">
+                            <div class="mb-4">
+                                <h5 class="fw-bold text-dark mb-2"><i class="fas fa-info-circle text-primary me-2"></i>Botanical Description</h5>
+                                <p class="text-muted">@Model.Description</p>
+                            </div>
+
+                            <div class="mb-4">
+                                <h5 class="fw-bold text-dark mb-2"><i class="fas fa-heartbeat text-success me-2"></i>Documented Medical Benefits</h5>
+                                <p class="text-muted">@Model.Benefits</p>
+                            </div>
+
+                            <div class="mb-4">
+                                <h5 class="fw-bold text-dark mb-2"><i class="fas fa-prescription-bottle-alt text-info me-2"></i>Dosage & Preparation Instructions</h5>
+                                <div class="bg-light p-3 rounded-3 border-start border-4 border-info">
+                                    <p class="text-dark small mb-0">@Model.Dosage</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Safety & Contraindications Notice -->
+                    <div class="alert alert-warning border-0 rounded-4 p-4 d-flex align-items-start">
+                        <i class="fas fa-exclamation-triangle fa-2x text-danger me-3 mt-1"></i>
+                        <div>
+                            <h5 class="fw-bold text-dark mb-1">Medical Warnings & Contraindications</h5>
+                            <p class="text-secondary small mb-0">@Model.Warnings</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

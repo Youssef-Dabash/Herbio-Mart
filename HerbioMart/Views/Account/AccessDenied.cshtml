@@ -1,0 +1,35 @@
+﻿@{
+    ViewData["Title"] = "Access Denied";
+}
+
+<div class="container-fluid page-header py-5">
+    <h1 class="text-center text-white display-6">Access Restricted</h1>
+    <ol class="breadcrumb justify-content-center mb-0">
+        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-white">Home</a></li>
+        <li class="breadcrumb-item active text-white">403 Forbidden</li>
+    </ol>
+</div>
+
+<div class="container-fluid py-5">
+    <div class="container py-5 text-center">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm rounded-4 p-5 bg-white">
+                    <i class="fas fa-user-lock fa-4x text-danger mb-4"></i>
+                    <h2 class="fw-bold text-dark mb-2">Access Denied</h2>
+                    <p class="text-muted mb-4">
+                        You do not have the required permissions or account credentials to access this clinical portal or vendor panel.
+                    </p>
+                    <div class="d-flex justify-content-center gap-3">
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4 py-2">
+                            Return Home
+                        </a>
+                        <a asp-controller="Recipe" asp-action="Index" class="btn btn-success rounded-pill px-4 py-2 text-white">
+                            Browse Remedies Catalog
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

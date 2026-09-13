@@ -1,34 +1,76 @@
 ﻿@model IEnumerable<HerbioMart.ViewModels.Diseases.DiseaseVM>
 
 @{
-    ViewData["Title"] = "Health Directory";
+    ViewData["Title"] = "Health Conditions Catalog";
 }
 
-<div class="container-fluid fruite py-5">
-    <div class="container py-5">
-        <div class="text-center mx-auto mb-5" style="max-width: 700px;">
-            <h4 class="text-primary text-uppercase">Health Directory</h4>
-            <h1 class="display-5 mb-3 text-dark fw-bold">Browse Conditions</h1>
-            <p class="text-muted">Select a health condition to explore verified organic herbal formulations tailored to your symptoms.</p>
+<!-- Single Page Header start -->
+<div class="container-fluid page-header py-5">
+    <h1 class="text-center text-white display-6">Health Conditions Registry</h1>
+    <ol class="breadcrumb justify-content-center mb-0">
+        <li class="breadcrumb-item"><a asp-controller="Herbalist" asp-action="Index" class="text-white">Dashboard</a></li>
+        <li class="breadcrumb-item active text-white">Conditions</li>
+    </ol>
+</div>
+<!-- Single Page Header End -->
+
+<div class="container-fluid py-5">
+    <div class="container py-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="fw-bold text-dark mb-1">Cataloged Diseases & Symptoms</h3>
+                <p class="text-muted small mb-0">Reference conditions for compounding targeted herbal preparations.</p>
+            </div>
+            <a asp-controller="Disease" asp-action="Create" class="btn btn-primary rounded-pill px-4 py-2 text-white fw-bold shadow-sm">
+                <i class="fas fa-plus-circle me-1"></i> Register New Condition
+            </a>
         </div>
 
-        <div class="row g-4">
-            @foreach (var disease in Model)
-            {
-                <div class="col-md-6 col-lg-4">
-                    <div class="card h-100 border-0 shadow-sm rounded p-4 text-center">
-                        <div class="mb-3">
-                            <i class="fas fa-heartbeat fa-3x text-primary"></i>
-                        </div>
-                        <h4 class="card-title text-dark fw-bold">@disease.DiseaseName</h4>
-                        <p class="card-text text-muted">@disease.Description</p>
-                        <div class="bg-light p-2 rounded mb-3">
-                            <small class="text-secondary fw-semibold">Symptoms: @disease.Symptoms</small>
-                        </div>
-                        <a asp-controller="Recipe" asp-action="ByDisease" asp-route-id="@disease.DiseaseId" class="btn btn-outline-primary rounded-pill px-4 mt-auto">View Formulations</a>
-                    </div>
+        @if (!Model.Any())
+        {
+            <div class="card border-0 shadow-sm rounded-4 p-5 text-center bg-white">
+                <i class="fas fa-notes-medical fa-4x text-muted mb-3"></i>
+                <h4 class="fw-bold text-dark">No Diseases Registered Yet</h4>
+                <p class="text-muted mb-4">Start cataloging common ailments to link them to herbal preparations.</p>
+                <div class="d-flex justify-content-center">
+                    <a asp-controller="Disease" asp-action="Create" class="btn btn-primary rounded-pill px-4 py-2">Add First Condition</a>
                 </div>
-            }
-        </div>
+            </div>
+        }
+        else
+        {
+            <div class="row g-4">
+                @foreach (var item in Model)
+                {
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card border-0 shadow-sm rounded-4 p-4 h-100 bg-white border-top border-4 border-info d-flex flex-column">
+                            <h5 class="fw-bold text-dark mb-2">@item.DiseaseName</h5>
+                            <p class="text-muted small mb-4 flex-grow-1" style="line-height: 1.5;">
+                                @item.Description
+                            </p>
+
+                            <!-- Modern Badges for Symptoms -->
+                            <div class="bg-light p-3 rounded-3 mt-auto">
+                                <small class="text-secondary fw-semibold d-block mb-2">
+                                    <i class="fas fa-clipboard-list text-warning me-1"></i> Key Symptoms:
+                                </small>
+                                <div class="d-flex flex-wrap gap-1">
+                                    @if (!string.IsNullOrWhiteSpace(item.Symptoms))
+                                    {
+                                        var symptomsList = item.Symptoms.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                                        foreach (var symptom in symptomsList)
+                                        {
+                                            <span class="badge bg-white text-dark border shadow-sm rounded-pill px-2 py-1 small fw-normal">
+                                                <i class="fas fa-check text-success me-1"></i>@symptom
+                                            </span>
+                                        }
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
     </div>
 </div>

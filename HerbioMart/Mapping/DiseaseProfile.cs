@@ -9,7 +9,6 @@ public class DiseaseProfile : Profile
     public DiseaseProfile()
     {
         CreateMap<Disease, DiseaseVM>();
-
         CreateMap<CreateDiseaseVM, Disease>()
                 .ForMember(dest => dest.DiseaseName, opt => opt.MapFrom(src => src.DiseaseName.Trim()))
                 .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description.Trim()))

@@ -1,0 +1,93 @@
+﻿@model HerbioMart.ViewModels.Inventory.AddToInventoryVM
+
+@{
+    ViewData["Title"] = "Stock Herb from Catalog";
+}
+
+<!-- Single Page Header start -->
+<div class="container-fluid page-header py-5">
+    <h1 class="text-center text-white display-6">Stock Herb to Inventory</h1>
+    <ol class="breadcrumb justify-content-center mb-0">
+        <li class="breadcrumb-item"><a asp-controller="Herbalist" asp-action="Index" class="text-white">Dashboard</a></li>
+        <li class="breadcrumb-item"><a asp-controller="Inventory" asp-action="Index" class="text-white">Inventory</a></li>
+        <li class="breadcrumb-item active text-white">Stock Herb</li>
+    </ol>
+</div>
+<!-- Single Page Header End -->
+
+<div class="container-fluid py-5">
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-7">
+                <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white">
+                    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+                        <div>
+                            <h3 class="fw-bold text-dark mb-1">Add to Store Stock</h3>
+                            <p class="text-muted small mb-0">Select a cataloged botanical specimen and assign your retail kilogram price.</p>
+                        </div>
+                        <a asp-controller="Inventory" asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">
+                            <i class="fas fa-arrow-left me-1"></i> My Stock
+                        </a>
+                    </div>
+
+                    <form asp-controller="Inventory" asp-action="Add" method="post">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small mb-4" role="alert"></div>
+
+                        <div class="row g-4">
+                            <!-- Select Herb Dropdown -->
+                            <div class="col-12">
+                                <label class="form-label fw-semibold text-secondary small">Select Botanical Herb</label>
+                                <select asp-for="HerbId" asp-items="Model.AvailableCatalogHerbs" class="form-select rounded-pill py-2 px-3 border">
+                                    <option value="">-- Choose from Catalog --</option>
+                                </select>
+                                <span asp-validation-for="HerbId" class="text-danger small fw-bold"></span>
+                                <small class="text-muted d-block mt-1 ps-2">
+                                    Can't find the herb? <a asp-controller="Herb" asp-action="Create" class="text-primary fw-semibold">Register a new herb first</a>.
+                                </small>
+                            </div>
+
+                            <!-- Retail Price Per Kg -->
+                            <div class="col-12">
+                                <label class="form-label fw-semibold text-secondary small">
+                                    Your Store Selling Price per Kilogram <span class="text-primary fw-bold">(1 Kg)</span>
+                                </label>
+                                <div class="input-group">
+                                    <input asp-for="Price" type="number" step="1" min="1" class="form-control rounded-start-pill py-2 px-3 border border-end-0" placeholder="e.g. 100" />
+                                    <span class="input-group-text bg-light rounded-end-pill text-dark fw-bold">
+                                        <i class="fas fa-weight-hanging text-muted me-1"></i> EGP / kg
+                                    </span>
+                                </div>
+                                <small class="text-muted d-block mt-1 ps-2">
+                                    <i class="fas fa-balance-scale text-primary me-1"></i> Base selling price is per 1 kilogram (1000g). Recipe portions will calculate proportionally.
+                                </small>
+                                <span asp-validation-for="Price" class="text-danger small fw-bold"></span>
+                            </div>
+
+                            <!-- Stock Visibility -->
+                            <div class="col-12">
+                                <div class="form-check form-switch ps-5">
+                                    <input asp-for="IsActive" class="form-check-input" type="checkbox" role="switch" checked>
+                                    <label class="form-check-label fw-semibold text-dark small" asp-for="IsActive">
+                                        Make publicly available for purchase immediately
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="col-12 text-end mt-4">
+                                <button type="submit" class="btn btn-primary rounded-pill px-5 py-3 text-white fw-bold shadow-sm">
+                                    <i class="fas fa-plus-circle me-2"></i> Confirm Stocking
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

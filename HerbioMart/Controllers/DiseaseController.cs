@@ -1,13 +1,11 @@
-﻿using AutoMapper;
-using HerbioMart.Data;
-using HerbioMart.Services.Interfaces;
+﻿using HerbioMart.Services.Interfaces;
 using HerbioMart.ViewModels.Diseases;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace HerbioMart.Controllers;
 
-// Manages health condition directory endpoints
+[Authorize(Roles = "Herbalist")]
 public class DiseaseController : Controller
 {
     private readonly IDiseaseService _diseaseService;
@@ -17,11 +15,37 @@ public class DiseaseController : Controller
         _diseaseService = diseaseService;
     }
 
-    // GET: /Disease/Index
     [HttpGet]
     public async Task<IActionResult> Index()
     {
         var diseases = await _diseaseService.GetAllDiseasesAsync();
         return View(diseases);
+    }
+
+    [HttpGet]
+    public IActionResult Create()
+    {
+        return View(new CreateDiseaseVM());
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Create(CreateDiseaseVM model)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(model);
+        }
+
+        var result = await _diseaseService.CreateDiseaseAsync(model);
+
+        if (!result.Success)
+        {
+            ModelState.AddModelError(nameof(model.DiseaseName), result.Message);
+            return View(model);
+        }
+
+        TempData["SuccessMessage"] = result.Message;
+        return RedirectToAction("Index", "Herbalist");
     }
 }
