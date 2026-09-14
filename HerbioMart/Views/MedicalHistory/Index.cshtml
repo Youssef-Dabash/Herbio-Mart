@@ -1,0 +1,157 @@
+﻿@model HerbioMart.ViewModels.MedicalHistory.MedicalHistoryVM
+@{
+    ViewData["Title"] = "Medical History";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Header Card -->
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body p-4 border-start border-4 border-success">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="fw-bold text-dark mb-1">
+                                <i class="fas fa-file-medical text-success me-2"></i>Medical History & Health Profile
+                            </h3>
+                            <p class="text-muted small mb-0">Confidential clinical record used for personalized herbal formulations.</p>
+                        </div>
+                        <a asp-controller="Patient" asp-action="Index" class="btn btn-outline-secondary rounded-pill btn-sm px-3">
+                            <i class="fas fa-arrow-left me-1"></i> Patient Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show rounded-3" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            <!-- Form -->
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-4">
+                    <form asp-controller="MedicalHistory" asp-action="Index" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="MedicalHistoryId" />
+
+                        <h5 class="fw-bold text-dark mb-3">Chronic Conditions & Health Status</h5>
+
+                        <div class="row g-3 mb-4">
+                            <!-- Diabetes -->
+                            <div class="col-md-6">
+                                <div class="p-3 border rounded-3 bg-light d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <label asp-for="Diabetes" class="fw-semibold text-dark mb-0 d-block">Diabetes Mellitus</label>
+                                        <small class="text-muted">Type 1 or Type 2</small>
+                                    </div>
+                                    <div class="form-check form-switch fs-4 mb-0">
+                                        <input class="form-check-input" type="checkbox" asp-for="Diabetes">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Hypertension -->
+                            <div class="col-md-6">
+                                <div class="p-3 border rounded-3 bg-light d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <label asp-for="Hypertension" class="fw-semibold text-dark mb-0 d-block">Hypertension</label>
+                                        <small class="text-muted">High blood pressure</small>
+                                    </div>
+                                    <div class="form-check form-switch fs-4 mb-0">
+                                        <input class="form-check-input" type="checkbox" asp-for="Hypertension">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Asthma -->
+                            <div class="col-md-6">
+                                <div class="p-3 border rounded-3 bg-light d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <label asp-for="Asthma" class="fw-semibold text-dark mb-0 d-block">Asthma / Allergies</label>
+                                        <small class="text-muted">Chronic respiratory condition</small>
+                                    </div>
+                                    <div class="form-check form-switch fs-4 mb-0">
+                                        <input class="form-check-input" type="checkbox" asp-for="Asthma">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Smoker -->
+                            <div class="col-md-6">
+                                <div class="p-3 border rounded-3 bg-light d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <label asp-for="Smoker" class="fw-semibold text-dark mb-0 d-block">Active Smoker</label>
+                                        <small class="text-muted">Tobacco or nicotine usage</small>
+                                    </div>
+                                    <div class="form-check form-switch fs-4 mb-0">
+                                        <input class="form-check-input" type="checkbox" asp-for="Smoker">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Heart Disease -->
+                            <div class="col-md-6">
+                                <div class="p-3 border rounded-3 bg-light d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <label asp-for="HeartDisease" class="fw-semibold text-dark mb-0 d-block">Cardiovascular Disease</label>
+                                        <small class="text-muted">Coronary or heart valve disorders</small>
+                                    </div>
+                                    <div class="form-check form-switch fs-4 mb-0">
+                                        <input class="form-check-input" type="checkbox" asp-for="HeartDisease">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Kidney Disease -->
+                            <div class="col-md-6">
+                                <div class="p-3 border rounded-3 bg-light d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <label asp-for="KidneyDisease" class="fw-semibold text-dark mb-0 d-block">Kidney Disease</label>
+                                        <small class="text-muted">Renal impairment or chronic stones</small>
+                                    </div>
+                                    <div class="form-check form-switch fs-4 mb-0">
+                                        <input class="form-check-input" type="checkbox" asp-for="KidneyDisease">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Liver Disease -->
+                            <div class="col-md-6">
+                                <div class="p-3 border rounded-3 bg-light d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <label asp-for="LiverDisease" class="fw-semibold text-dark mb-0 d-block">Liver Disease</label>
+                                        <small class="text-muted">Hepatic or fatty liver disorders</small>
+                                    </div>
+                                    <div class="form-check form-switch fs-4 mb-0">
+                                        <input class="form-check-input" type="checkbox" asp-for="LiverDisease">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Notes Section -->
+                        <div class="mb-4">
+                            <label asp-for="OtherNotes" class="form-label fw-semibold text-dark">Additional Health Details or Allergies</label>
+                            <textarea asp-for="OtherNotes" class="form-control" rows="4" placeholder="Detail any prescription drugs, special allergies, or medical notes..."></textarea>
+                        </div>
+
+                        <div class="alert alert-light border small text-muted mb-4">
+                            <i class="fas fa-lock text-success me-1"></i> This clinical information is strictly restricted to your patient account and cannot be deleted.
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-success rounded-pill px-4 py-2 fw-semibold">
+                                <i class="fas fa-save me-2"></i> Save Health Record
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

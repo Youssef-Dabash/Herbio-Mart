@@ -1,0 +1,270 @@
+﻿@model HerbioMart.ViewModels.Feedback.FeedbackFormVM
+
+@{
+    bool isEdit = Model.FeedbackId > 0;
+    ViewData["Title"] = isEdit ? "Update Review" : "Review Remedy";
+
+    // استخراج الرقم الصحيح والعشري الحاليين للتهيئة
+    double currentRating = Model.RatingValue >= 1.0 && Model.RatingValue <= 5.0 ? Model.RatingValue : 5.0;
+    int initialInt = (int)Math.Floor(currentRating);
+    int initialDec = (int)Math.Round((currentRating - initialInt) * 10);
+    if (initialInt >= 5) { initialInt = 5; initialDec = 0; }
+}
+
+<style>
+    /* 1. ضبط مسافات الكارت تحت الـ Fixed Navbar */
+    .feedback-page-wrapper {
+        margin-top: 155px;
+        margin-bottom: 60px;
+    }
+
+    .feedback-card {
+        border-radius: 20px;
+        border: 1px solid #e2e8f0;
+        background: #ffffff;
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.05);
+        max-width: 680px;
+        margin: 0 auto;
+    }
+
+    /* 2. إصلاح الـ Badge العلوي ليظهر النص بوضوح تام وعالي التباين */
+    .review-status-pill {
+        display: inline-block;
+        background-color: #dcfce7 !important;
+        color: #15803d !important;
+        border: 1px solid #86efac;
+        font-weight: 700;
+        font-size: 0.8rem;
+        padding: 6px 18px;
+        border-radius: 50px;
+        letter-spacing: 0.3px;
+    }
+
+    /* 3. صندوق التقييم التفاعلي */
+    .rating-control-box {
+        background-color: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 24px;
+    }
+
+    .rating-score-display {
+        font-size: 2.8rem;
+        font-weight: 800;
+        color: #16a34a;
+        font-family: monospace;
+        line-height: 1;
+    }
+
+    .stars-live-preview {
+        color: #ffc107;
+        font-size: 1.4rem;
+        letter-spacing: 2px;
+    }
+
+    /* ستايل مخصص للـ Range Slider */
+    .custom-range-slider {
+        cursor: pointer;
+        height: 8px;
+    }
+
+        .custom-range-slider::-webkit-slider-thumb {
+            background-color: #16a34a;
+        }
+</style>
+
+<div class="container feedback-page-wrapper">
+    <div class="card feedback-card p-4 p-md-5">
+
+        <!-- Header -->
+        <div class="text-center mb-4">
+            <div class="review-status-pill mb-2">
+                <i class="fas @(isEdit ? "fa-edit" : "fa-feather-alt") me-1"></i>
+                @(isEdit ? "Update Existing Review" : "Verified Patient Experience")
+            </div>
+
+            <h2 class="fw-bold text-dark mb-1">@(isEdit ? "Edit Your Review" : "Rate Formulation")</h2>
+            <p class="text-muted small mb-0">
+                Remedy: <span class="fw-semibold text-success">@(Model.RecipeName ?? "Therapeutic Formulation")</span>
+            </p>
+        </div>
+
+        <form asp-action="Create" method="post" id="feedbackForm">
+            @Html.AntiForgeryToken()
+
+            <!-- الحقول المخفية -->
+            <input type="hidden" asp-for="FeedbackId" />
+            <input type="hidden" asp-for="RecipeId" />
+            <input type="hidden" asp-for="RecipeName" />
+
+            <!-- القيمة الرقمية النهائية التي ستُرسل للسيرفر -->
+            <input type="hidden" asp-for="RatingValue" id="RatingValue" value="@currentRating.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture)" />
+
+            <!-- نظام اختيار التقييم (الصحيح والعشري) -->
+            <div class="rating-control-box mb-4 text-center">
+
+                <!-- العرض الرقمي الحي ومعاينة النجوم -->
+                <div class="d-flex flex-column align-items-center mb-3">
+                    <div class="d-flex align-items-baseline gap-1">
+                        <span class="rating-score-display" id="ratingDisplay">@currentRating.ToString("0.0")</span>
+                        <span class="text-muted fw-bold fs-6">/ 5.0</span>
+                    </div>
+                    <div class="stars-live-preview mt-1" id="starsPreview">
+                        <!-- تُحدث ديناميكياً بالـ JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Range Slider تفاعلي سريع -->
+                <div class="mb-4 px-2">
+                    <input type="range" class="form-range custom-range-slider"
+                           id="ratingSlider" min="1.0" max="5.0" step="0.1"
+                           value="@currentRating.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture)">
+                </div>
+
+                <!-- اختيار الرقم الصحيح والعشري بدقة عبر Dropdowns -->
+                <div class="row g-2 justify-content-center text-start">
+
+                    <!-- الرقم الصحيح -->
+                    <div class="col-6 col-sm-4">
+                        <label class="form-label small fw-bold text-muted mb-1">Integer</label>
+                        <select class="form-select text-center fw-bold text-dark rounded-3" id="intSelect">
+                            <option value="1">1 Star</option>
+                            <option value="2">2 Stars</option>
+                            <option value="3">3 Stars</option>
+                            <option value="4">4 Stars</option>
+                            <option value="5">5 Stars</option>
+                        </select>
+                    </div>
+
+                    <!-- الكسر العشري -->
+                    <div class="col-6 col-sm-4">
+                        <label class="form-label small fw-bold text-muted mb-1">Decimal</label>
+                        <select class="form-select text-center fw-bold text-dark rounded-3" id="decSelect">
+                            <option value="0">.0</option>
+                            <option value="1">.1</option>
+                            <option value="2">.2</option>
+                            <option value="3">.3</option>
+                            <option value="4">.4</option>
+                            <option value="5">.5</option>
+                            <option value="6">.6</option>
+                            <option value="7">.7</option>
+                            <option value="8">.8</option>
+                            <option value="9">.9</option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <span asp-validation-for="RatingValue" class="text-danger small d-block mt-2"></span>
+            </div>
+
+            <!-- التعليق والملاحظات -->
+            <div class="mb-4">
+                <label asp-for="Comment" class="form-label fw-semibold text-dark">Clinical Feedback & Observations</label>
+                <textarea asp-for="Comment" rows="4" class="form-control rounded-3"
+                          placeholder="Describe the therapeutic effects, taste, dosage tolerance, or any feedback for fellow patients..."></textarea>
+                <span asp-validation-for="Comment" class="text-danger small"></span>
+            </div>
+
+            <!-- أزرار الإجراءات -->
+            <div class="d-flex justify-content-end align-items-center gap-2 pt-3 border-top">
+                <a asp-action="MyFeedbacks" class="btn btn-light rounded-pill px-4 py-2 text-muted fw-semibold">
+                    Cancel
+                </a>
+                <button type="submit" class="btn btn-success rounded-pill px-5 py-2 fw-bold shadow-sm">
+                    <i class="fas @(isEdit ? "fa-save" : "fa-paper-plane") me-1"></i>
+                    @(isEdit ? "Save Changes" : "Submit Review")
+                </button>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        $(document).ready(function() {
+            var $ratingInput = $("#RatingValue");
+            var $slider = $("#ratingSlider");
+            var $intSelect = $("#intSelect");
+            var $decSelect = $("#decSelect");
+            var $display = $("#ratingDisplay");
+            var $starsPreview = $("#starsPreview");
+
+            // 1. دالة رسم النجوم التفاعلية (كاملة / نصف نجمة / فارغة)
+            function renderStars(rating) {
+                var starsHtml = "";
+                for (var i = 1; i <= 5; i++) {
+                    if (rating >= i) {
+                        starsHtml += '<i class="fas fa-star"></i>';
+                    } else if (rating >= (i - 0.5)) {
+                        starsHtml += '<i class="fas fa-star-half-alt"></i>';
+                    } else {
+                        starsHtml += '<i class="far fa-star text-muted opacity-50"></i>';
+                    }
+                }
+                $starsPreview.html(starsHtml);
+            }
+
+            // 2. دالة المزامنة الشاملة
+            function updateAll(val, source) {
+                val = parseFloat(val);
+                if (isNaN(val)) val = 5.0;
+                if (val < 1.0) val = 1.0;
+                if (val > 5.0) val = 5.0;
+
+                val = Math.round(val * 10) / 10;
+                var valFormatted = val.toFixed(1);
+
+                // استخراج الصحيح والعشري
+                var intPart = Math.floor(val);
+                var decPart = Math.round((val - intPart) * 10);
+
+                // لو التقييم 5، لا يمكن اختيار عشري أكبر من 0
+                if (intPart === 5) {
+                    decPart = 0;
+                    $decSelect.prop("disabled", true);
+                } else {
+                    $decSelect.prop("disabled", false);
+                }
+
+                // تحديث الـ Input الفعلي والقيمة المعروضة
+                $ratingInput.val(valFormatted);
+                $display.text(valFormatted);
+
+                // مزامنة العناصر التفاعلية الأخرى
+                if (source !== 'slider') {
+                    $slider.val(valFormatted);
+                }
+                if (source !== 'dropdowns') {
+                    $intSelect.val(intPart);
+                    $decSelect.val(decPart);
+                }
+
+                renderStars(val);
+            }
+
+            // الاستماع لحركة الـ Slider
+            $slider.on("input change", function() {
+                updateAll($(this).val(), 'slider');
+            });
+
+            // الاستماع لاختيار الـ Dropdowns
+            $intSelect.add($decSelect).on("change", function() {
+                var intVal = parseInt($intSelect.val());
+                var decVal = parseInt($decSelect.val());
+                if (intVal === 5) {
+                    decVal = 0;
+                }
+                var combined = intVal + (decVal / 10.0);
+                updateAll(combined, 'dropdowns');
+            });
+
+            // التهيئة الأولية عند فتح الصفحة
+            var initialVal = parseFloat($ratingInput.val()) || 5.0;
+            updateAll(initialVal, 'init');
+        });
+    </script>
+}

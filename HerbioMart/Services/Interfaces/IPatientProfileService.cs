@@ -1,4 +1,4 @@
-﻿using HerbioMart.ViewModels.PatientProfile;
+﻿using HerbioMart.ViewModels.Patient;
 using System.Threading.Tasks;
 
 namespace HerbioMart.Services.Interfaces

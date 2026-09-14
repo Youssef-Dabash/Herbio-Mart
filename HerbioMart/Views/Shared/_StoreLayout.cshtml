@@ -1,6 +1,36 @@
-﻿
+﻿@using HerbioMart.Models.Enums
+@using System.Security.Claims
+@inject HerbioMart.Data.AppDbContext _context
 
-@using HerbioMart.Models.Enums
+@{
+    int pendingOrdersCount = 0;
+    string? profilePic = null;
+    var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+    int.TryParse(userIdStr, out var currentUserId);
+
+    if (User.Identity?.IsAuthenticated == true && currentUserId > 0)
+    {
+        profilePic = User.FindFirst("ProfilePicture")?.Value;
+
+        if (string.IsNullOrEmpty(profilePic))
+        {
+            profilePic = _context.Users
+                .Where(u => u.Id == currentUserId)
+                .Select(u => u.ImageUrl)
+                .FirstOrDefault();
+        }
+
+        if (User.IsInRole("Herbalist"))
+        {
+            pendingOrdersCount = _context.SubOrders
+                .Count(s => s.Herbalist.UserId == currentUserId && s.Status.ToString() == "Pending");
+        }
+    }
+
+    var fullName = User.FindFirst("FullName")?.Value ?? User.Identity?.Name ?? "User";
+    var userInitial = !string.IsNullOrWhiteSpace(fullName) ? fullName.Trim()[0].ToString().ToUpper() : "U";
+}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -26,6 +56,33 @@
 
     <!-- Template Stylesheet -->
     <link href="~/css/style.css" rel="stylesheet">
+
+    <style>
+            /* ستايل الأفاتار وصورة المستخدم في الـ Navbar */
+            .nav-avatar-initial {
+                width: 36px;
+                height: 36px;
+                border-radius: 50%;
+                background-color: #2e7d32;
+                color: #ffffff;
+                font-weight: 700;
+                font-size: 0.95rem;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                text-transform: uppercase;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.12);
+            }
+
+            .nav-avatar-img {
+                width: 36px;
+                height: 36px;
+                border-radius: 50%;
+                object-fit: cover;
+                border: 2px solid #81c784;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.12);
+            }
+    </style>
 </head>
 
 <body>
@@ -39,15 +96,15 @@
         <div class="container topbar bg-primary d-none d-lg-block">
             <div class="d-flex justify-content-between">
                 <div class="top-info ps-2">
-                    <small class="me-3"><i class="fas fa-map-marker-alt me-2 text-secondary"></i> <span class="text-white">Cairo, Egypt</span></small>
+                    <small class="me-3"><i class="fas fa-map-marker-alt me-2 text-secondary"></i> <span class="text-white">Menofia, Egypt</span></small>
                     <small class="me-3"><i class="fas fa-envelope me-2 text-secondary"></i><span class="text-white">support@herbiomart.com</span></small>
                 </div>
                 <div class="top-link pe-2">
-                    <a asp-controller="Home" asp-action="Privacy" class="text-white"><small class="text-white mx-2">Privacy Policy</small>/</a>
-                    <a asp-controller="Home" asp-action="Contact" class="text-white"><small class="text-white ms-2">Contact Support</small></a>
+                    <a asp-controller="Home" asp-action="Privacy" class="text-white"><small class="text-white mx-2">About & Policy</small></a>
                 </div>
             </div>
         </div>
+
         <div class="container px-0">
             <nav class="navbar navbar-light bg-white navbar-expand-xl">
                 <a asp-controller="Home" asp-action="Index" class="navbar-brand">
@@ -56,50 +113,103 @@
                 <button class="navbar-toggler py-2 px-3" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
                     <span class="fa fa-bars text-primary"></span>
                 </button>
+
                 <div class="collapse navbar-collapse bg-white" id="navbarCollapse">
+                    <!-- Navigation Links -->
                     <div class="navbar-nav mx-auto">
                         <a asp-controller="Home" asp-action="Index" class="nav-item nav-link">Home</a>
                         <a asp-controller="Herb" asp-action="Index" class="nav-item nav-link">Herbs</a>
                         <a asp-controller="Recipe" asp-action="Index" class="nav-item nav-link">Recipes</a>
-                         @if (User.IsInRole("Herbalist"))
+
+                        @if (User.IsInRole("Patient"))
                         {
                             <a asp-controller="Shop" asp-action="Index" class="nav-item nav-link">Shop Catalog</a>
                             <a asp-controller="Cart" asp-action="Index" class="nav-item nav-link">Cart</a>
+                            <a asp-controller="Checkout" asp-action="Index" class="nav-item nav-link">Checkout</a>
                         }
-                        @* <a asp-controller="Home" asp-action="Checkout" class="nav-item nav-link">Checkout</a> *@
-                        <a asp-controller="Home" asp-action="Testimonials" class="nav-item nav-link">Feedbacks</a>
-                        <a asp-controller="Home" asp-action="Contact" class="nav-item nav-link">Contact</a>
-                    </div>
-                    <div class="d-flex m-3 me-0 align-items-center">
-                        <button class="btn-search btn border border-secondary btn-md-square rounded-circle bg-white me-4" data-bs-toggle="modal" data-bs-target="#searchModal">
-                            <i class="fas fa-search text-primary"></i>
-                        </button>
-                        <a asp-controller="Cart" asp-action="Index" class="position-relative me-4 my-auto">
-                            <i class="fa fa-shopping-bag fa-2x"></i>
-                        </a>
+                        else if (User.IsInRole("Herbalist"))
+                        {
+                            <a asp-controller="Herbalist" asp-action="Index" class="nav-item nav-link text-success fw-semibold">
+                                <i class="fas fa-store-alt me-1"></i> My Apothecary
+                            </a>
+                        }
 
+                        <a asp-controller="Feedback" asp-action="Index" class="nav-item nav-link">Feedbacks</a>
+                    </div>
+
+                    <!-- Right Actions Area -->
+                    <div class="d-flex m-3 me-0 align-items-center">
+                        <!-- Patient Shopping Bag -->
+                        @if (User.IsInRole("Patient"))
+                        {
+                            <a asp-controller="Cart" asp-action="Index" class="position-relative me-4 my-auto text-primary" title="Shopping Cart">
+                                <i class="fa fa-shopping-bag fa-2x"></i>
+                            </a>
+                        }
+
+                        <!-- Herbalist Pending Orders Notification -->
+                        @if (User.IsInRole("Herbalist"))
+                        {
+                            <a asp-controller="Herbalist" asp-action="Orders" class="position-relative me-4 my-auto text-dark" title="Pending Orders">
+                                <i class="fas fa-clipboard-list fa-2x text-success"></i>
+                                @if (pendingOrdersCount > 0)
+                                {
+                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-white" style="font-size: 0.7rem;">
+                                        @pendingOrdersCount
+                                        <span class="visually-hidden">pending orders</span>
+                                    </span>
+                                }
+                            </a>
+                        }
+
+                        <!-- Authentication State / Profile Dropdown -->
                         @if (User.Identity?.IsAuthenticated == true)
                         {
                             <div class="nav-item dropdown my-auto">
-                                <a href="#" class="dropdown-toggle text-dark d-flex align-items-center" data-bs-toggle="dropdown">
-                                    <i class="fas fa-user-circle fa-2x text-primary me-2"></i>
-                                    <span class="fw-semibold small">@User.Identity.Name</span>
-                                </a>
-                                <div class="dropdown-menu dropdown-menu-end m-0 bg-white shadow-sm rounded-3">
-                                    @if (User.IsInRole("Herbalist"))
+                                <a href="#" class="dropdown-toggle text-dark d-flex align-items-center text-decoration-none" data-bs-toggle="dropdown">
+                                    @if (!string.IsNullOrEmpty(profilePic))
                                     {
-                                        <a asp-controller="Herbalist" asp-action="Index" class="dropdown-item">
-                                            <i class="fas fa-store me-2 text-success"></i> Herbalist Panel
-                                        </a>
+                                        <img src="@profilePic" alt="@fullName" class="nav-avatar-img me-2" />
                                     }
                                     else
                                     {
-                                        <a asp-controller="Patient" asp-action="Index" class="dropdown-item">
-                                            <i class="fas fa-user-injured me-2 text-primary"></i> Patient Portal
+                                        <div class="nav-avatar-initial me-2">
+                                            @userInitial
+                                        </div>
+                                    }
+                                    <span class="fw-semibold small">@fullName</span>
+                                </a>
+
+                                <div class="dropdown-menu dropdown-menu-end m-0 bg-white shadow-sm rounded-3 border">
+                                    @if (User.IsInRole("Herbalist"))
+                                    {
+                                        <a asp-controller="Herbalist" asp-action="Index" class="dropdown-item py-2">
+                                            <i class="fas fa-store me-2 text-success"></i> Herbalist Dashboard
+                                        </a>
+                                        <a asp-controller="Recipe" asp-action="Index" class="dropdown-item py-2">
+                                            <i class="fas fa-mortar-pestle me-2 text-primary"></i> My Formulations
+                                        </a>
+                                        <a asp-controller="Herbalist" asp-action="Orders" class="dropdown-item py-2 d-flex justify-content-between align-items-center">
+                                            <span><i class="fas fa-box-open me-2 text-warning"></i> Incoming Orders</span>
+                                            @if (pendingOrdersCount > 0)
+                                            {
+                                                <span class="badge bg-danger rounded-pill">@pendingOrdersCount</span>
+                                            }
                                         </a>
                                     }
+                                    else if (User.IsInRole("Patient"))
+                                    {
+                                        <a asp-controller="Patient" asp-action="Index" class="dropdown-item py-2">
+                                            <i class="fas fa-id-card me-2 text-success"></i> Patient Profile
+                                        </a>
+                                        <a asp-controller="MedicalHistory" asp-action="Index" class="dropdown-item py-2">
+                                            <i class="fas fa-file-medical me-2 text-danger"></i> Medical History
+                                        </a>
+                                    }
+
                                     <hr class="dropdown-divider my-1">
-                                    <form asp-controller="Account" asp-action="Logout" method="post" class="px-2">
+                                    <form asp-controller="Account" asp-action="Logout" method="post" class="px-2 py-1">
+                                        @Html.AntiForgeryToken()
                                         <button type="submit" class="btn btn-sm btn-outline-danger w-100 rounded-pill">
                                             <i class="fas fa-sign-out-alt me-1"></i> Logout
                                         </button>
@@ -109,9 +219,14 @@
                         }
                         else
                         {
-                            <a asp-controller="Account" asp-action="Login" class="btn btn-outline-primary rounded-pill px-3 py-1 my-auto">
-                                <i class="fas fa-sign-in-alt me-1"></i> Login
-                            </a>
+                            <div class="d-flex gap-2">
+                                <a asp-controller="Account" asp-action="Login" class="btn btn-outline-primary rounded-pill px-3 py-1 my-auto fw-semibold">
+                                    <i class="fas fa-sign-in-alt me-1"></i> Login
+                                </a>
+                                <a asp-controller="Account" asp-action="Register" class="btn btn-primary text-white rounded-pill px-3 py-1 my-auto fw-semibold">
+                                    Register
+                                </a>
+                            </div>
                         }
                     </div>
                 </div>
@@ -119,26 +234,6 @@
         </div>
     </div>
     <!-- Navbar End -->
-    <!-- Modal Search Start -->
-    <div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="searchModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-fullscreen">
-            <div class="modal-content rounded-0">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="searchModalLabel">Search Natural Herbs & Recipes</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body d-flex align-items-center">
-                    <form asp-controller="Shop" asp-action="Index" method="get" class="w-75 mx-auto">
-                        <div class="input-group">
-                            <input type="search" name="searchQuery" class="form-control p-3" placeholder="Search by herb, recipe name, or symptoms..." aria-describedby="search-icon-1">
-                            <button type="submit" class="input-group-text p-3 bg-primary text-white border-0"><i class="fa fa-search"></i></button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Modal Search End -->
     <!-- Body Render -->
     <main role="main">
         @RenderBody()
@@ -172,15 +267,15 @@
                         <h4 class="text-light mb-3">Quick Links</h4>
                         <a class="btn-link" asp-controller="Shop" asp-action="Index">Store Catalog</a>
                         <a class="btn-link" asp-controller="Cart" asp-action="Index">My Prescription Cart</a>
-                        <a class="btn-link" asp-controller="Home" asp-action="Contact">Contact & Inquiries</a>
+                        <a class="btn-link" asp-controller="Home" asp-action="Privacy">About & Team Governance</a>
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6">
                     <div class="footer-item">
-                        <h4 class="text-light mb-3">Contact Support</h4>
-                        <p>Address: Cairo, Egypt</p>
-                        <p>Email: info@herbiomart.com</p>
-                        <p>Phone: (+20) 010 1234 5678</p>
+                        <h4 class="text-light mb-3">Platform Helpdesk</h4>
+                        <p>Address: Menofia, Egypt</p>
+                        <p>Email: support@herbiomart.com</p>
+                        <p>Helpline: (+20) 010 0000 0000</p>
                     </div>
                 </div>
             </div>

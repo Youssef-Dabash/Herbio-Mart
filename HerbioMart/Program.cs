@@ -31,7 +31,9 @@ public class Program
         builder.Services.AddScoped<IRecipeService, RecipeService>();
         builder.Services.AddScoped<IInventoryService, InventoryService>();
         builder.Services.AddScoped<IShopService, ShopService>();
+        builder.Services.AddScoped<IFeedbackService, FeedbackService>();
         builder.Services.AddScoped<IPatientProfileService, PatientProfileService>();
+        builder.Services.AddScoped<IMedicalHistoryService, MedicalHistoryService>();
 
         var app = builder.Build();
 

@@ -1,8 +1,50 @@
-﻿@{
+﻿@model HerbioMart.ViewModels.Herbalist.HerbalistDashboardVM
+
+@{
     ViewData["Title"] = "Herbalist Dashboard";
     var username = User.Identity?.Name;
-    var fullName = User.FindFirst("FullName")?.Value ?? username;
+    var fullName = !string.IsNullOrWhiteSpace(Model?.FullName) ? Model.FullName : (User.FindFirst("FullName")?.Value ?? username);
+    var userInitial = !string.IsNullOrWhiteSpace(fullName) ? fullName.Trim()[0].ToString().ToUpper() : "H";
+    var userImage = Model?.ImageUrl ?? User.FindFirst("ProfilePicture")?.Value;
 }
+
+<style>
+    /* أفاتار وصورة العطار في لوحة التحكم */
+    .dashboard-avatar-initial {
+        width: 68px;
+        height: 68px;
+        border-radius: 50%;
+        background-color: #2e7d32;
+        color: #ffffff;
+        font-size: 1.8rem;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 3px solid #81c784;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+        flex-shrink: 0;
+    }
+
+    .dashboard-avatar-img {
+        width: 68px;
+        height: 68px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #81c784;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+        flex-shrink: 0;
+    }
+
+    .bio-box {
+        background-color: #f8fafc;
+        border-left: 4px solid #198754;
+        border-radius: 6px;
+        padding: 10px 14px;
+        font-size: 0.88rem;
+        color: #495057;
+    }
+</style>
 
 <!-- Single Page Header start -->
 <div class="container-fluid page-header py-5">
@@ -27,19 +69,38 @@
             </div>
         }
 
-        <!-- Welcome Banner -->
+        <!-- Welcome Banner with Avatar & Edit Action -->
         <div class="bg-light rounded-4 p-4 mb-4 shadow-sm border">
             <div class="row align-items-center">
-                <div class="col-md-8">
-                    <h2 class="fw-bold text-dark mb-1">Welcome back, @fullName!</h2>
-                    <p class="text-muted mb-0">
-                        Username: <span class="badge bg-primary font-monospace">@@@username</span> |
-                        Role: <span class="badge bg-success">Herbalist</span>
-                    </p>
+                <div class="col-md-8 d-flex align-items-center gap-3">
+
+                    <!-- Profile Picture or Initial Avatar -->
+                    @if (!string.IsNullOrEmpty(userImage))
+                    {
+                        <img src="@userImage" alt="@fullName" class="dashboard-avatar-img" />
+                    }
+                    else
+                    {
+                        <div class="dashboard-avatar-initial">
+                            @userInitial
+                        </div>
+                    }
+
+                    <div>
+                        <h2 class="fw-bold text-dark mb-1">Welcome back, @fullName!</h2>
+                        <p class="text-muted mb-0">
+                            Username: <span class="badge bg-primary font-monospace">@@@username</span> |
+                            Role: <span class="badge bg-success">Herbalist</span>
+                        </p>
+                    </div>
                 </div>
-                <div class="col-md-4 text-md-end mt-3 mt-md-0">
-                    <a asp-controller="Shop" asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4 py-2">
-                        <i class="fas fa-store me-1"></i> Public Catalog
+
+                <div class="col-md-4 text-md-end mt-3 mt-md-0 d-flex justify-content-md-end gap-2">
+                    <a asp-action="EditProfile" class="btn btn-outline-success rounded-pill px-3 py-2 fw-semibold shadow-sm">
+                        <i class="fas fa-user-edit me-1"></i> Edit Profile
+                    </a>
+                    <a asp-controller="Herbalist" asp-action="Orders" class="btn btn-outline-secondary rounded-pill px-3 py-2">
+                        <i class="fas fa-store me-1"></i> Pending Orders
                     </a>
                 </div>
             </div>
@@ -52,13 +113,13 @@
                     <i class="fas fa-leaf fa-lg me-2"></i> Add New Herb
                 </a>
             </div>
-          
-           
+
             <div class="col-md-4">
                 <a asp-controller="Recipe" asp-action="Create" class="btn btn-success w-100 py-3 rounded-4 shadow-sm text-white fw-bold d-flex align-items-center justify-content-center">
                     <i class="fas fa-mortar-pestle fa-lg me-2"></i> Add New Recipe
                 </a>
             </div>
+
             <div class="col-md-4">
                 <a asp-controller="Disease" asp-action="Create" class="btn btn-info w-100 py-3 rounded-4 shadow-sm text-white fw-bold d-flex align-items-center justify-content-center">
                     <i class="fas fa-notes-medical fa-lg me-2"></i> Add New Disease
@@ -66,26 +127,26 @@
             </div>
         </div>
 
-        <!-- Metrics Cards -->
+        <!-- Metrics Cards (Real Database Counts) -->
         <div class="row g-4 mb-5">
             <div class="col-md-4">
                 <div class="card border-0 shadow-sm rounded-4 p-4 text-center bg-white border-top border-4 border-primary">
                     <i class="fas fa-leaf fa-3x text-primary mb-3"></i>
-                    <h3 class="fw-bold text-dark">0</h3>
+                    <h3 class="fw-bold text-dark">@(Model?.AddedHerbsCount ?? 0)</h3>
                     <span class="text-muted fw-semibold">My Catalog Herbs</span>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="card border-0 shadow-sm rounded-4 p-4 text-center bg-white border-top border-4 border-success">
                     <i class="fas fa-mortar-pestle fa-3x text-success mb-3"></i>
-                    <h3 class="fw-bold text-dark">0</h3>
+                    <h3 class="fw-bold text-dark">@(Model?.FormulatedRecipesCount ?? 0)</h3>
                     <span class="text-muted fw-semibold">Formulated Recipes</span>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="card border-0 shadow-sm rounded-4 p-4 text-center bg-white border-top border-4 border-warning">
                     <i class="fas fa-box-open fa-3x text-warning mb-3"></i>
-                    <h3 class="fw-bold text-dark">0</h3>
+                    <h3 class="fw-bold text-dark">@(Model?.PendingOrdersCount ?? 0)</h3>
                     <span class="text-muted fw-semibold">Pending Orders</span>
                 </div>
             </div>
@@ -97,7 +158,6 @@
                 <div class="card border-0 shadow-sm rounded-4 p-4 h-100 bg-white">
                     <h5 class="fw-bold text-dark mb-3"><i class="fas fa-tasks text-primary me-2"></i>Direct Management</h5>
                     <div class="d-grid gap-3">
-                        
                         <a asp-controller="Herb" asp-action="Index" class="btn btn-outline-success rounded-pill py-3 text-start px-4">
                             <i class="fas fa-seedling me-2"></i> Browse All Herbs
                         </a>
@@ -107,34 +167,68 @@
                         <a asp-controller="Recipe" asp-action="Index" class="btn btn-outline-primary rounded-pill py-3 text-start px-4">
                             <i class="fas fa-mortar-pestle me-2"></i> Browse All Recipes
                         </a>
-                        <a asp-controller="Home" asp-action="Contact" class="btn btn-outline-secondary rounded-pill py-3 text-start px-4">
-                            <i class="fas fa-headset me-2"></i> Support & Verification Desk
+                        <a asp-controller="Home" asp-action="Privacy" class="btn btn-outline-secondary rounded-pill py-3 text-start px-4">
+                            <i class="fas fa-shield-alt me-2"></i> Platform Governance & Policies
                         </a>
                     </div>
                 </div>
             </div>
+
+            <!-- Enhanced Vendor Accreditation Card -->
             <div class="col-lg-6">
                 <div class="card border-0 shadow-sm rounded-4 p-4 h-100 bg-white d-flex flex-column">
-                    <h5 class="fw-bold text-dark mb-3"><i class="fas fa-user-shield text-success me-2"></i>Vendor Accreditation</h5>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold text-dark mb-0"><i class="fas fa-user-shield text-success me-2"></i>Vendor Accreditation</h5>
+                        <a asp-action="EditProfile" class="btn btn-sm btn-outline-success rounded-pill px-3">
+                            <i class="fas fa-edit me-1"></i> Edit
+                        </a>
+                    </div>
 
                     <div class="list-group list-group-flush mb-3">
-                        <div class="list-group-item d-flex justify-content-between align-items-center py-3">
-                            <span class="text-muted">Registered Name:</span>
+                        <div class="list-group-item d-flex justify-content-between align-items-center py-2 px-0">
+                            <span class="text-muted"><i class="fas fa-id-badge text-muted me-2"></i>Registered Name:</span>
                             <span class="fw-bold text-dark">@fullName</span>
                         </div>
-                        <div class="list-group-item d-flex justify-content-between align-items-center py-3">
-                            <span class="text-muted">Account Access:</span>
-                            <span class="badge bg-success">Verified Apothecary</span>
+                        <div class="list-group-item d-flex justify-content-between align-items-center py-2 px-0">
+                            <span class="text-muted"><i class="fas fa-certificate text-success me-2"></i>License Number:</span>
+                            <span class="badge bg-light text-dark border font-monospace">
+                                @(!string.IsNullOrWhiteSpace(Model?.LicenseNumber) ? Model.LicenseNumber : "Unregistered")
+                            </span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center py-2 px-0">
+                            <span class="text-muted"><i class="fas fa-phone-alt text-primary me-2"></i>Contact Phone:</span>
+                            <span class="fw-semibold text-dark">@(!string.IsNullOrWhiteSpace(Model?.Phone) ? Model.Phone : "Not Provided")</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center py-2 px-0">
+                            <span class="text-muted"><i class="fas fa-map-marker-alt text-danger me-2"></i>Dispensary Location:</span>
+                            <span class="fw-semibold text-dark text-truncate" style="max-width: 250px;">
+                                @(!string.IsNullOrWhiteSpace(Model?.FullAddress) ? Model.FullAddress : "Not Set")
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Professional Herbalist Bio -->
+                    <div class="mb-4">
+                        <span class="text-muted small fw-bold d-block mb-1"><i class="fas fa-quote-left text-success me-1"></i> Professional Bio:</span>
+                        <div class="bio-box">
+                            @if (!string.IsNullOrWhiteSpace(Model?.Bio))
+                            {
+                                <span>@Model.Bio</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted fst-italic">No practitioner biography provided. Click "Edit" to summarize your botanical experience.</span>
+                            }
                         </div>
                     </div>
 
                     <!-- Vendor Personal Actions -->
                     <div class="mt-auto d-grid gap-2">
-                        <a asp-controller="Recipe" asp-action="MyRecipes" class="btn btn-success rounded-pill py-2 px-4 fw-bold d-flex align-items-center justify-content-center shadow-sm">
+                        <a asp-controller="Recipe" asp-action="Index" class="btn btn-success rounded-pill py-2 px-4 fw-bold d-flex align-items-center justify-content-center shadow-sm">
                             <i class="fas fa-scroll me-2"></i> My Store Recipes
                         </a>
-                        <a asp-controller="Inventory" asp-action="Index" class="btn btn-outline-primary rounded-pill py-2 px-4 fw-bold d-flex align-items-center justify-content-center">
-                            <i class="fas fa-boxes me-2"></i> Manage Store Inventory
+                        <a asp-controller="Herb" asp-action="Index" class="btn btn-outline-primary rounded-pill py-2 px-4 fw-bold d-flex align-items-center justify-content-center">
+                            <i class="fas fa-boxes me-2"></i> Manage Dispensary Inventory
                         </a>
                     </div>
                 </div>

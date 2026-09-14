@@ -1,0 +1,102 @@
+﻿@model HerbioMart.ViewModels.Herbalist.EditHerbalistProfileVM
+
+@{
+    ViewData["Title"] = "Edit Herbalist Profile";
+}
+
+<style>
+    .edit-profile-wrapper {
+        margin-top: 150px;
+    }
+</style>
+
+<div class="container edit-profile-wrapper py-4" style="max-width: 800px;">
+    <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white">
+
+        <div class="d-flex align-items-center justify-content-between mb-4 border-bottom pb-3">
+            <div>
+                <h3 class="fw-bold text-dark mb-1">Edit Apothecary Profile</h3>
+                <p class="text-muted small mb-0">Update your public botanical credentials, contact info, and profile image.</p>
+            </div>
+            <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-3">
+                <i class="fas fa-arrow-left me-1"></i> Back
+            </a>
+        </div>
+
+        <form asp-action="EditProfile" method="post" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+
+            <div class="row g-3 mb-4">
+
+                <!-- Full Name -->
+                <div class="col-md-6">
+                    <label asp-for="FullName" class="form-label fw-semibold">Full Legal / Store Name</label>
+                    <input asp-for="FullName" class="form-control rounded-3" placeholder="e.g. Master Apothecary Ahmed" />
+                    <span asp-validation-for="FullName" class="text-danger small"></span>
+                </div>
+
+                <!-- Phone -->
+                <div class="col-md-6">
+                    <label asp-for="Phone" class="form-label fw-semibold">Contact Phone Number</label>
+                    <input asp-for="Phone" class="form-control rounded-3" placeholder="010xxxxxxxx" />
+                    <span asp-validation-for="Phone" class="text-danger small"></span>
+                </div>
+
+                <!-- License Number -->
+                <div class="col-12">
+                    <label asp-for="LicenseNumber" class="form-label fw-semibold">Ministry / Syndicate License Number</label>
+                    <input asp-for="LicenseNumber" class="form-control rounded-3" placeholder="e.g. APOTH-2026-987" />
+                    <span asp-validation-for="LicenseNumber" class="text-danger small"></span>
+                </div>
+
+                <!-- Professional Bio -->
+                <div class="col-12">
+                    <label asp-for="Bio" class="form-label fw-semibold">Apothecary Bio / Practice Specialties</label>
+                    <textarea asp-for="Bio" rows="3" class="form-control rounded-3" placeholder="Briefly introduce your botanical expertise, years of experience, or specialized herbal remedies..."></textarea>
+                    <span asp-validation-for="Bio" class="text-danger small"></span>
+                </div>
+
+                <!-- Address: Governorate, City, Street -->
+                <div class="col-md-4">
+                    <label asp-for="Governorate" class="form-label fw-semibold">Governorate</label>
+                    <input asp-for="Governorate" class="form-control rounded-3" placeholder="Menofia" />
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="City" class="form-label fw-semibold">City</label>
+                    <input asp-for="City" class="form-control rounded-3" placeholder="Menouf" />
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="Street" class="form-label fw-semibold">Street</label>
+                    <input asp-for="Street" class="form-control rounded-3" placeholder="El-Galaa St." />
+                </div>
+
+                <!-- Profile Picture Upload -->
+                <div class="col-12 mt-3">
+                    <label class="form-label fw-semibold">Profile Picture</label>
+                    @if (!string.IsNullOrEmpty(Model.ExistingImageUrl))
+                    {
+                        <div class="mb-2 d-flex align-items-center gap-3">
+                            <img src="@Model.ExistingImageUrl" alt="Current Photo" class="rounded-circle border" style="width: 60px; height: 60px; object-fit: cover;" />
+                            <small class="text-muted">Current photo displayed. Select a new file below if you wish to change it.</small>
+                        </div>
+                    }
+                    <input asp-for="ProfileImage" type="file" accept="image/*" class="form-control rounded-3" />
+                    <span asp-validation-for="ProfileImage" class="text-danger small"></span>
+                </div>
+
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                <a asp-action="Index" class="btn btn-light rounded-pill px-4">Cancel</a>
+                <button type="submit" class="btn btn-success rounded-pill px-5 fw-bold shadow-sm">
+                    <i class="fas fa-save me-1"></i> Save Changes
+                </button>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,53 +1,277 @@
-@model HerbioMart.ViewModels.PatientProfile.PatientProfileVM
+@model HerbioMart.ViewModels.Patient.PatientProfileVM
 
 @{
     ViewData["Title"] = "Patient Profile";
 }
 
-<div class="container mt-4">
-    <h2>Patient Profile</h2>
-    <hr />
+<style>
+    .avatar-img-circle {
+        width: 95px;
+        height: 95px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #81c784;
+        box-shadow: 0 6px 16px rgba(25, 135, 84, 0.25);
+        margin: 0 auto 1rem auto;
+        display: block;
+    }
 
+    .profile-card {
+        border-radius: 16px;
+        border: 1px solid #e2e8f0;
+        background: #ffffff;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    }
+
+    .avatar-circle {
+        width: 95px;
+        height: 95px;
+        background: linear-gradient(135deg, #82ae46 0%, #198754 100%);
+        color: #ffffff;
+        font-size: 2.2rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        margin: 0 auto 1rem auto;
+        box-shadow: 0 6px 16px rgba(25, 135, 84, 0.25);
+    }
+
+    .badge-verified {
+        background-color: #e8f5e9 !important;
+        color: #2e7d32 !important;
+        border: 1px solid #c8e6c9;
+        font-size: 0.8rem;
+        font-weight: 600;
+        display: inline-block;
+        padding: 0.35rem 0.85rem;
+    }
+
+    .condition-pill {
+        border-radius: 50rem;
+        padding: 0.4rem 0.9rem;
+        font-size: 0.8rem;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+
+    .condition-active {
+        background-color: #fef2f2;
+        color: #dc2626;
+        border: 1px solid #fca5a5;
+    }
+
+    .condition-clear {
+        background-color: #f0fdf4;
+        color: #16a34a;
+        border: 1px solid #bbf7d0;
+    }
+
+    .data-item {
+        background-color: #f8fafc;
+        border: 1px solid #edf2f7;
+        border-radius: 12px;
+        padding: 1rem;
+        height: 100%;
+    }
+</style>
+
+<!-- Single Page Header (Fixes Navbar overlap and unifies site layout) -->
+<div class="container-fluid page-header py-5 mb-5">
+    <h1 class="text-center text-white display-6 fw-bold">Patient Profile</h1>
+    <ol class="breadcrumb justify-content-center mb-0">
+        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-white">Home</a></li>
+        <li class="breadcrumb-item active text-white">My Account</li>
+    </ol>
+</div>
+<!-- Single Page Header End -->
+
+<div class="container pb-5">
+    <!-- Alerts -->
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+        <div class="alert alert-success alert-dismissible fade show rounded-3 mb-4 shadow-sm" role="alert">
+            <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
     }
     @if (TempData["ErrorMessage"] != null)
     {
-        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+        <div class="alert alert-danger alert-dismissible fade show rounded-3 mb-4 shadow-sm" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
     }
 
-    <div class="card p-4 shadow-sm">
-        <dl class="row">
-            <dt class="col-sm-3">Full Name:</dt>
-            <dd class="col-sm-9">@Model.FullName</dd>
+    <div class="row g-4">
+        <!-- ======================= LEFT COLUMN: ACCOUNT DETAILS ======================= -->
+        <div class="col-lg-4">
+            <div class="profile-card p-4 text-center">
+                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                {
+                    <img src="@Model.ImageUrl" alt="@Model.FullName" class="avatar-img-circle" />
+                }
+                else
+                {
+                    <div class="avatar-circle">
+                        @(string.IsNullOrEmpty(Model.FullName) ? "P" : Model.FullName.Substring(0, 1).ToUpper())
+                    </div>
+                }
 
-            <dt class="col-sm-3">Username:</dt>
-            <dd class="col-sm-9">@Model.UserName</dd>
+                <h4 class="fw-bold text-dark mb-1">@Model.FullName</h4>
+                <p class="text-muted small mb-2">@@@Model.UserName</p>
 
-            <dt class="col-sm-3">Email:</dt>
-            <dd class="col-sm-9">@Model.Email</dd>
+                <!-- Fixed Badge Contrast -->
+                <span class="badge rounded-pill badge-verified mb-4">
+                    <i class="fas fa-shield-alt me-1"></i> Verified Patient
+                </span>
 
-            <dt class="col-sm-3">Phone Number:</dt>
-            <dd class="col-sm-9">@Model.Phone</dd>
+                <div class="text-start border-top pt-3 mb-4">
+                    <div class="mb-3">
+                        <small class="text-muted text-uppercase fw-bold d-block" style="font-size: 0.7rem; letter-spacing: 0.5px;">Email Address</small>
+                        <span class="text-dark fw-semibold small">@Model.Email</span>
+                    </div>
+                    <div>
+                        <small class="text-muted text-uppercase fw-bold d-block" style="font-size: 0.7rem; letter-spacing: 0.5px;">Account Role</small>
+                        <span class="text-dark fw-semibold small">Patient (Apothecary Client)</span>
+                    </div>
+                </div>
 
-            <dt class="col-sm-3">Address:</dt>
-            <dd class="col-sm-9">@Model.Address</dd>
+                <div class="d-grid gap-2">
+                    <a asp-action="Edit" class="btn btn-success rounded-pill fw-semibold py-2">
+                        <i class="fas fa-user-edit me-1"></i> Edit Information
+                    </a>
 
-            <dt class="col-sm-3">Birth Date:</dt>
-            <dd class="col-sm-9">@Model.BirthDate?.ToString("yyyy-MM-dd")</dd>
+                    <form asp-action="Delete" method="post" class="w-100" onsubmit="return confirm('Are you sure you want to deactivate your patient account?');">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-outline-danger rounded-pill w-100 py-2 btn-sm">
+                            <i class="fas fa-user-times me-1"></i> Deactivate Account
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
 
-            <dt class="col-sm-3">Gender:</dt>
-            <dd class="col-sm-9">@Model.Gender</dd>
-        </dl>
+        <!-- ======================= RIGHT COLUMN: INFO & MEDICAL HISTORY ======================= -->
+        <div class="col-lg-8">
+            <!-- Personal Information Box -->
+            <div class="profile-card p-4 mb-4">
+                <h5 class="fw-bold text-dark mb-3 d-flex align-items-center">
+                    <i class="fas fa-address-card text-success me-2"></i> Personal Information
+                </h5>
 
-        <div class="mt-3">
-            <a asp-action="Update" class="btn btn-primary">Edit Information</a>
-            
-            <!-- زر الحذف مع تنبيه تأكيد -->
-            <form asp-action="Delete" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to deactivate your account?');">
-                <button type="submit" class="btn btn-danger">Delete</button>
-            </form>
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <div class="data-item">
+                            <small class="text-muted d-block mb-1"><i class="fas fa-phone-alt me-1 text-muted"></i> Phone Number</small>
+                            <span class="fw-bold text-dark">@(string.IsNullOrWhiteSpace(Model.Phone) ? "Not provided" : Model.Phone)</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="data-item">
+                            <small class="text-muted d-block mb-1"><i class="fas fa-venus-mars me-1 text-muted"></i> Gender</small>
+                            <span class="fw-bold text-dark">@(string.IsNullOrWhiteSpace(Model.Gender) ? "Not specified" : Model.Gender)</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="data-item">
+                            <small class="text-muted d-block mb-1"><i class="fas fa-birthday-cake me-1 text-muted"></i> Birth Date</small>
+                            <span class="fw-bold text-dark">@(Model.BirthDate?.ToString("MMMM dd, yyyy") ?? "Not provided")</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="data-item">
+                            <small class="text-muted d-block mb-1"><i class="fas fa-map-marker-alt me-1 text-muted"></i> Residential Address</small>
+                            <span class="fw-bold text-dark">@(string.IsNullOrWhiteSpace(Model.Address) ? "No address registered" : Model.Address)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Medical History Box -->
+            <div class="profile-card p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                    <h5 class="fw-bold text-dark mb-0 d-flex align-items-center">
+                        <i class="fas fa-file-medical text-danger me-2"></i> Medical History & Clinical Profile
+                    </h5>
+
+                    <a asp-controller="MedicalHistory" asp-action="Index" class="btn btn-outline-success rounded-pill btn-sm px-3 fw-semibold">
+                        <i class="fas fa-edit me-1"></i> Update Health Record
+                    </a>
+                </div>
+
+                <p class="text-muted small mb-4">
+                    Your chronic health status helps herbalists verify that remedy components are free of adverse herb-drug reactions.
+                </p>
+
+                @if (Model.MedicalHistory == null)
+                {
+                    <div class="p-4 bg-light rounded-4 text-center border">
+                        <i class="fas fa-notes-medical text-muted fa-2x mb-2"></i>
+                        <h6 class="fw-bold text-dark">No Medical History Recorded</h6>
+                        <p class="text-muted small mb-3">Record your health status to receive safe, customized formulations.</p>
+                        <a asp-controller="MedicalHistory" asp-action="Index" class="btn btn-success btn-sm rounded-pill px-4">
+                            <i class="fas fa-plus-circle me-1"></i> Add Medical Record
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    <div class="mb-4">
+                        <small class="text-muted d-block fw-semibold mb-2">CHRONIC CONDITIONS & RISK FACTORS</small>
+                        <div class="d-flex flex-wrap gap-2">
+                            <span class="condition-pill @(Model.MedicalHistory.Diabetes ? "condition-active" : "condition-clear")">
+                                <i class="fas @(Model.MedicalHistory.Diabetes ? "fa-exclamation-triangle" : "fa-check-circle")"></i>
+                                Diabetes: @(Model.MedicalHistory.Diabetes ? "Yes" : "No")
+                            </span>
+
+                            <span class="condition-pill @(Model.MedicalHistory.Hypertension ? "condition-active" : "condition-clear")">
+                                <i class="fas @(Model.MedicalHistory.Hypertension ? "fa-exclamation-triangle" : "fa-check-circle")"></i>
+                                Hypertension: @(Model.MedicalHistory.Hypertension ? "Yes" : "No")
+                            </span>
+
+                            <span class="condition-pill @(Model.MedicalHistory.Asthma ? "condition-active" : "condition-clear")">
+                                <i class="fas @(Model.MedicalHistory.Asthma ? "fa-exclamation-triangle" : "fa-check-circle")"></i>
+                                Asthma: @(Model.MedicalHistory.Asthma ? "Yes" : "No")
+                            </span>
+
+                            <span class="condition-pill @(Model.MedicalHistory.HeartDisease ? "condition-active" : "condition-clear")">
+                                <i class="fas @(Model.MedicalHistory.HeartDisease ? "fa-exclamation-triangle" : "fa-check-circle")"></i>
+                                Heart Disease: @(Model.MedicalHistory.HeartDisease ? "Yes" : "No")
+                            </span>
+
+                            <span class="condition-pill @(Model.MedicalHistory.KidneyDisease ? "condition-active" : "condition-clear")">
+                                <i class="fas @(Model.MedicalHistory.KidneyDisease ? "fa-exclamation-triangle" : "fa-check-circle")"></i>
+                                Kidney Disease: @(Model.MedicalHistory.KidneyDisease ? "Yes" : "No")
+                            </span>
+
+                            <span class="condition-pill @(Model.MedicalHistory.LiverDisease ? "condition-active" : "condition-clear")">
+                                <i class="fas @(Model.MedicalHistory.LiverDisease ? "fa-exclamation-triangle" : "fa-check-circle")"></i>
+                                Liver Disease: @(Model.MedicalHistory.LiverDisease ? "Yes" : "No")
+                            </span>
+
+                            <span class="condition-pill @(Model.MedicalHistory.Smoker ? "condition-active" : "condition-clear")">
+                                <i class="fas @(Model.MedicalHistory.Smoker ? "fa-smoking" : "fa-smoking-ban")"></i>
+                                Active Smoker: @(Model.MedicalHistory.Smoker ? "Yes" : "No")
+                            </span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <small class="text-muted d-block fw-semibold mb-1">CLINICAL NOTES & SPECIAL ALLERGIES</small>
+                        <div class="p-3 bg-light rounded-3 border">
+                            <p class="text-muted small mb-0 fst-italic">
+                                @(string.IsNullOrWhiteSpace(Model.MedicalHistory.OtherNotes)
+                                    ? "No additional notes or allergies recorded."
+                                    : Model.MedicalHistory.OtherNotes)
+                            </p>
+                        </div>
+                    </div>
+                }
+            </div>
         </div>
     </div>
 </div>
