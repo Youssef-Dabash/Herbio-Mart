@@ -91,8 +91,8 @@ The platform relies on a relational architecture structured around multi-tenant 
 | :---: | :---: |
 | ![Home Page & Live Stats](docs/screenshots/home-stats.png) | ![Community Reviews](docs/screenshots/Community.png) |
 
-| Smooth-Scroll Featured Remedies | Patient Orders History & Tracking |
-| :---: | :---: |
+| Smooth-Scroll Featured Remedies |
+| :---: |
 | ![Patient Orders Tracking](docs/screenshots/orders-patients.png) |
 
 ### 2. Dispensary Operations & Compounding
