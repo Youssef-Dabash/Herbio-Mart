@@ -1,0 +1,196 @@
+﻿@using HerbioMart.Models.Enums
+@model List<HerbioMart.ViewModels.Herbalist.HerbalistSubOrderListItemVM>
+
+@{
+    ViewData["Title"] = "Incoming Dispensary Orders";
+    var currentFilter = ViewBag.CurrentFilter as SubOrderStatus?;
+}
+
+<style>
+    .status-badge-pending {
+        background-color: #fef3c7 !important;
+        color: #92400e !important;
+        border: 1px solid #fcd34d !important;
+        font-weight: 700 !important;
+        font-size: 0.75rem !important;
+        padding: 6px 14px !important;
+        border-radius: 50rem !important;
+        display: inline-flex !important;
+        align-items: center !important;
+    }
+
+    .status-badge-accepted {
+        background-color: #e0f2fe !important;
+        color: #0369a1 !important;
+        border: 1px solid #7dd3fc !important;
+        font-weight: 700 !important;
+        font-size: 0.75rem !important;
+        padding: 6px 14px !important;
+        border-radius: 50rem !important;
+        display: inline-flex !important;
+        align-items: center !important;
+    }
+
+    .status-badge-shipped {
+        background-color: #dcfce7 !important;
+        color: #15803d !important;
+        border: 1px solid #86efac !important;
+        font-weight: 700 !important;
+        font-size: 0.75rem !important;
+        padding: 6px 14px !important;
+        border-radius: 50rem !important;
+        display: inline-flex !important;
+        align-items: center !important;
+    }
+
+    .status-badge-cancelled {
+        background-color: #fee2e2 !important;
+        color: #991b1b !important;
+        border: 1px solid #fca5a5 !important;
+        font-weight: 700 !important;
+        font-size: 0.75rem !important;
+        padding: 6px 14px !important;
+        border-radius: 50rem !important;
+        display: inline-flex !important;
+        align-items: center !important;
+    }
+</style>
+
+<!-- Page Header -->
+<div class="container-fluid page-header py-5 mb-4">
+    <h1 class="text-center text-white display-6 fw-bold">Incoming Dispensary Orders</h1>
+    <ol class="breadcrumb justify-content-center mb-0">
+        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-white">Home</a></li>
+        <li class="breadcrumb-item"><a asp-controller="Herbalist" asp-action="Index" class="text-white">Dashboard</a></li>
+        <li class="breadcrumb-item active text-white">Orders</li>
+    </ol>
+</div>
+
+<div class="container py-4">
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show rounded-4 shadow-sm mb-4" role="alert">
+            <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show rounded-4 shadow-sm mb-4" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Status Filters -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <h4 class="fw-bold text-dark mb-1">Prescription Fulfillment Queue</h4>
+            <p class="text-muted small mb-0">Review assigned medicinal preparations and dispatch status.</p>
+        </div>
+
+        <div class="btn-group rounded-pill p-1 bg-light border shadow-sm" role="group">
+            <a asp-action="Orders" class="btn btn-sm rounded-pill px-3 @(currentFilter == null ? "btn-success fw-bold text-white" : "text-dark")">
+                All Orders
+            </a>
+            <a asp-action="Orders" asp-route-status="@SubOrderStatus.Pending" class="btn btn-sm rounded-pill px-3 @(currentFilter == SubOrderStatus.Pending ? "btn-warning fw-bold text-dark" : "text-dark")">
+                Pending
+            </a>
+            <a asp-action="Orders" asp-route-status="@SubOrderStatus.Accepted" class="btn btn-sm rounded-pill px-3 @(currentFilter == SubOrderStatus.Accepted ? "btn-primary fw-bold text-white" : "text-dark")">
+                Accepted
+            </a>
+            <a asp-action="Orders" asp-route-status="@SubOrderStatus.Shipped" class="btn btn-sm rounded-pill px-3 @(currentFilter == SubOrderStatus.Shipped ? "btn-success fw-bold text-white" : "text-dark")">
+                Shipped
+            </a>
+        </div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5 bg-light rounded-4 border">
+            <i class="fas fa-inbox fa-3x text-muted mb-3 opacity-50"></i>
+            <h5 class="fw-bold text-dark">No Orders in this Queue</h5>
+            <p class="text-muted small mb-0">New patient prescription packages will appear here when placed.</p>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive bg-white rounded-4 border shadow-sm p-3">
+            <table class="table align-middle mb-0">
+                <thead class="table-light small text-uppercase text-muted">
+                    <tr>
+                        <th>Package Ref</th>
+                        <th>Order Date</th>
+                        <th>Patient Name</th>
+                        <th class="text-center">Items Count</th>
+                        <th>Revenue</th>
+                        <th>Status</th>
+                        <th class="text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var order in Model)
+                    {
+                        <tr>
+                            <td class="font-monospace fw-bold text-dark">
+                                #SUB-@order.SubOrderId
+                                <small class="text-muted d-block" style="font-size: 0.7rem;">Parent: #@order.OrderId</small>
+                            </td>
+
+                            <td class="small text-muted">
+                                @order.OrderDate.ToString("MMM dd, yyyy - hh:mm tt")
+                            </td>
+
+                            <td class="fw-semibold text-dark">
+                                @order.PatientName
+                            </td>
+
+                            <td class="text-center">
+                                <span class="badge bg-light text-dark border font-monospace px-2 py-1">@order.TotalItemsCount item(s)</span>
+                            </td>
+
+                            <td class="font-monospace fw-bold text-success fs-6">
+                                @order.SubTotal.ToString("0.00") EGP
+                            </td>
+
+                            <td>
+                                @if (order.Status == SubOrderStatus.Shipped)
+                                {
+                                    <span class="status-badge-shipped">
+                                        <i class="fas fa-shipping-fast me-1"></i> Shipped
+                                    </span>
+                                }
+                                else if (order.Status == SubOrderStatus.Accepted)
+                                {
+                                    <span class="status-badge-accepted">
+                                        <i class="fas fa-box-open me-1"></i> Preparing
+                                    </span>
+                                }
+                                else if (order.Status == SubOrderStatus.Cancelled)
+                                {
+                                    <span class="status-badge-cancelled">
+                                        <i class="fas fa-times-circle me-1"></i> Cancelled
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="status-badge-pending">
+                                        <i class="fas fa-clock me-1"></i> Pending
+                                    </span>
+                                }
+                            </td>
+
+                            <td class="text-center">
+                                <a asp-action="OrderDetails" asp-route-id="@order.SubOrderId" class="btn btn-sm btn-outline-success rounded-pill px-3 fw-semibold">
+                                    <i class="fas fa-clipboard-check me-1"></i> Manage Package
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+</div>

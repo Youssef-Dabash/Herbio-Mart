@@ -1,144 +1,340 @@
-﻿@{
-    ViewData["Title"] = "Shopping Cart";
+﻿@model HerbioMart.ViewModels.Order.CartVM
+
+@{
+    ViewData["Title"] = "Prescription Cart";
 }
 
-<!-- Single Page Header start -->
-<div class="container-fluid page-header py-5">
-    <h1 class="text-center text-white display-6">Prescription Cart</h1>
+<style>
+    .cart-avatar-herb {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background-color: #16a34a !important;
+        color: #fff !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        flex-shrink: 0;
+    }
+
+    .cart-avatar-recipe {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background-color: #0284c7 !important;
+        color: #fff !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        flex-shrink: 0;
+    }
+
+    .badge-herb-type {
+        background-color: #dcfce7 !important;
+        color: #15803d !important;
+        border: 1px solid #86efac !important;
+        font-weight: 700;
+        font-size: 0.75rem;
+        padding: 6px 12px;
+        border-radius: 50px;
+    }
+
+    .badge-recipe-type {
+        background-color: #e0f2fe !important;
+        color: #0369a1 !important;
+        border: 1px solid #7dd3fc !important;
+        font-weight: 700;
+        font-size: 0.75rem;
+        padding: 6px 12px;
+        border-radius: 50px;
+    }
+
+    .qty-btn {
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50% !important;
+    }
+</style>
+
+<!-- Single Page Header -->
+<div class="container-fluid page-header py-5 mb-4">
+    <h1 class="text-center text-white display-6 fw-bold">Prescription Cart</h1>
     <ol class="breadcrumb justify-content-center mb-0">
         <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-white">Home</a></li>
         <li class="breadcrumb-item"><a asp-controller="Shop" asp-action="Index" class="text-white">Shop</a></li>
         <li class="breadcrumb-item active text-white">Cart</li>
     </ol>
 </div>
-<!-- Single Page Header End -->
-<!-- Cart Page Start -->
-<div class="container-fluid py-5">
-    <div class="container py-5">
-        <div class="table-responsive">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th scope="col">Remedy</th>
-                        <th scope="col">Name</th>
-                        <th scope="col">Price</th>
-                        <th scope="col">Quantity</th>
+
+<div class="container py-4">
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show rounded-4 shadow-sm mb-4" role="alert">
+            <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (Model == null || !Model.Items.Any())
+    {
+        <div class="text-center py-5 bg-light rounded-4 border my-4" id="emptyCartMessage">
+            <i class="fas fa-shopping-basket fa-4x text-muted mb-3 opacity-50"></i>
+            <h4 class="fw-bold text-dark mb-2">Your Cart is Currently Empty</h4>
+            <p class="text-muted small mb-4">Choose from authentic herbs or therapeutic compounding formulations.</p>
+            <a asp-controller="Shop" asp-action="Index" class="btn btn-success rounded-pill px-4 py-2 fw-semibold shadow-sm">
+                <i class="fas fa-store me-1"></i> Browse Medicinal Catalog
+            </a>
+        </div>
+    }
+    else
+    {
+        <!-- Cart Table -->
+        <div class="table-responsive bg-white rounded-4 border shadow-sm p-3 mb-4">
+            <table class="table align-middle mb-0" id="cartTable">
+                <thead class="table-light">
+                    <tr class="small text-uppercase text-muted">
+                        <th scope="col" style="min-width: 260px;">Item & Dispensary</th>
+                        <th scope="col">Type</th>
+                        <th scope="col">Rate / Unit Price</th>
+                        <th scope="col" class="text-center" style="min-width: 190px;">Quantity / Weight</th>
                         <th scope="col">Total</th>
-                        <th scope="col">Remove</th>
+                        <th scope="col" class="text-center">Remove</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <th scope="row">
-                            <div class="d-flex align-items-center">
-                                <img src="~/img/vegetable-item-3.png" class="img-fluid me-5 rounded-circle" style="width: 80px; height: 80px;" alt="Chamomile Pack">
-                            </div>
-                        </th>
-                        <td>
-                            <p class="mb-0 mt-4 fw-semibold">Organic Chamomile Pack</p>
-                            <small class="text-muted">Vendor: Al-Azhar Herbalists</small>
-                        </td>
-                        <td>
-                            <p class="mb-0 mt-4">45.00 EGP</p>
-                        </td>
-                        <td>
-                            <div class="input-group quantity mt-4" style="width: 100px;">
-                                <div class="input-group-btn">
-                                    <button class="btn btn-sm btn-minus rounded-circle bg-light border" type="button">
-                                        <i class="fa fa-minus"></i>
+                    @for (int i = 0; i < Model.Items.Count; i++)
+                    {
+                        var item = Model.Items[i];
+                        bool isHerb = item.ItemType == HerbioMart.ViewModels.Order.CartItemType.Herb;
+
+                        <tr class="cart-row" data-index="@i" data-type="@(isHerb ? "Herb" : "Recipe")" data-unitprice="@item.UnitPrice">
+
+                            <!-- Item Info & Vendor Selector -->
+                            <td>
+                                <div class="d-flex align-items-start">
+                                    <div class="me-3 mt-1 @(isHerb ? "cart-avatar-herb" : "cart-avatar-recipe")">
+                                        <i class="fas @(isHerb ? "fa-leaf" : "fa-mortar-pestle")"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="fw-bold text-dark mb-1">@item.ItemName</h6>
+
+                                        @if (isHerb && item.AvailableVendors.Any())
+                                        {
+                                            <div class="mt-1" style="max-width: 250px;">
+                                                <label class="text-muted fw-bold mb-1" style="font-size: 0.7rem;">SELECT DISPENSARY VENDOR:</label>
+                                                <select class="form-select form-select-sm rounded-3 vendor-select-in-cart" data-index="@i">
+                                                    @foreach (var v in item.AvailableVendors)
+                                                    {
+                                                        <option value="@v.HerbalistId" data-price="@v.Price" selected="@(v.HerbalistId == item.HerbalistId)">
+                                                            @v.HerbalistName (@v.Price.ToString("0.00") EGP/Kg)
+                                                        </option>
+                                                    }
+                                                </select>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <small class="text-muted">
+                                                <i class="fas fa-user-check text-success me-1"></i>Vendor: <strong>@item.HerbalistName</strong>
+                                            </small>
+                                        }
+                                    </div>
+                                </div>
+                            </td>
+
+                            <!-- Badge -->
+                            <td>
+                                @if (isHerb)
+                                {
+                                    <span class="badge-herb-type"><i class="fas fa-leaf me-1"></i> Single Herb</span>
+                                }
+                                else
+                                {
+                                    <span class="badge-recipe-type"><i class="fas fa-mortar-pestle me-1"></i> Remedy Pack</span>
+                                }
+                            </td>
+
+                            <!-- Unit Price -->
+                            <td>
+                                <span class="fw-bold text-dark font-monospace row-unit-price">@item.UnitPrice.ToString("0.00")</span>
+                                <small class="text-muted fw-semibold">EGP @(isHerb ? "/ Kg" : "/ Unit")</small>
+                                @if (isHerb)
+                                {
+                                    <small class="text-muted d-block gram-rate-text" style="font-size: 0.72rem;">
+                                        (@((item.UnitPrice / 1000m).ToString("0.000")) EGP / gram)
+                                    </small>
+                                }
+                            </td>
+
+                            <!-- Quantity Controls -->
+                            <td class="text-center">
+                                <div class="d-inline-flex align-items-center gap-1">
+                                    <button type="button" class="btn btn-sm btn-light border qty-btn btn-qty-minus" title="Decrease">
+                                        <i class="fa fa-minus small"></i>
+                                    </button>
+
+                                    @if (isHerb)
+                                    {
+                                        <div class="input-group input-group-sm" style="width: 110px;">
+                                            <input type="number" class="form-control text-center fw-bold font-monospace px-1 qty-input"
+                                                   value="@item.Quantity" min="10" step="50" />
+                                            <span class="input-group-text px-1 small fw-bold bg-light">g</span>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="input-group input-group-sm" style="width: 80px;">
+                                            <input type="number" class="form-control text-center fw-bold font-monospace px-1 qty-input"
+                                                   value="@item.Quantity" min="1" step="1" />
+                                        </div>
+                                    }
+
+                                    <button type="button" class="btn btn-sm btn-light border qty-btn btn-qty-plus" title="Increase">
+                                        <i class="fa fa-plus small"></i>
                                     </button>
                                 </div>
-                                <input type="text" class="form-control form-control-sm text-center border-0" value="1">
-                                <div class="input-group-btn">
-                                    <button class="btn btn-sm btn-plus rounded-circle bg-light border" type="button">
-                                        <i class="fa fa-plus"></i>
+                            </td>
+
+                            <!-- SubTotal -->
+                            <td>
+                                <span class="fw-bold text-success font-monospace row-subtotal">@item.SubTotal.ToString("0.00")</span>
+                                <small class="text-muted fw-bold">EGP</small>
+                            </td>
+
+                            <!-- Remove Button -->
+                            <td class="text-center">
+                                <form asp-controller="Cart" asp-action="Remove" method="post" class="m-0">
+                                    <input type="hidden" name="index" value="@i" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle" style="width: 34px; height: 34px;">
+                                        <i class="fas fa-trash-alt"></i>
                                     </button>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <p class="mb-0 mt-4">45.00 EGP</p>
-                        </td>
-                        <td>
-                            <button type="button" class="btn btn-md rounded-circle bg-light border mt-4">
-                                <i class="fa fa-times text-danger"></i>
-                            </button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row">
-                            <div class="d-flex align-items-center">
-                                <img src="~/img/vegetable-item-5.jpg" class="img-fluid me-5 rounded-circle" style="width: 80px; height: 80px;" alt="Digestive Compound">
-                            </div>
-                        </th>
-                        <td>
-                            <p class="mb-0 mt-4 fw-semibold">Digestive Relief Recipe</p>
-                            <small class="text-muted">Vendor: Ibn Sina Remedies</small>
-                        </td>
-                        <td>
-                            <p class="mb-0 mt-4">120.00 EGP</p>
-                        </td>
-                        <td>
-                            <div class="input-group quantity mt-4" style="width: 100px;">
-                                <div class="input-group-btn">
-                                    <button class="btn btn-sm btn-minus rounded-circle bg-light border" type="button">
-                                        <i class="fa fa-minus"></i>
-                                    </button>
-                                </div>
-                                <input type="text" class="form-control form-control-sm text-center border-0" value="1">
-                                <div class="input-group-btn">
-                                    <button class="btn btn-sm btn-plus rounded-circle bg-light border" type="button">
-                                        <i class="fa fa-plus"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <p class="mb-0 mt-4">120.00 EGP</p>
-                        </td>
-                        <td>
-                            <button type="button" class="btn btn-md rounded-circle bg-light border mt-4">
-                                <i class="fa fa-times text-danger"></i>
-                            </button>
-                        </td>
-                    </tr>
+                                </form>
+                            </td>
+                        </tr>
+                    }
                 </tbody>
             </table>
         </div>
 
-        <div class="mt-5">
-            <input type="text" class="border-0 border-bottom rounded me-5 py-3 mb-4" placeholder="Voucher Code">
-            <button class="btn border-secondary rounded-pill px-4 py-3 text-primary" type="button">Apply Code</button>
-        </div>
+        <!-- Horizontal Checkout Bar (Full-Width) -->
+        <div class="card border-0 shadow-sm rounded-4 p-4 bg-light mb-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div>
+                    <a asp-controller="Shop" asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4 py-2 fw-semibold">
+                        <i class="fas fa-arrow-left me-2"></i> Continue Shopping
+                    </a>
+                </div>
 
-        <div class="row g-4 justify-content-end">
-            <div class="col-8"></div>
-            <div class="col-sm-8 col-md-7 col-lg-6 col-xl-4">
-                <div class="bg-light rounded">
-                    <div class="p-4">
-                        <h1 class="display-6 mb-4">Cart <span class="fw-normal">Summary</span></h1>
-                        <div class="d-flex justify-content-between mb-4">
-                            <h5 class="mb-0 me-4">Subtotal:</h5>
-                            <p class="mb-0">165.00 EGP</p>
-                        </div>
-                        <div class="d-flex justify-content-between">
-                            <h5 class="mb-0 me-4">Standard Delivery:</h5>
-                            <div>
-                                <p class="mb-0">30.00 EGP</p>
-                            </div>
-                        </div>
-                        <p class="mb-0 text-end text-muted small">Standard Cairo & Giza Dispatch</p>
+                <div class="d-flex flex-wrap align-items-center gap-4">
+                    <div class="text-end">
+                        <span class="text-muted small d-block">Items Subtotal:</span>
+                        <span class="fs-3 fw-bold text-success font-monospace" id="cartTotalText">@Model.ItemsTotal.ToString("0.00")</span>
+                        <span class="text-dark fw-bold">EGP</span>
                     </div>
-                    <div class="py-4 mb-4 border-top border-bottom d-flex justify-content-between">
-                        <h5 class="mb-0 ps-4 me-4">Order Total:</h5>
-                        <p class="mb-0 pe-4 fw-bold fs-5">195.00 EGP</p>
-                    </div>
-                    <a asp-controller="Checkout" asp-action="Index" class="btn border-secondary rounded-pill px-4 py-3 text-primary text-uppercase mb-4 ms-4 d-inline-block fw-semibold">
-                        Proceed Checkout <i class="fas fa-arrow-right ms-2"></i>
+
+                    <a asp-controller="Checkout" asp-action="Index" class="btn btn-success rounded-pill px-5 py-3 fw-bold text-uppercase shadow-sm d-flex align-items-center gap-2">
+                        <span>Proceed to Checkout</span>
+                        <i class="fas fa-arrow-right"></i>
                     </a>
                 </div>
             </div>
         </div>
-    </div>
+    }
+
 </div>
-<!-- Cart Page End -->
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Live Cart Recalculation (No delivery fee on Cart page)
+            function recalculateCartTotals() {
+                var itemsTotal = 0;
+                $(".cart-row").each(function() {
+                    var sub = parseFloat($(this).find(".row-subtotal").text()) || 0;
+                    itemsTotal += sub;
+                });
+
+                $("#cartTotalText").text(itemsTotal.toFixed(2));
+            }
+
+            function recalculateRow($row) {
+                var type = $row.data("type");
+                var unitPrice = parseFloat($row.data("unitprice")) || 0;
+                var qty = parseInt($row.find(".qty-input").val()) || 0;
+
+                var subtotal = (type === "Herb") ? ((qty * unitPrice) / 1000.0) : (qty * unitPrice);
+
+                $row.find(".row-subtotal").text(subtotal.toFixed(2));
+                recalculateCartTotals();
+
+                var index = $row.data("index");
+                $.post("/Cart/UpdateQuantityAjax", { index: index, quantity: qty });
+            }
+
+            // Minus Button
+            $(document).on("click", ".btn-qty-minus", function() {
+                var $row = $(this).closest(".cart-row");
+                var $input = $row.find(".qty-input");
+                var currentVal = parseInt($input.val()) || 0;
+                var isHerb = $row.data("type") === "Herb";
+                var step = isHerb ? 50 : 1;
+                var min = isHerb ? 10 : 1;
+
+                if (currentVal - step >= min) {
+                    $input.val(currentVal - step);
+                    recalculateRow($row);
+                }
+            });
+
+            // Plus Button
+            $(document).on("click", ".btn-qty-plus", function() {
+                var $row = $(this).closest(".cart-row");
+                var $input = $row.find(".qty-input");
+                var currentVal = parseInt($input.val()) || 0;
+                var isHerb = $row.data("type") === "Herb";
+                var step = isHerb ? 50 : 1;
+
+                $input.val(currentVal + step);
+                recalculateRow($row);
+            });
+
+            // Manual Input Keyup/Change
+            $(document).on("change keyup", ".qty-input", function() {
+                var $row = $(this).closest(".cart-row");
+                var val = parseInt($(this).val()) || 0;
+                var isHerb = $row.data("type") === "Herb";
+                var min = isHerb ? 10 : 1;
+
+                if (val < min) {
+                    val = min;
+                    $(this).val(min);
+                }
+                recalculateRow($row);
+            });
+
+            // Vendor Selection Change
+            $(document).on("change", ".vendor-select-in-cart", function() {
+                var $row = $(this).closest(".cart-row");
+                var index = $(this).data("index");
+                var herbalistId = $(this).val();
+                var selectedOption = $(this).find("option:selected");
+                var newPrice = parseFloat(selectedOption.data("price")) || 0;
+
+                $row.data("unitprice", newPrice);
+                $row.find(".row-unit-price").text(newPrice.toFixed(2));
+                $row.find(".gram-rate-text").text("(" + (newPrice / 1000.0).toFixed(3) + " EGP / gram)");
+
+                recalculateRow($row);
+
+                $.post("/Cart/ChangeVendorAjax", { index: index, herbalistId: herbalistId });
+            });
+        });
+    </script>
+}

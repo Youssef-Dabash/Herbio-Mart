@@ -6,6 +6,44 @@
     ViewData["Title"] = pageTitle;
 }
 
+<style>
+    /* Protected Monograph Card */
+    .protected-monograph-alert {
+        background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+        border: 1.5px solid #fcd34d;
+        border-radius: 20px;
+        padding: 1.25rem 1.5rem;
+        box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.12);
+        animation: alertSlideDown 0.35s ease-out;
+    }
+
+    .alert-shield-icon {
+        width: 46px;
+        height: 46px;
+        border-radius: 14px;
+        background: #f59e0b;
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        flex-shrink: 0;
+        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+    }
+
+    @@keyframes alertSlideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
 <!-- Single Page Header start -->
 <div class="container-fluid page-header py-5">
     <h1 class="text-center text-white display-6">@pageTitle</h1>
@@ -19,8 +57,49 @@
 <div class="container-fluid py-5">
     <div class="container py-4">
 
+        <!-- 1. Proprietary Protection Notice -->
+        @if (TempData["ProtectedMonographMessage"] != null)
+        {
+            <div class="protected-monograph-alert alert-dismissible fade show mb-4 d-flex align-items-start gap-3 position-relative" role="alert">
+                <div class="alert-shield-icon">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <div class="flex-grow-1 pe-4">
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <h6 class="fw-bold text-dark mb-0">
+                            @(TempData["ProtectedMonographTitle"] ?? "Proprietary Compounding Monograph Protected")
+                        </h6>
+                        <span class="badge bg-warning bg-opacity-25 text-dark border border-warning rounded-pill px-2 py-0 small fw-bold" style="font-size: 0.68rem;">
+                            Licensed Apothecary Rights
+                        </span>
+                    </div>
+                    <p class="text-muted small mb-0" style="line-height: 1.6;">
+                        @TempData["ProtectedMonographMessage"]
+                    </p>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="top: 1.25rem; right: 1.25rem;"></button>
+            </div>
+        }
+
+        <!-- 2. Standard Success / Error Alerts -->
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show rounded-4 shadow-sm mb-4" role="alert">
+                <i class="fas fa-check-circle me-2"></i> @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        @if (TempData["ErrorMessage"] != null && TempData["ProtectedMonographMessage"] == null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show rounded-4 shadow-sm mb-4" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i> @TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
         <!-- Header Actions -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
             <div>
                 <h3 class="fw-bold text-dark mb-1">@pageTitle</h3>
                 <p class="text-muted small mb-0">
@@ -29,12 +108,28 @@
                         : "Browse prepared medicinal herbal remedies compounded by certified apothecaries.")
                 </p>
             </div>
-            <!-- Top Action Button -->
+
+            <!-- Top Action Buttons for Herbalist -->
             @if (User.IsInRole("Herbalist"))
             {
-                <a asp-controller="Recipe" asp-action="Create" class="btn btn-success rounded-pill px-4 py-2 text-white fw-bold shadow-sm">
-                    <i class="fas fa-plus me-1"></i> Formulate New Recipe
-                </a>
+                <div class="d-flex align-items-center gap-2">
+                    @if (isOwner)
+                    {
+                        <a asp-controller="Recipe" asp-action="Index" class="btn btn-outline-success rounded-pill px-4 py-2 fw-bold shadow-sm">
+                            <i class="fas fa-globe me-1"></i> All Recipes
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-controller="Recipe" asp-action="MyRecipes" class="btn btn-outline-success rounded-pill px-4 py-2 fw-bold shadow-sm">
+                            <i class="fas fa-mortar-pestle me-1"></i> My Recipes
+                        </a>
+                    }
+
+                    <a asp-controller="Recipe" asp-action="Create" class="btn btn-success rounded-pill px-4 py-2 text-white fw-bold shadow-sm">
+                        <i class="fas fa-plus me-1"></i> Formulate New Recipe
+                    </a>
+                </div>
             }
         </div>
 
@@ -52,7 +147,7 @@
                         </a>
                     </div>
                 }
-            </div> 
+            </div>
         }
         else
         {
@@ -94,12 +189,11 @@
                                 </div>
                             </div>
 
-                            <!-- Ingredients Counter (Without exposing the quantities) -->
+                            <!-- Ingredients Counter -->
                             <div class="text-muted small mb-4">
                                 <i class="fas fa-leaf text-success me-1"></i> Proprietary blend of <strong>@item.IngredientsCount</strong> medicinal herbs
                             </div>
 
-                            <!-- Bottom Row: Price & Conditional Action -->
                             <!-- Bottom Row: Price & Role-based Action -->
                             <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center">
                                 <div>
@@ -107,7 +201,7 @@
                                     <span class="fw-bold text-success fs-5">@item.Price.ToString("N2") <small class="fs-6">EGP</small></span>
                                 </div>
 
-                                @if (User.IsInRole("Herbalist"))
+                                @if (User.IsInRole("Herbalist") || User.IsInRole("Patient"))
                                 {
                                     <a asp-controller="Recipe" asp-action="Details" asp-route-id="@item.RecipeId" class="btn btn-outline-success rounded-pill px-4 py-2 fw-bold btn-sm shadow-sm">
                                         <i class="fas fa-eye me-1"></i> View Details
@@ -115,15 +209,12 @@
                                 }
                                 else
                                 {
-                                    <form asp-controller="Cart" asp-action="Index" method="post" class="d-inline">
-                                        @Html.AntiForgeryToken()
-                                        <input type="hidden" name="recipeId" value="@item.RecipeId" />
-                                        <button type="submit" class="btn btn-success rounded-pill px-4 py-2 fw-bold btn-sm shadow-sm text-white">
-                                            <i class="fas fa-shopping-basket me-1"></i> Add to Cart
-                                        </button>
-                                    </form>
+                                    <a asp-controller="Recipe" asp-action="Details" asp-route-id="@item.RecipeId" class="btn btn-outline-success rounded-pill px-4 py-2 btn-sm fw-bold shadow-sm">
+                                        <i class="fas fa-info-circle me-1"></i> View Details
+                                    </a>
                                 }
                             </div>
+
                         </div>
                     </div>
                 }

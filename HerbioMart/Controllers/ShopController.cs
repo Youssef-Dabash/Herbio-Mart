@@ -1,6 +1,7 @@
-﻿namespace HerbioMart.Controllers;
+﻿using Microsoft.AspNetCore.Mvc;
 using HerbioMart.Services.Interfaces;
-using Microsoft.AspNetCore.Mvc;
+
+namespace HerbioMart.Controllers;
 
 public class ShopController : Controller
 {
@@ -11,15 +12,24 @@ public class ShopController : Controller
         _shopService = shopService;
     }
 
-    public async Task<IActionResult> Index(string? searchQuery, string? disease, string? sortBy)
+    // GET: /Shop/ أو /Shop/Index
+    [HttpGet]
+    public async Task<IActionResult> Index(string? searchQuery, string? sortBy, string? disease)
     {
-        var viewModel = await _shopService.GetCatalogAsync(searchQuery, disease, sortBy);
-        return View(viewModel);
+        var catalog = await _shopService.GetCatalogAsync(searchQuery, sortBy, disease);
+        return View("Catalog", catalog); // يفتح صفحة Catalog.cshtml
     }
 
-    public IActionResult Details(int? id, string type = "Herb")
+    // GET: /Shop/Details/{id}
+    [HttpGet]
+    public async Task<IActionResult> Details(int id)
     {
-        if (id == null) return NotFound();
-        return View();
+        var remedy = await _shopService.GetRecipeDetailsAsync(id);
+        if (remedy == null)
+        {
+            return NotFound("Formulated remedy was not found.");
+        }
+
+        return View(remedy);
     }
 }

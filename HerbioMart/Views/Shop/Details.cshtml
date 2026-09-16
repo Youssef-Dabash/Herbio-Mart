@@ -1,6 +1,21 @@
-﻿@{
-    ViewData["Title"] = "Remedy Details";
+﻿@model HerbioMart.ViewModels.Recipes.RecipeDetailsVM
+
+@{
+    ViewData["Title"] = Model.RecipeName + " - Details";
 }
+
+<style>
+    .badge-disease-pill {
+        border: 1px solid #fca5a5;
+        color: #dc2626;
+        background-color: #fef2f2;
+        font-weight: 600;
+        border-radius: 50rem;
+        padding: 0.35rem 0.85rem;
+        font-size: 0.8rem;
+        display: inline-block;
+    }
+</style>
 
 <!-- Single Page Header start -->
 <div class="container-fluid page-header py-5">
@@ -8,319 +23,212 @@
     <ol class="breadcrumb justify-content-center mb-0">
         <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-white">Home</a></li>
         <li class="breadcrumb-item"><a asp-controller="Shop" asp-action="Index" class="text-white">Catalog</a></li>
-        <li class="breadcrumb-item active text-white">Details</li>
+        <li class="breadcrumb-item active text-white">@Model.RecipeName</li>
     </ol>
 </div>
 <!-- Single Page Header End -->
-<!-- Single Product Start -->
-<div class="container-fluid py-5 mt-5">
-    <div class="container py-5">
+
+<div class="container-fluid py-5">
+    <div class="container py-4">
         <div class="row g-4 mb-5">
             <div class="col-lg-8 col-xl-9">
                 <div class="row g-4">
-                    <!-- Product Image -->
+
+                    <!-- Remedy Image Placeholder / Icon Container -->
                     <div class="col-lg-6">
-                        <div class="border rounded position-relative">
-                            <img src="~/img/single-item.jpg" class="img-fluid rounded w-100" alt="Digestive Soothe Compound">
-                            <span class="badge bg-secondary position-absolute top-0 start-0 m-3 px-3 py-2 rounded-pill">Formulated Recipe</span>
+                        <div class="border rounded-4 position-relative overflow-hidden shadow-sm bg-light d-flex align-items-center justify-content-center" style="height: 380px;">
+                            <img src="~/img/single-item.jpg" class="img-fluid w-100 h-100 rounded-4" style="object-fit: cover;" alt="@Model.RecipeName" />
+                            <span class="badge bg-success position-absolute top-0 start-0 m-3 px-3 py-2 rounded-pill shadow-sm">
+                                <i class="fas fa-mortar-pestle me-1"></i> Formulated Recipe
+                            </span>
                         </div>
                     </div>
 
-                    <!-- Core Remedy Info & Add to Cart -->
+                    <!-- Core Info & Add to Cart -->
                     <div class="col-lg-6">
-                        <h4 class="fw-bold mb-2 text-dark">Digestive Relief Compound</h4>
+                        <h3 class="fw-bold mb-2 text-dark">@Model.RecipeName</h3>
+
                         <p class="mb-2 text-muted small">
-                            Prepared By: <span class="text-primary fw-semibold">Al-Azhar Apothecary (Lic: #EG-8841)</span>
-                        </p>
-                        <h5 class="fw-bold mb-3 text-primary">120.00 EGP</h5>
-
-                        <div class="d-flex align-items-center mb-3 text-primary">
-                            <i class="fa fa-star"></i>
-                            <i class="fa fa-star"></i>
-                            <i class="fa fa-star"></i>
-                            <i class="fa fa-star"></i>
-                            <i class="fas fa-star-half-alt"></i>
-                            <span class="text-muted ms-2 small">(24 Patient Reviews)</span>
-                        </div>
-
-                        <p class="mb-4 text-muted">
-                            A standardized synergistic blend of pure dried chamomile, peppermint leaves, and crushed fennel seeds formulated to ease gastrointestinal discomfort, bloating, and acute digestive spasms.
+                            Compounded By: <strong class="text-success">@Model.HerbalistName</strong>
                         </p>
 
-                        <!-- Dosage Highlight -->
-                        <div class="alert alert-light border rounded-3 p-3 mb-4">
-                            <small class="fw-bold text-dark d-block mb-1"><i class="fas fa-prescription me-1 text-primary"></i> Recommended Dosage:</small>
-                            <span class="small text-muted">Steep 1 tablespoon in 200ml boiling water for 10 minutes. Consume twice daily after main meals.</span>
+                        <div class="d-flex align-items-baseline gap-2 mb-3">
+                            <h3 class="fw-bold text-dark font-monospace mb-0">@Model.Price.ToString("0.00")</h3>
+                            <span class="text-muted fw-bold">EGP</span>
                         </div>
 
-                        <form asp-controller="Cart" asp-action="Index" method="post">
-                            <input type="hidden" name="itemId" value="1" />
-                            <input type="hidden" name="itemType" value="Recipe" />
+                        <!-- Live Rating Summary -->
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="text-warning small me-2">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    if (i <= Math.Round(Model.AverageRating))
+                                    {
+                                        <i class="fas fa-star text-warning"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="far fa-star text-muted"></i>
+                                    }
+                                }
+                            </div>
+                            <span class="fw-bold text-dark font-monospace me-1">@Model.AverageRating.ToString("0.0")</span>
+                            <span class="text-muted small">(@Model.TotalRatings Reviews)</span>
+                        </div>
+
+                        <!-- Targeted Diseases Badges -->
+                        <div class="mb-3">
+                            <small class="text-muted fw-bold d-block mb-1">TARGETED CONDITIONS:</small>
+                            <div class="d-flex flex-wrap gap-1">
+                                @if (Model.TargetedDiseases.Any())
+                                {
+                                    @foreach (var disease in Model.TargetedDiseases)
+                                    {
+                                        <span class="badge-disease-pill">@disease</span>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="badge-disease-pill">General Wellness</span>
+                                }
+                            </div>
+                        </div>
+
+                        <p class="mb-4 text-muted small" style="line-height: 1.6;">
+                            @Model.Description
+                        </p>
+
+                        <!-- Add to Cart Form -->
+                        <form asp-controller="Cart" asp-action="AddRecipeToCart" method="post">
+                            <input type="hidden" name="recipeId" value="@Model.RecipeId" />
+                            <input type="hidden" name="recipeName" value="@Model.RecipeName" />
+                            <input type="hidden" name="herbalistName" value="@Model.HerbalistName" />
+                            <input type="hidden" name="price" value="@Model.Price" />
 
                             <div class="d-flex align-items-center gap-3 mb-4">
-                                <div class="input-group quantity" style="width: 120px;">
-                                    <div class="input-group-btn">
-                                        <button class="btn btn-sm btn-minus rounded-circle bg-light border" type="button">
-                                            <i class="fa fa-minus"></i>
-                                        </button>
-                                    </div>
-                                    <input type="text" name="quantity" class="form-control form-control-sm text-center border-0" value="1">
-                                    <div class="input-group-btn">
-                                        <button class="btn btn-sm btn-plus rounded-circle bg-light border" type="button">
-                                            <i class="fa fa-plus"></i>
-                                        </button>
-                                    </div>
+                                <div class="input-group" style="width: 130px;">
+                                    <button class="btn btn-light border px-3" type="button" id="btnMinus">
+                                        <i class="fa fa-minus small"></i>
+                                    </button>
+                                    <input type="number" id="qtyInput" name="quantity" class="form-control text-center fw-bold" value="1" min="1" max="50">
+                                    <button class="btn btn-light border px-3" type="button" id="btnPlus">
+                                        <i class="fa fa-plus small"></i>
+                                    </button>
                                 </div>
-                                <button type="submit" class="btn border border-secondary rounded-pill px-4 py-2 text-primary fw-semibold">
-                                    <i class="fa fa-shopping-bag me-2 text-primary"></i> Add To Cart
+
+                                <button type="submit" class="btn btn-success rounded-pill px-4 py-2 text-white fw-semibold shadow-sm">
+                                    <i class="fas fa-shopping-basket me-2"></i> Add To Cart
                                 </button>
                             </div>
                         </form>
+
+                        <div class="d-flex gap-2">
+                            <a asp-controller="Feedback" asp-action="Create" asp-route-recipeId="@Model.RecipeId" class="btn btn-outline-success rounded-pill btn-sm px-3 fw-semibold">
+                                <i class="fas fa-star me-1"></i> Review This Remedy
+                            </a>
+                        </div>
                     </div>
 
-                    <!-- Product Specifications & Reviews Tabs -->
-                    <div class="col-lg-12 mt-5">
+                    <!-- Instructions & Ingredients Tabs -->
+                    <div class="col-lg-12 mt-4">
                         <nav>
                             <div class="nav nav-tabs mb-3" id="nav-tab" role="tablist">
-                                <button class="nav-link active border-white border-bottom-0 fw-semibold" id="nav-desc-tab" data-bs-toggle="tab" data-bs-target="#nav-desc" type="button" role="tab">
-                                    Clinical Description & Safety
+                                <button class="nav-link active fw-semibold" id="nav-instructions-tab" data-bs-toggle="tab" data-bs-target="#nav-instructions" type="button" role="tab">
+                                    Preparation & Instructions
                                 </button>
-                                <button class="nav-link border-white border-bottom-0 fw-semibold" id="nav-ingredients-tab" data-bs-toggle="tab" data-bs-target="#nav-ingredients" type="button" role="tab">
-                                    Recipe Composition
-                                </button>
-                                <button class="nav-link border-white border-bottom-0 fw-semibold" id="nav-reviews-tab" data-bs-toggle="tab" data-bs-target="#nav-reviews" type="button" role="tab">
-                                    Patient Feedback (2)
+                                <button class="nav-link fw-semibold" id="nav-ingredients-tab" data-bs-toggle="tab" data-bs-target="#nav-ingredients" type="button" role="tab">
+                                    Blend Composition (@Model.Ingredients.Count)
                                 </button>
                             </div>
                         </nav>
-                        <div class="tab-content mb-5" id="nav-tabContent">
-                            <!-- Tab 1: Description -->
-                            <div class="tab-pane active" id="nav-desc" role="tabpanel">
-                                <h5 class="fw-bold mb-2">Therapeutic Indications</h5>
-                                <p class="text-muted">
-                                    Engineered primarily for easing spastic colon irritability and non-ulcer dyspepsia. The volatile oils contained within the composite herbs soothe smooth muscle tissues within the intestinal walls.
-                                </p>
 
-                                <h5 class="fw-bold mt-4 mb-2 text-danger"><i class="fas fa-exclamation-circle me-1"></i> Medical Contraindications & Warnings</h5>
-                                <p class="text-muted mb-0">
-                                    Do not consume during the first trimester of pregnancy. Avoid simultaneous intake with strong sedative drugs without prior physician consultation. Keep dry in an airtight jar away from direct sunlight.
+                        <div class="tab-content border rounded-4 p-4 bg-white shadow-sm mb-5" id="nav-tabContent">
+
+                            <!-- Tab 1: Instructions -->
+                            <div class="tab-pane fade show active" id="nav-instructions" role="tabpanel">
+                                <h5 class="fw-bold mb-2 text-success">
+                                    <i class="fas fa-prescription me-1"></i> Usage Instructions & Clinical Guidance
+                                </h5>
+                                <p class="text-muted mb-0" style="line-height: 1.8;">
+                                    @(string.IsNullOrWhiteSpace(Model.Instructions)
+                                        ? "Take as advised by your apothecary or consulting physician."
+                                        : Model.Instructions)
                                 </p>
                             </div>
 
-                            <!-- Tab 2: Composition -->
-                            <div class="tab-pane" id="nav-ingredients" role="tabpanel">
+                            <!-- Tab 2: Composition Table -->
+                            <div class="tab-pane fade" id="nav-ingredients" role="tabpanel">
                                 <div class="table-responsive">
-                                    <table class="table table-bordered">
-                                        <thead class="table-light">
+                                    <table class="table table-bordered align-middle mb-0">
+                                        <thead class="table-light small text-uppercase">
                                             <tr>
                                                 <th>Constituent Herb</th>
-                                                <th>Scientific Botanical Name</th>
-                                                <th>Net Weight / Proportion</th>
+                                                <th>Quantity / Weight</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-                                                <td>Dried Chamomile Blossoms</td>
-                                                <td><em>Matricaria chamomilla</em></td>
-                                                <td>50 grams</td>
-                                            </tr>
-                                            <tr>
-                                                <td>Organic Peppermint Cut Leaves</td>
-                                                <td><em>Mentha piperita</em></td>
-                                                <td>30 grams</td>
-                                            </tr>
-                                            <tr>
-                                                <td>Fennel Whole Seeds</td>
-                                                <td><em>Foeniculum vulgare</em></td>
-                                                <td>20 grams</td>
-                                            </tr>
+                                            @if (Model.Ingredients.Any())
+                                            {
+                                                @foreach (var ing in Model.Ingredients)
+                                                {
+                                                    <tr>
+                                                        <td class="fw-semibold text-dark">
+                                                            <i class="fas fa-leaf text-success me-2"></i>@ing.HerbName
+                                                        </td>
+                                                        <td>
+                                                            <span class="badge bg-light text-dark border px-3 py-2">
+                                                                @ing.AmountInGrams Grams
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <tr>
+                                                    <td colspan="2" class="text-center text-muted py-3">Proprietary composition details not disclosed.</td>
+                                                </tr>
+                                            }
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
 
-                            <!-- Tab 3: Reviews -->
-                            <div class="tab-pane" id="nav-reviews" role="tabpanel">
-                                <div class="d-flex mb-4">
-                                    <img src="~/img/avatar.jpg" class="img-fluid rounded-circle p-2" style="width: 80px; height: 80px;" alt="Patient">
-                                    <div class="ms-3">
-                                        <div class="d-flex justify-content-between align-items-center mb-1">
-                                            <h6 class="mb-0 fw-bold">Dr. Mahmoud Saber</h6>
-                                            <span class="text-muted small">May 14, 2026</span>
-                                        </div>
-                                        <div class="d-flex text-primary mb-2 small">
-                                            <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
-                                        </div>
-                                        <p class="text-muted small mb-0">
-                                            Very clean formulation. The seal was airtight and the aroma confirms freshness of the harvest. Highly recommended for post-prandial heaviness.
-                                        </p>
-                                    </div>
-                                </div>
-                                <hr class="text-muted" />
-                                <div class="d-flex mb-4">
-                                    <img src="~/img/avatar.jpg" class="img-fluid rounded-circle p-2" style="width: 80px; height: 80px;" alt="Patient">
-                                    <div class="ms-3">
-                                        <div class="d-flex justify-content-between align-items-center mb-1">
-                                            <h6 class="mb-0 fw-bold">Mariam Adel</h6>
-                                            <span class="text-muted small">June 02, 2026</span>
-                                        </div>
-                                        <div class="d-flex text-primary mb-2 small">
-                                            <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star text-muted"></i>
-                                        </div>
-                                        <p class="text-muted small mb-0">
-                                            Arrived neatly packaged within 48 hours. Clear dosage label on the packet.
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <!-- Post Feedback Form -->
-                                <form asp-controller="Shop" asp-action="Details" method="post" class="mt-5 border-top pt-4">
-                                    <h5 class="fw-bold mb-3">Leave a Patient Evaluation</h5>
-                                    <div class="row g-4">
-                                        <div class="col-lg-6">
-                                            <input type="text" name="PatientName" class="form-control" placeholder="Your Name *" required>
-                                        </div>
-                                        <div class="col-lg-6">
-                                            <select name="RatingValue" class="form-select">
-                                                <option value="5">5 Stars - Excellent Result</option>
-                                                <option value="4">4 Stars - Good Efficacy</option>
-                                                <option value="3">3 Stars - Average</option>
-                                                <option value="2">2 Stars - Minimal Effect</option>
-                                                <option value="1">1 Star - Unsatisfactory</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-12">
-                                            <textarea name="Comment" class="form-control" rows="4" placeholder="Detail your health results or remedy evaluation *" required></textarea>
-                                        </div>
-                                        <div class="col-12">
-                                            <button type="submit" class="btn border border-secondary text-primary rounded-pill px-4 py-2 fw-semibold">
-                                                Post Feedback
-                                            </button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
                         </div>
                     </div>
+
                 </div>
             </div>
 
             <!-- Sidebar -->
             <div class="col-lg-4 col-xl-3">
-                <div class="row g-4 fruite">
-                    <div class="col-lg-12">
-                        <!-- Search widget -->
-                        <form asp-controller="Shop" asp-action="Index" method="get">
-                            <div class="input-group w-100 mx-auto d-flex mb-4">
-                                <input type="search" name="searchQuery" class="form-control p-3" placeholder="Search catalog...">
-                                <button type="submit" class="input-group-text p-3 bg-primary text-white border-0"><i class="fa fa-search"></i></button>
-                            </div>
-                        </form>
-
-                        <!-- Disease Categories -->
-                        <div class="mb-4">
-                            <h4 class="fw-bold mb-3">Related Conditions</h4>
-                            <ul class="list-unstyled fruite-categorie">
-                                <li>
-                                    <div class="d-flex justify-content-between fruite-name">
-                                        <a asp-controller="Shop" asp-action="Index" asp-route-disease="Digestive"><i class="fas fa-notes-medical me-2"></i>IBS & Digestion</a>
-                                        <span>(15)</span>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="d-flex justify-content-between fruite-name">
-                                        <a asp-controller="Shop" asp-action="Index" asp-route-disease="Hypertension"><i class="fas fa-notes-medical me-2"></i>Hypertension</a>
-                                        <span>(12)</span>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="d-flex justify-content-between fruite-name">
-                                        <a asp-controller="Shop" asp-action="Index" asp-route-disease="Diabetes"><i class="fas fa-notes-medical me-2"></i>Diabetes Care</a>
-                                        <span>(9)</span>
-                                    </div>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- Sidebar Featured -->
-                    <div class="col-lg-12">
-                        <h4 class="mb-3 fw-bold">Popular Remedies</h4>
-                        <div class="d-flex align-items-center justify-content-start mb-3">
-                            <div class="rounded me-3" style="width: 80px; height: 80px;">
-                                <img src="~/img/featur-1.jpg" class="img-fluid rounded" alt="Chamomile">
-                            </div>
-                            <div>
-                                <h6 class="mb-1">Organic Chamomile</h6>
-                                <p class="fw-bold mb-0 text-primary">45.00 EGP</p>
-                                <a asp-controller="Shop" asp-action="Details" asp-route-id="2" class="small text-muted text-decoration-underline">View Details</a>
-                            </div>
-                        </div>
-                        <div class="d-flex align-items-center justify-content-start mb-3">
-                            <div class="rounded me-3" style="width: 80px; height: 80px;">
-                                <img src="~/img/featur-2.jpg" class="img-fluid rounded" alt="Cardio Mix">
-                            </div>
-                            <div>
-                                <h6 class="mb-1">Cardio-Tonic Mix</h6>
-                                <p class="fw-bold mb-0 text-primary">150.00 EGP</p>
-                                <a asp-controller="Shop" asp-action="Details" asp-route-id="3" class="small text-muted text-decoration-underline">View Details</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Related Remedies Carousel -->
-        <h2 class="fw-bold mb-4">Related Formulations</h2>
-        <div class="vesitable">
-            <div class="owl-carousel vegetable-carousel justify-content-center">
-                <div class="border border-primary rounded position-relative vesitable-item p-3 bg-white">
-                    <div class="vesitable-img mb-3">
-                        <img src="~/img/vegetable-item-6.jpg" class="img-fluid w-100 rounded" alt="Peppermint">
-                    </div>
-                    <div class="text-white bg-primary px-3 py-1 rounded position-absolute" style="top: 20px; right: 20px;">Single Herb</div>
-                    <h5 class="fw-bold">Dried Mint Leaves</h5>
-                    <p class="text-muted small mb-3">Carminative and spasm-reducing infusion herb.</p>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span class="text-dark fw-bold">35.00 EGP</span>
-                        <a asp-controller="Shop" asp-action="Details" asp-route-id="6" class="btn border border-secondary rounded-pill px-3 py-1 text-primary">
-                            Details
-                        </a>
-                    </div>
-                </div>
-
-                <div class="border border-primary rounded position-relative vesitable-item p-3 bg-white">
-                    <div class="vesitable-img mb-3">
-                        <img src="~/img/vegetable-item-1.jpg" class="img-fluid w-100 rounded" alt="Thyme">
-                    </div>
-                    <div class="text-white bg-secondary px-3 py-1 rounded position-absolute" style="top: 20px; right: 20px;">Recipe</div>
-                    <h5 class="fw-bold">Chest Clarifier</h5>
-                    <p class="text-muted small mb-3">Thyme and licorice infusion for chronic coughs.</p>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span class="text-dark fw-bold">95.00 EGP</span>
-                        <a asp-controller="Shop" asp-action="Details" asp-route-id="5" class="btn border border-secondary rounded-pill px-3 py-1 text-primary">
-                            Details
-                        </a>
-                    </div>
-                </div>
-
-                <div class="border border-primary rounded position-relative vesitable-item p-3 bg-white">
-                    <div class="vesitable-img mb-3">
-                        <img src="~/img/vegetable-item-3.png" class="img-fluid w-100 rounded" alt="Ginger">
-                    </div>
-                    <div class="text-white bg-primary px-3 py-1 rounded position-absolute" style="top: 20px; right: 20px;">Single Herb</div>
-                    <h5 class="fw-bold">Crushed Ginger Root</h5>
-                    <p class="text-muted small mb-3">Pure natural circulation booster and anti-inflammatory.</p>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span class="text-dark fw-bold">55.00 EGP</span>
-                        <a asp-controller="Shop" asp-action="Details" asp-route-id="4" class="btn border border-secondary rounded-pill px-3 py-1 text-primary">
-                            Details
-                        </a>
-                    </div>
+                <div class="card border-0 shadow-sm rounded-4 p-4 bg-light">
+                    <h5 class="fw-bold text-dark mb-3">
+                        <i class="fas fa-shield-alt text-success me-2"></i>HerbioMart Guarantee
+                    </h5>
+                    <ul class="list-unstyled small text-muted mb-0 d-flex flex-column gap-2">
+                        <li><i class="fas fa-check-circle text-success me-2"></i>Formulated by certified botanical herbalists.</li>
+                        <li><i class="fas fa-check-circle text-success me-2"></i>100% natural, laboratory-tested constituents.</li>
+                        <li><i class="fas fa-check-circle text-success me-2"></i>Direct dispatch from licensed apothecary stores.</li>
+                    </ul>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<!-- Single Product End -->
+
+@section Scripts {
+    <script>
+        document.getElementById('btnMinus').addEventListener('click', function() {
+            var input = document.getElementById('qtyInput');
+            var val = parseInt(input.value) || 1;
+            if (val > 1) input.value = val - 1;
+        });
+
+        document.getElementById('btnPlus').addEventListener('click', function() {
+            var input = document.getElementById('qtyInput');
+            var val = parseInt(input.value) || 1;
+            if (val < 50) input.value = val + 1;
+        });
+    </script>
+}

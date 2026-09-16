@@ -2,6 +2,6 @@
 
 public class ShopIndexVM
 {
-    public List<ShopHerbItemVM> Herbs { get; set; } = new();
-    public List<ShopRecipeItemVM> Recipes { get; set; } = new();
+    public List<ShopHerbVM> Herbs { get; set; } = new();
+    public List<ShopRecipeVM> Recipes { get; set; } = new();
 }

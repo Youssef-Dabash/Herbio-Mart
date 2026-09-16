@@ -1,69 +1,319 @@
 ﻿@model HerbioMart.ViewModels.Home.SiteStatsVM
 
+<style>
+    /* Section Ambient Wrapper */
+    .stats-hub-wrapper {
+        background: radial-gradient(circle at 10% 20%, rgba(22, 163, 74, 0.05) 0%, transparent 40%), radial-gradient(circle at 90% 80%, rgba(14, 165, 233, 0.05) 0%, transparent 40%), #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 32px;
+        padding: 4rem 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Live Pulse Indicator */
+    .live-pulse-badge {
+        display: inline-flex !important;
+        align-items: center;
+        gap: 8px;
+        background: #ecfdf5 !important;
+        border: 1px solid #a7f3d0 !important;
+        color: #065f46 !important;
+        font-weight: 700;
+        font-size: 0.8rem;
+        padding: 6px 18px;
+        border-radius: 50px;
+        letter-spacing: 0.5px;
+    }
+
+    .pulse-dot {
+        width: 8px;
+        height: 8px;
+        background-color: #10b981;
+        border-radius: 50%;
+        display: inline-block;
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+        animation: pulse-ring 1.8s infinite cubic-bezier(0.66, 0, 0, 1);
+    }
+
+    @@keyframes pulse-ring {
+        0% {
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+        }
+
+        70% {
+            box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+        }
+
+        100% {
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+        }
+    }
+
+    /* Animated Stat Cards */
+    .metric-card {
+        background: #ffffff;
+        border: 1px solid #edf2f7;
+        border-radius: 24px;
+        padding: 2.25rem 1.5rem;
+        text-align: center;
+        position: relative;
+        transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03);
+        cursor: pointer;
+    }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 24px;
+            padding: 2px;
+            background: linear-gradient(135deg, transparent, transparent);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            transition: all 0.4s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-8px) scale(1.02);
+        }
+
+    /* Hover Icon Float & Rotate */
+    .metric-icon-box {
+        width: 68px;
+        height: 68px;
+        border-radius: 20px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.6rem;
+        margin-bottom: 1.25rem;
+        transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .metric-card:hover .metric-icon-box {
+        transform: scale(1.15) rotate(6deg);
+    }
+
+    /* Card Themes with Ambient Glow */
+    .theme-patients .metric-icon-box {
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        color: #fff;
+        box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+    }
+
+    .theme-patients:hover {
+        border-color: #93c5fd;
+        box-shadow: 0 20px 30px -10px rgba(59, 130, 246, 0.18);
+    }
+
+    .theme-herbalists .metric-icon-box {
+        background: linear-gradient(135deg, #10b981, #047857);
+        color: #fff;
+        box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
+    }
+
+    .theme-herbalists:hover {
+        border-color: #6ee7b7;
+        box-shadow: 0 20px 30px -10px rgba(16, 185, 129, 0.18);
+    }
+
+    .theme-herbs .metric-icon-box {
+        background: linear-gradient(135deg, #14b8a6, #0f766e);
+        color: #fff;
+        box-shadow: 0 10px 20px rgba(20, 184, 166, 0.3);
+    }
+
+    .theme-herbs:hover {
+        border-color: #5eead4;
+        box-shadow: 0 20px 30px -10px rgba(20, 184, 166, 0.18);
+    }
+
+    .theme-recipes .metric-icon-box {
+        background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+        color: #fff;
+        box-shadow: 0 10px 20px rgba(139, 92, 246, 0.3);
+    }
+
+    .theme-recipes:hover {
+        border-color: #c4b5fd;
+        box-shadow: 0 20px 30px -10px rgba(139, 92, 246, 0.18);
+    }
+
+    .theme-orders .metric-icon-box {
+        background: linear-gradient(135deg, #f59e0b, #b45309);
+        color: #fff;
+        box-shadow: 0 10px 20px rgba(245, 158, 11, 0.3);
+    }
+
+    .theme-orders:hover {
+        border-color: #fde68a;
+        box-shadow: 0 20px 30px -10px rgba(245, 158, 11, 0.18);
+    }
+
+    .theme-feedback .metric-icon-box {
+        background: linear-gradient(135deg, #f43f5e, #be123c);
+        color: #fff;
+        box-shadow: 0 10px 20px rgba(244, 63, 94, 0.3);
+    }
+
+    .theme-feedback:hover {
+        border-color: #fecdd3;
+        box-shadow: 0 20px 30px -10px rgba(244, 63, 94, 0.18);
+    }
+
+    /* Animated Counter Numbers */
+    .stat-counter-value {
+        font-size: 2.8rem;
+        font-weight: 800;
+        line-height: 1;
+        letter-spacing: -1px;
+        color: #0f172a;
+        font-family: var(--bs-font-monospace);
+    }
+</style>
+
 <div class="container-fluid py-5">
     <div class="container">
-        <div class="bg-light p-5 rounded-4 shadow-sm border">
-            <div class="row g-4 justify-content-center text-center">
+
+        <div class="stats-hub-wrapper shadow-sm">
+
+            <!-- Section Header -->
+            <div class="text-center mx-auto mb-5" style="max-width: 650px;">
+                <div class="live-pulse-badge mb-3">
+                    <span class="pulse-dot"></span>
+                    <span>LIVE PLATFORM ECOSYSTEM</span>
+                </div>
+                <h2 class="display-6 fw-bold text-dark mb-2">Growing Botanical Community</h2>
+                <p class="text-muted small mb-0">Real-time metrics tracking verified patients, certified dispensaries, and clinical compounded formulations across our network.</p>
+            </div>
+
+            <!-- 6 Interactive Cards Grid -->
+            <div class="row g-4 row-cols-1 row-cols-md-2 row-cols-lg-3">
+
                 <!-- 1. Active Patients -->
-                <div class="col-md-6 col-lg-6 col-xl-3">
-                    <div class="counter bg-white rounded-4 p-4 shadow-sm h-100 border">
-                        <div class="mb-3">
-                            <i class="fa fa-users fa-3x text-warning"></i>
+                <div class="col">
+                    <div class="metric-card theme-patients h-100">
+                        <div class="metric-icon-box">
+                            <i class="fas fa-users"></i>
                         </div>
-                        <h5 class="text-uppercase fw-bold text-success mb-2" style="font-size: 0.9rem; letter-spacing: 0.5px;">
-                            Active Patients
-                        </h5>
-                        <h2 class="display-6 fw-bold text-dark mb-0">
-                            @Model.PatientsCount
-                        </h2>
+                        <div class="stat-counter-value mb-1" data-count="@Model.PatientsCount">0</div>
+                        <h6 class="fw-bold text-dark text-uppercase small mb-1" style="letter-spacing: 0.5px;">Active Patients</h6>
+                        <small class="text-muted" style="font-size: 0.75rem;">Verified client profiles</small>
                     </div>
                 </div>
 
                 <!-- 2. Licensed Herbalists -->
-                <div class="col-md-6 col-lg-6 col-xl-3">
-                    <div class="counter bg-white rounded-4 p-4 shadow-sm h-100 border">
-                        <div class="mb-3">
-                            <i class="fas fa-store-alt fa-3x text-warning"></i>
+                <div class="col">
+                    <div class="metric-card theme-herbalists h-100">
+                        <div class="metric-icon-box">
+                            <i class="fas fa-store"></i>
                         </div>
-                        <h5 class="text-uppercase fw-bold text-success mb-2" style="font-size: 0.9rem; letter-spacing: 0.5px;">
-                            Licensed Apothecaries
-                        </h5>
-                        <h2 class="display-6 fw-bold text-dark mb-0">
-                            @Model.HerbalistsCount
-                        </h2>
+                        <div class="stat-counter-value mb-1" data-count="@Model.HerbalistsCount">0</div>
+                        <h6 class="fw-bold text-dark text-uppercase small mb-1" style="letter-spacing: 0.5px;">Licensed Apothecaries</h6>
+                        <small class="text-muted" style="font-size: 0.75rem;">Dispensary practitioners</small>
                     </div>
                 </div>
 
-                <!-- 3. Client Feedbacks -->
-                <div class="col-md-6 col-lg-6 col-xl-3">
-                    <div class="counter bg-white rounded-4 p-4 shadow-sm h-100 border">
-                        <div class="mb-3">
-                            <i class="fas fa-comments fa-3x text-warning"></i>
+                <!-- 3. Botanical Herbs -->
+                <div class="col">
+                    <div class="metric-card theme-herbs h-100">
+                        <div class="metric-icon-box">
+                            <i class="fas fa-leaf"></i>
                         </div>
-                        <h5 class="text-uppercase fw-bold text-success mb-2" style="font-size: 0.9rem; letter-spacing: 0.5px;">
-                            Client Feedbacks
-                        </h5>
-                        <h2 class="display-6 fw-bold text-dark mb-0">
-                            @Model.FeedbacksCount
-                        </h2>
+                        <div class="stat-counter-value mb-1" data-count="@Model.HerbsCount">0</div>
+                        <h6 class="fw-bold text-dark text-uppercase small mb-1" style="letter-spacing: 0.5px;">Botanical Specimen</h6>
+                        <small class="text-muted" style="font-size: 0.75rem;">Master herbs in catalog</small>
                     </div>
                 </div>
 
-                <!-- 4. Dispatched Orders -->
-                <div class="col-md-6 col-lg-6 col-xl-3">
-                    <div class="counter bg-white rounded-4 p-4 shadow-sm h-100 border">
-                        <div class="mb-3">
-                            <i class="fas fa-box fa-3x text-warning"></i>
+                <!-- 4. Formulated Recipes -->
+                <div class="col">
+                    <div class="metric-card theme-recipes h-100">
+                        <div class="metric-icon-box">
+                            <i class="fas fa-mortar-pestle"></i>
                         </div>
-                        <h5 class="text-uppercase fw-bold text-success mb-2" style="font-size: 0.9rem; letter-spacing: 0.5px;">
-                            Orders Dispatched
-                        </h5>
-                        <h2 class="display-6 fw-bold text-dark mb-0">
-                            @Model.OrdersCount
-                        </h2>
+                        <div class="stat-counter-value mb-1" data-count="@Model.RecipesCount">0</div>
+                        <h6 class="fw-bold text-dark text-uppercase small mb-1" style="letter-spacing: 0.5px;">Proprietary Remedies</h6>
+                        <small class="text-muted" style="font-size: 0.75rem;">Compounded clinical blends</small>
                     </div>
                 </div>
+
+                <!-- 5. Dispatched Orders -->
+                <div class="col">
+                    <div class="metric-card theme-orders h-100">
+                        <div class="metric-icon-box">
+                            <i class="fas fa-shipping-fast"></i>
+                        </div>
+                        <div class="stat-counter-value mb-1" data-count="@Model.OrdersCount">0</div>
+                        <h6 class="fw-bold text-dark text-uppercase small mb-1" style="letter-spacing: 0.5px;">Dispensary Packages</h6>
+                        <small class="text-muted" style="font-size: 0.75rem;">Orders prepared & routed</small>
+                    </div>
+                </div>
+
+                <!-- 6. Feedbacks -->
+                <div class="col">
+                    <div class="metric-card theme-feedback h-100">
+                        <div class="metric-icon-box">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="stat-counter-value mb-1" data-count="@Model.FeedbacksCount">0</div>
+                        <h6 class="fw-bold text-dark text-uppercase small mb-1" style="letter-spacing: 0.5px;">Client Reviews</h6>
+                        <small class="text-muted" style="font-size: 0.75rem;">Documented testimonials</small>
+                    </div>
+                </div>
+
             </div>
+
         </div>
+
     </div>
 </div>
+
+<!-- Counter-Up Animation Script -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const counters = document.querySelectorAll('.stat-counter-value');
+        let animated = false;
+
+        const animateCounters = () => {
+            counters.forEach(counter => {
+                const target = +counter.getAttribute('data-count');
+                const duration = 1200; // مدة الأنيميشن بالمللي ثانية
+                const stepTime = 20;
+                const totalSteps = duration / stepTime;
+                const increment = target / totalSteps;
+                let current = 0;
+
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= target) {
+                        counter.innerText = target;
+                        clearInterval(timer);
+                    } else {
+                        counter.innerText = Math.floor(current);
+                    }
+                }, stepTime);
+            });
+        };
+
+        // تشغيل الأنيميشن أول ما السكشن يظهر في الشاشة
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && !animated) {
+                    animated = true;
+                    animateCounters();
+                }
+            });
+        }, { threshold: 0.25 });
+
+        const section = document.querySelector('.stats-hub-wrapper');
+        if (section) {
+            observer.observe(section);
+        } else {
+            animateCounters();
+        }
+    });
+</script>

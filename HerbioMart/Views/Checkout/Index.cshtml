@@ -1,10 +1,96 @@
-﻿@{
+﻿@model HerbioMart.ViewModels.Order.CheckoutVM
+
+@{
     ViewData["Title"] = "Order Checkout";
 }
 
+<style>
+    /* Fixed High-Contrast Verified Badge */
+    .badge-verified-patient {
+        background-color: #dcfce7 !important;
+        color: #15803d !important;
+        border: 1px solid #86efac !important;
+        font-weight: 700 !important;
+        font-size: 0.75rem !important;
+        padding: 5px 14px !important;
+        border-radius: 50rem !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        letter-spacing: 0.3px;
+    }
+
+    /* Right Summary Card Polish */
+    .summary-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 20px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+    }
+
+    .summary-table th {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #64748b;
+        font-weight: 700;
+        border-bottom: 2px solid #f1f5f9;
+        padding-bottom: 0.75rem;
+    }
+
+    .summary-table td {
+        padding: 0.85rem 0.25rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #f8fafc;
+    }
+
+    .item-icon-herb {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background-color: #16a34a !important;
+        color: #ffffff !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .item-icon-recipe {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background-color: #0284c7 !important;
+        color: #ffffff !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    /* Payment Option Card */
+    .payment-box {
+        border: 1.5px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 14px 16px;
+        transition: all 0.2s ease;
+        background-color: #fafafa;
+        cursor: pointer;
+    }
+
+        .payment-box:hover {
+            border-color: #16a34a;
+            background-color: #ffffff;
+        }
+
+        .payment-box input[type="radio"]:checked + label {
+            color: #16a34a;
+        }
+</style>
+
 <!-- Single Page Header start -->
-<div class="container-fluid page-header py-5">
-    <h1 class="text-center text-white display-6">Dispatch Checkout</h1>
+<div class="container-fluid page-header py-5 mb-4">
+    <h1 class="text-center text-white display-6 fw-bold">Dispatch Checkout</h1>
     <ol class="breadcrumb justify-content-center mb-0">
         <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-white">Home</a></li>
         <li class="breadcrumb-item"><a asp-controller="Cart" asp-action="Index" class="text-white">Cart</a></li>
@@ -12,165 +98,195 @@
     </ol>
 </div>
 <!-- Single Page Header End -->
-<!-- Checkout Page Start -->
-<div class="container-fluid py-5">
-    <div class="container py-5">
-        <h1 class="mb-4">Shipping & Prescription Billing</h1>
-        <form asp-controller="Checkout" asp-action="Index" method="post">
-            <div class="row g-5">
-                <div class="col-md-12 col-lg-6 col-xl-7">
-                    <div class="row">
-                        <div class="col-md-12 col-lg-6">
-                            <div class="form-item w-100 mb-3">
-                                <label class="form-label my-3">Recipient Full Name<sup>*</sup></label>
-                                <input type="text" name="FullName" class="form-control" placeholder="Full name">
+
+<div class="container py-4">
+
+    <div class="mb-4">
+        <h3 class="fw-bold text-dark mb-1">Prescription Billing & Shipping</h3>
+        <p class="text-muted small mb-0">Confirm delivery destination and place your dispensary order.</p>
+    </div>
+
+    <form asp-controller="Checkout" asp-action="Index" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="FullName" />
+        <input type="hidden" asp-for="Phone" />
+        <input type="hidden" asp-for="Email" />
+
+        <div class="row g-4 align-items-start">
+
+            <!-- Left Column: Patient Details & Mandatory Address -->
+            <div class="col-lg-6 col-xl-6">
+
+                <!-- Recipient Profile Card -->
+                <div class="card border rounded-4 p-4 bg-white shadow-sm mb-4">
+                    <div class="d-flex justify-content-between align-items-center pb-3 mb-3 border-bottom">
+                        <div class="d-flex align-items-center">
+                            <div class="rounded-circle bg-success bg-opacity-10 text-success d-flex align-items-center justify-content-center me-2" style="width: 36px; height: 36px;">
+                                <i class="fas fa-id-card"></i>
                             </div>
+                            <h6 class="fw-bold text-dark mb-0">Recipient Profile</h6>
                         </div>
-                        <div class="col-md-12 col-lg-6">
-                            <div class="form-item w-100 mb-3">
-                                <label class="form-label my-3">Contact Phone<sup>*</sup></label>
-                                <input type="tel" name="Phone" class="form-control" placeholder="01012345678">
-                            </div>
-                        </div>
+
+                        <!-- Fixed Visible Badge -->
+                        <span class="badge-verified-patient">
+                            <i class="fas fa-check-circle me-1"></i> Verified Account
+                        </span>
                     </div>
 
-                    <div class="row">
-                        <div class="col-md-12 col-lg-6">
-                            <div class="form-item w-100 mb-3">
-                                <label class="form-label my-3">Governorate<sup>*</sup></label>
-                                <input type="text" name="Governorate" class="form-control" placeholder="Cairo">
-                            </div>
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <span class="text-muted small d-block">Full Name</span>
+                            <span class="fw-bold text-dark">@Model.FullName</span>
                         </div>
-                        <div class="col-md-12 col-lg-6">
-                            <div class="form-item w-100 mb-3">
-                                <label class="form-label my-3">City / District<sup>*</sup></label>
-                                <input type="text" name="City" class="form-control" placeholder="Nasr City">
-                            </div>
+                        <div class="col-sm-6">
+                            <span class="text-muted small d-block">Contact Phone</span>
+                            <span class="fw-bold font-monospace text-dark">@Model.Phone</span>
                         </div>
-                    </div>
-
-                    <div class="form-item mb-3">
-                        <label class="form-label my-3">Street Address / Building Details<sup>*</sup></label>
-                        <input type="text" name="Street" class="form-control" placeholder="Building no., Street name, Apartment">
-                    </div>
-
-                    <div class="form-item mb-3">
-                        <label class="form-label my-3">Email Address (For Invoicing)<sup>*</sup></label>
-                        <input type="email" name="Email" class="form-control" placeholder="patient@example.com">
-                    </div>
-
-                    <div class="form-item mt-4">
-                        <label class="form-label mb-2">Delivery & Health Notes (Optional)</label>
-                        <textarea name="Notes" class="form-control" spellcheck="false" cols="30" rows="6" placeholder="Special delivery instructions or herbal packaging requests..."></textarea>
+                        <div class="col-12 pt-2 border-top">
+                            <span class="text-muted small d-block">Invoice Confirmation Email</span>
+                            <span class="fw-semibold text-dark">@Model.Email</span>
+                        </div>
                     </div>
                 </div>
 
-                <div class="col-md-12 col-lg-6 col-xl-5">
-                    <div class="table-responsive">
-                        <table class="table">
+                <!-- Destination Address Only (Mandatory) -->
+                <div class="card border rounded-4 p-4 bg-white shadow-sm">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="rounded-circle bg-danger bg-opacity-10 text-danger d-flex align-items-center justify-content-center me-2" style="width: 36px; height: 36px;">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold text-dark mb-0">Order Shipping Destination</h6>
+                            <small class="text-muted" style="font-size: 0.72rem;">Specific delivery location for this package</small>
+                        </div>
+                    </div>
+
+                    <div class="mb-2">
+                        <label asp-for="ShippingAddress" class="form-label fw-bold text-dark small mb-2">
+                            Delivery Address (City, Street, Building & Apartment) <span class="text-danger">*</span>
+                        </label>
+                        <textarea asp-for="ShippingAddress"
+                                  class="form-control rounded-3 p-3 shadow-none border"
+                                  rows="4"
+                                  placeholder="e.g., Menofia, Shebin El-Koom, 15 El-Galaa Street, Floor 3, Apartment 7" required></textarea>
+                        <span asp-validation-for="ShippingAddress" class="text-danger small fw-semibold d-block mt-1"></span>
+                    </div>
+
+                    <small class="text-muted mt-2 d-block" style="font-size: 0.76rem; line-height: 1.5;">
+                        <i class="fas fa-info-circle text-primary me-1"></i> Delivery couriers route individual packages directly to this provided address.
+                    </small>
+                </div>
+
+            </div>
+
+            <!-- Right Column: Polished Prescription Billing Summary -->
+            <div class="col-lg-6 col-xl-6">
+                <div class="summary-card p-4">
+
+                    <div class="d-flex justify-content-between align-items-center pb-3 mb-3 border-bottom">
+                        <h5 class="fw-bold text-dark mb-0">Prescription Billing Summary</h5>
+                        <span class="badge bg-light text-dark border font-monospace">@Model.Cart.Items.Count Item(s)</span>
+                    </div>
+
+                    <!-- Items Table -->
+                    <div class="table-responsive mb-3">
+                        <table class="table summary-table align-middle mb-0">
                             <thead>
                                 <tr>
                                     <th scope="col">Remedy</th>
-                                    <th scope="col">Name</th>
-                                    <th scope="col">Price</th>
-                                    <th scope="col">Qty</th>
-                                    <th scope="col">Total</th>
+                                    <th scope="col">Vendor</th>
+                                    <th scope="col" class="text-center">Dosage / Qty</th>
+                                    <th scope="col" class="text-end">Total</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <th scope="row">
-                                        <div class="d-flex align-items-center mt-2">
-                                            <img src="~/img/vegetable-item-3.png" class="img-fluid rounded-circle" style="width: 60px; height: 60px;" alt="Chamomile">
-                                        </div>
-                                    </th>
-                                    <td class="py-4">Chamomile Pack</td>
-                                    <td class="py-4">45.00 EGP</td>
-                                    <td class="py-4">1</td>
-                                    <td class="py-4">45.00 EGP</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">
-                                        <div class="d-flex align-items-center mt-2">
-                                            <img src="~/img/vegetable-item-5.jpg" class="img-fluid rounded-circle" style="width: 60px; height: 60px;" alt="Digestive Blend">
-                                        </div>
-                                    </th>
-                                    <td class="py-4">Digestive Blend</td>
-                                    <td class="py-4">120.00 EGP</td>
-                                    <td class="py-4">1</td>
-                                    <td class="py-4">120.00 EGP</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row"></th>
-                                    <td class="py-4"></td>
-                                    <td class="py-4"></td>
-                                    <td class="py-4">
-                                        <p class="mb-0 text-dark py-2 fw-semibold">Subtotal</p>
-                                    </td>
-                                    <td class="py-4">
-                                        <div class="py-2">
-                                            <p class="mb-0 text-dark">165.00 EGP</p>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th scope="row"></th>
-                                    <td class="py-4"></td>
-                                    <td class="py-4"></td>
-                                    <td class="py-4">
-                                        <p class="mb-0 text-dark py-2 fw-semibold">Shipping</p>
-                                    </td>
-                                    <td class="py-4">
-                                        <div class="py-2">
-                                            <p class="mb-0 text-dark">30.00 EGP</p>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th scope="row"></th>
-                                    <td class="py-4"></td>
-                                    <td class="py-4"></td>
-                                    <td class="py-4">
-                                        <p class="mb-0 text-dark text-uppercase py-3 fw-bold">TOTAL</p>
-                                    </td>
-                                    <td class="py-4">
-                                        <div class="py-3 border-bottom border-top">
-                                            <p class="mb-0 text-dark fw-bold fs-5">195.00 EGP</p>
-                                        </div>
-                                    </td>
-                                </tr>
+                                @foreach (var item in Model.Cart.Items)
+                                {
+                                    bool isHerb = item.ItemType == HerbioMart.ViewModels.Order.CartItemType.Herb;
+
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="me-2 @(isHerb ? "item-icon-herb" : "item-icon-recipe")">
+                                                    <i class="fas @(isHerb ? "fa-leaf" : "fa-mortar-pestle") text-white" style="font-size: 0.85rem;"></i>
+                                                </div>
+                                                <div>
+                                                    <h6 class="mb-0 fw-bold text-dark" style="font-size: 0.85rem;">@item.ItemName</h6>
+                                                    <small class="text-muted" style="font-size: 0.68rem;">@(isHerb ? "Single Herb" : "Remedy Pack")</small>
+                                                </div>
+                                            </div>
+                                        </td>
+
+                                        <td class="small text-muted" style="font-size: 0.8rem;">
+                                            @item.HerbalistName
+                                        </td>
+
+                                        <td class="text-center font-monospace fw-bold text-dark small">
+                                            @(isHerb ? $"{item.Quantity} g" : $"{item.Quantity} unit")
+                                        </td>
+
+                                        <td class="text-end font-monospace fw-bold text-dark">
+                                            @item.SubTotal.ToString("0.00") <small class="text-muted" style="font-size: 0.7rem;">EGP</small>
+                                        </td>
+                                    </tr>
+                                }
                             </tbody>
                         </table>
                     </div>
 
-                    <div class="row g-4 text-center align-items-center justify-content-center border-bottom py-3">
-                        <div class="col-12">
-                            <div class="form-check text-start my-2">
-                                <input type="radio" class="form-check-input bg-primary border-0" id="Payment-COD" name="PaymentMethod" value="CashOnDelivery" checked>
-                                <label class="form-check-label fw-semibold" for="Payment-COD">Cash On Delivery (COD)</label>
-                            </div>
-                            <p class="text-start text-muted small">Pay in cash directly to the delivery representative upon inspecting the herbal products.</p>
+                    <!-- Price Calculations -->
+                    <div class="p-3 bg-light rounded-4 mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-muted small">Items Subtotal:</span>
+                            <span class="fw-bold font-monospace text-dark">@Model.Cart.ItemsTotal.ToString("0.00") EGP</span>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-muted small">Consolidated Delivery Fee:</span>
+                            <span class="fw-bold font-monospace text-dark">@Model.Cart.DeliveryFee.ToString("0.00") EGP</span>
+                        </div>
+
+                        <hr class="my-2 border-secondary border-opacity-25" />
+
+                        <div class="d-flex justify-content-between align-items-center pt-1">
+                            <span class="fw-bold text-dark fs-5">Grand Total:</span>
+                            <span class="fw-bold text-success font-monospace fs-4">@Model.Cart.GrandTotal.ToString("0.00") EGP</span>
                         </div>
                     </div>
 
-                    <div class="row g-4 text-center align-items-center justify-content-center border-bottom py-3">
-                        <div class="col-12">
-                            <div class="form-check text-start my-2">
-                                <input type="radio" class="form-check-input bg-primary border-0" id="Payment-Card" name="PaymentMethod" value="OnlineCard">
-                                <label class="form-check-label fw-semibold" for="Payment-Card">Credit / Debit Card</label>
-                            </div>
-                            <p class="text-start text-muted small">Secure online checkout via Visa, Mastercard, or Meeza payment cards.</p>
-                        </div>
-                    </div>
+                    <!-- Payment Methods (Clean Card Radio) -->
+                    @* <div class="mb-4">
+                        <label class="form-label fw-bold text-dark small mb-2">Select Payment Method</label>
 
-                    <div class="row g-4 text-center align-items-center justify-content-center pt-4">
-                        <button type="submit" class="btn border-secondary py-3 px-4 text-uppercase w-100 text-primary fw-bold">
-                            <i class="fas fa-check-circle me-2"></i>Place Order
-                        </button>
-                    </div>
+                        <div class="d-flex flex-column gap-2">
+                            <div class="payment-box d-flex align-items-start">
+                                <input class="form-check-input mt-1 me-3" type="radio" asp-for="PaymentMethod" value="CashOnDelivery" id="payCOD" checked />
+                                <label class="form-check-label w-100" for="payCOD">
+                                    <span class="fw-bold d-block text-dark small">Cash On Delivery (COD)</span>
+                                    <small class="text-muted d-block" style="font-size: 0.72rem;">Pay in cash directly upon receipt of inspected herbal packages.</small>
+                                </label>
+                            </div>
+
+                            <div class="payment-box d-flex align-items-start">
+                                <input class="form-check-input mt-1 me-3" type="radio" asp-for="PaymentMethod" value="OnlineCard" id="payCard" />
+                                <label class="form-check-label w-100" for="payCard">
+                                    <span class="fw-bold d-block text-dark small">Credit / Debit Card</span>
+                                    <small class="text-muted d-block" style="font-size: 0.72rem;">Secure checkout with Visa, Mastercard, or Meeza payment cards.</small>
+                                </label>
+                            </div>
+                        </div>
+                    </div> *@
+
+                    <!-- Action Button -->
+                    <button type="submit" class="btn btn-success rounded-pill py-3 px-4 text-uppercase w-100 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2">
+                        <i class="fas fa-lock me-1"></i>
+                        <span>Place & Confirm Order</span>
+                    </button>
+
                 </div>
             </div>
-        </form>
-    </div>
+
+        </div>
+    </form>
+
 </div>
-<!-- Checkout Page End -->

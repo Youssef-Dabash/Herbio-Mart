@@ -1,0 +1,362 @@
+﻿@model HerbioMart.ViewModels.Shop.ShopIndexVM
+@{
+    ViewData["Title"] = "Herbal & Remedies Catalog";
+}
+
+<style>
+    .herb-card {
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+        background: #fff;
+    }
+
+        .herb-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.08);
+        }
+
+    .herb-img-wrapper {
+        position: relative;
+        height: 180px;
+        overflow: hidden;
+        background-color: #f8fafc;
+    }
+
+        .herb-img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+    .herb-card:hover .herb-img-wrapper img {
+        transform: scale(1.05);
+    }
+
+    .recipe-card {
+        border-radius: 16px;
+        border: 1px solid #e9ecef;
+        border-top: 4px solid #198754;
+        background: #ffffff;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .recipe-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(25, 135, 84, 0.1);
+        }
+
+    .badge-disease {
+        border: 1px solid #f87171;
+        color: #dc2626;
+        background-color: #fef2f2;
+        font-weight: 500;
+        border-radius: 50rem;
+        padding: 0.3rem 0.75rem;
+        font-size: 0.75rem;
+    }
+</style>
+
+<!-- Single Page Header -->
+<div class="container-fluid page-header py-5 mb-4">
+    <h1 class="text-center text-white display-6 fw-bold">Medicinal Catalog</h1>
+    <ol class="breadcrumb justify-content-center mb-0">
+        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-white">Home</a></li>
+        <li class="breadcrumb-item active text-white">Shop</li>
+    </ol>
+</div>
+
+<div class="container py-4">
+
+    <!-- Tabs & Search Controls -->
+    <div class="row align-items-center mb-4 g-3">
+        <div class="col-lg-6">
+            <ul class="nav nav-pills p-1 bg-light rounded-pill d-inline-flex border" id="catalogTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active rounded-pill px-4 py-2 fw-semibold" id="herbs-tab" data-bs-toggle="pill" data-bs-target="#herbs-content" type="button" role="tab">
+                        <i class="fas fa-leaf text-success me-2"></i> Single Herbs (@Model.Herbs.Count)
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link rounded-pill px-4 py-2 fw-semibold" id="recipes-tab" data-bs-toggle="pill" data-bs-target="#recipes-content" type="button" role="tab">
+                        <i class="fas fa-mortar-pestle text-primary me-2"></i> Formulated Recipes (@Model.Recipes.Count)
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="d-flex gap-2 justify-content-lg-end">
+                <form asp-controller="Shop" asp-action="Index" method="get" class="d-flex flex-grow-1" style="max-width: 380px;">
+                    <div class="input-group">
+                        <input type="search" name="searchQuery" class="form-control rounded-start-pill ps-3" placeholder="Search remedies or herbs...">
+                        <button type="submit" class="btn btn-success rounded-end-pill px-3">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                </form>
+
+                <select id="sorting" name="sortBy" class="form-select rounded-pill" style="max-width: 170px;" onchange="location.href='?sortBy='+this.value">
+                    <option value="latest">Sort: Latest</option>
+                    <option value="priceAsc">Price: Low to High</option>
+                    <option value="priceDesc">Price: High to Low</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Area -->
+    <div class="tab-content" id="catalogTabsContent">
+
+        <!-- ======================= TAB 1: SINGLE HERBS ======================= -->
+        <div class="tab-pane fade show active" id="herbs-content" role="tabpanel">
+            <div class="mb-4">
+                <h3 class="fw-bold text-dark mb-1">Authentic Medicinal Herbs</h3>
+                <p class="text-muted small">Pure laboratory-tested medicinal botanicals. Add herbs to configure vendor and weight inside your cart.</p>
+            </div>
+
+            @if (!Model.Herbs.Any())
+            {
+                <div class="alert alert-light border text-center py-5 rounded-4">
+                    <i class="fas fa-seedling text-muted fa-3x mb-3"></i>
+                    <p class="text-muted fw-semibold">No herbs found matching your search criteria.</p>
+                </div>
+            }
+            else
+            {
+                <div class="row g-4">
+                    @foreach (var herb in Model.Herbs)
+                    {
+                        var hasVendors = herb.AvailableVendors != null && herb.AvailableVendors.Any();
+
+                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3">
+                            <div class="herb-card h-100 d-flex flex-column">
+
+                                <div class="herb-img-wrapper">
+                                    <img src="@(string.IsNullOrEmpty(herb.ImageUrl) ? "/img/single-item.jpg" : herb.ImageUrl)" alt="@herb.Name" />
+                                    <span class="badge bg-success position-absolute top-0 start-0 m-3 px-2 py-1 rounded-pill small shadow-sm">
+                                        <i class="fas fa-leaf me-1"></i> Herb
+                                    </span>
+                                </div>
+
+                                <div class="p-3 d-flex flex-column flex-grow-1">
+                                    <h5 class="fw-bold text-dark mb-1 text-truncate" title="@herb.Name">@herb.Name</h5>
+
+                                    <p class="text-muted fst-italic small mb-2 text-truncate" style="font-size: 0.8rem;">
+                                        @(string.IsNullOrWhiteSpace(herb.ScientificName) ? "Botanical Specimen" : herb.ScientificName)
+                                    </p>
+
+                                    <p class="text-muted small flex-grow-1 mb-3" style="font-size: 0.82rem; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                        @herb.Description
+                                    </p>
+
+                                    @if (!hasVendors)
+                                    {
+                                        <div class="alert alert-secondary py-2 px-2 small rounded-3 mb-0 mt-auto text-center border-0" style="font-size: 0.78rem;">
+                                            <i class="fas fa-box-open me-1"></i> Out of stock across apothecaries
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <form class="ajax-add-herb-form mt-auto m-0">
+                                            <input type="hidden" name="herbId" value="@herb.Id" />
+                                            <input type="hidden" name="grams" value="100" />
+
+                                            <div class="pt-2 border-top">
+                                                <button type="submit" class="btn btn-outline-success rounded-pill w-100 btn-sm fw-semibold d-flex align-items-center justify-content-center gap-2 py-2 shadow-sm btn-add-cart">
+                                                    <i class="fas fa-cart-plus"></i> Add to Cart
+                                                </button>
+                                            </div>
+                                        </form>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <!-- ======================= TAB 2: FORMULATED RECIPES ======================= -->
+        <div class="tab-pane fade" id="recipes-content" role="tabpanel">
+            <div class="mb-4">
+                <h3 class="fw-bold text-dark mb-1">All Formulated Recipes</h3>
+                <p class="text-muted small">Browse prepared medicinal herbal remedies compounded by certified apothecaries.</p>
+            </div>
+
+            @if (!Model.Recipes.Any())
+            {
+                <div class="alert alert-light border text-center py-5 rounded-4">
+                    <i class="fas fa-mortar-pestle text-muted fa-3x mb-3"></i>
+                    <p class="text-muted fw-semibold">No formulated recipes found currently.</p>
+                </div>
+            }
+            else
+            {
+                <div class="row g-4">
+                    @foreach (var recipe in Model.Recipes)
+                    {
+                        <div class="col-md-6 col-lg-4">
+                            <div class="recipe-card p-4 h-100 d-flex flex-column">
+
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <span class="badge rounded-pill bg-light text-dark border px-3 py-2 fw-normal d-flex align-items-center">
+                                        <i class="fas fa-user-check text-success me-2"></i> @recipe.HerbalistName
+                                    </span>
+                                    <div class="text-warning small d-flex align-items-center">
+                                        <i class="fas fa-star me-1 text-warning"></i>
+                                        <span class="fw-bold text-dark font-monospace">@recipe.Rating.ToString("0.0")</span>
+                                        <span class="text-muted ms-1">(@recipe.ReviewCount)</span>
+                                    </div>
+                                </div>
+
+                                <h4 class="fw-bold text-dark mb-3" style="font-size: 1.25rem;">
+                                    <a asp-controller="Shop" asp-action="Details" asp-route-id="@recipe.Id" class="text-dark text-decoration-none">
+                                        @recipe.Name
+                                    </a>
+                                </h4>
+
+                                <div class="mb-3">
+                                    <div class="d-flex align-items-center text-danger small fw-semibold mb-2">
+                                        <i class="fas fa-heartbeat me-2"></i> Indicated For:
+                                    </div>
+                                    <div class="d-flex flex-wrap gap-1">
+                                        @if (recipe.DiseasesTreated != null && recipe.DiseasesTreated.Any())
+                                        {
+                                            @foreach (var dis in recipe.DiseasesTreated)
+                                            {
+                                                <span class="badge-disease">@dis</span>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <span class="badge-disease">General Wellness</span>
+                                        }
+                                    </div>
+                                </div>
+
+                                <p class="text-muted small flex-grow-1 mb-4" style="font-size: 0.82rem; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                                    @recipe.Description
+                                </p>
+
+                                <div class="pt-3 border-top mt-auto d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <span class="text-muted text-uppercase fw-semibold d-block" style="font-size: 0.68rem; letter-spacing: 0.5px;">PRICE</span>
+                                        <span class="fs-4 fw-bold text-dark font-monospace">@recipe.Price.ToString("0.00")</span>
+                                        <small class="text-muted fw-bold">EGP</small>
+                                    </div>
+
+                                    <div class="d-flex gap-2 align-items-center">
+                                        @* <a asp-controller="Shop" asp-action="Details" asp-route-id="@recipe.Id"
+                                           class="btn btn-outline-secondary rounded-pill btn-sm px-3 py-2" title="Details">
+                                            <i class="fas fa-info-circle"></i> Details
+                                        </a> *@
+
+                                        <form class="ajax-add-recipe-form m-0">
+                                            <input type="hidden" name="recipeId" value="@recipe.Id" />
+                                            <input type="hidden" name="quantity" value="1" />
+
+                                            <button type="submit" class="btn btn-success rounded-pill px-3 py-2 text-white fw-semibold d-flex align-items-center gap-1 shadow-sm btn-add-cart">
+                                                <i class="fas fa-cart-plus"></i> Add to Cart
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+    </div>
+</div>
+
+<!-- Floating Notification Toast -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1090;">
+    <div id="cartToast" class="toast align-items-center text-white bg-success border-0 shadow-lg rounded-4" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body d-flex align-items-center gap-2 fw-semibold">
+                <i class="fas fa-check-circle fs-5"></i>
+                <span id="cartToastMsg">Item added to cart!</span>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            function showToast(msg, isSuccess) {
+                var $toast = $('#cartToast');
+                if (isSuccess) {
+                    $toast.removeClass('bg-danger').addClass('bg-success');
+                } else {
+                            $toast.removeClass('bg-success').addClass('bg-danger');
+                }
+                $('#cartToastMsg').text(msg);
+                var toastInstance = new bootstrap.Toast($toast[0], { delay: 2500 });
+                toastInstance.show();
+            }
+
+                    function updateNavBadge(count) {
+                        var $badge = $('#navCartCount');
+                        $badge.text(count);
+                        if (count > 0) {
+                            $badge.show();
+                        } else {
+                            $badge.hide();
+                        }
+                    }
+
+                    // 1. Add Herb via AJAX
+                    $(document).on('submit', '.ajax-add-herb-form', function (e) {
+                        e.preventDefault();
+                        var $btn = $(this).find('.btn-add-cart');
+                        var originalHtml = $btn.html();
+
+                        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Adding...');
+
+                        $.post('/Cart/AddHerbAjax', $(this).serialize(), function (res) {
+                            if (res.success) {
+                                updateNavBadge(res.cartCount);
+                                showToast(res.message, true);
+                            } else {
+                                showToast(res.message, false);
+                            }
+                        }).fail(function () {
+                            showToast('Could not add herb to cart.', false);
+                        }).always(function () {
+                            $btn.prop('disabled', false).html(originalHtml);
+                        });
+                    });
+
+                    // 2. Add Recipe via AJAX
+                    $(document).on('submit', '.ajax-add-recipe-form', function (e) {
+                        e.preventDefault();
+                        var $btn = $(this).find('.btn-add-cart');
+                        var originalHtml = $btn.html();
+
+                        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
+
+                        $.post('/Cart/AddRecipeAjax', $(this).serialize(), function (res) {
+                            if (res.success) {
+                                updateNavBadge(res.cartCount);
+                                showToast(res.message, true);
+                            } else {
+                                showToast(res.message, false);
+                            }
+                        }).fail(function () {
+                            showToast('Could not add recipe to cart.', false);
+                        }).always(function () {
+                            $btn.prop('disabled', false).html(originalHtml);
+                        });
+                    });
+                });
+    </script>
+}

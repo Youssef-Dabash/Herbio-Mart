@@ -55,33 +55,101 @@
         padding: 0.25rem 0.65rem;
         font-size: 0.72rem;
     }
+
+    /* Horizontal Slider Track */
+    .slider-scroll-track {
+        display: flex;
+        gap: 1.5rem;
+        overflow-x: auto;
+        scroll-behavior: smooth;
+        scroll-snap-type: x mandatory;
+        padding: 0.5rem 0.25rem 1.5rem 0.25rem;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+        .slider-scroll-track::-webkit-scrollbar {
+            display: none;
+        }
+
+    /* Responsive Item Sizes */
+    .slider-item-herb {
+        flex: 0 0 calc(25% - 1.15rem);
+        min-width: 270px;
+        scroll-snap-align: start;
+    }
+
+    .slider-item-recipe {
+        flex: 0 0 calc(33.333% - 1rem);
+        min-width: 320px;
+        scroll-snap-align: start;
+    }
+
+ 
+
+    /* Next / Prev Buttons */
+    .slider-nav-btn {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #ffffff;
+        border: 1.5px solid #e2e8f0;
+        color: #1e293b;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+    }
+
+        .slider-nav-btn:hover {
+            background-color: #198754;
+            border-color: #198754;
+            color: #ffffff;
+            transform: scale(1.06);
+        }
 </style>
 
 <div class="container-fluid py-5">
-    <div class="container py-5">
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5 gap-3">
+    <div class="container py-4">
+
+        <!-- Header Controls Row -->
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center mb-4 gap-3">
             <div>
                 <h1 class="display-5 fw-bold text-dark mb-1">Featured Remedies</h1>
                 <p class="text-muted mb-0">Explore verified botanical herbs and master apothecary formulations.</p>
             </div>
 
-            <ul class="nav nav-pills bg-light p-1 rounded-pill border d-inline-flex" id="featuredTabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active rounded-pill px-4 py-2 fw-semibold" id="tab-herbs-btn" data-bs-toggle="pill" data-bs-target="#tab-herbs" type="button" role="tab">
-                        <i class="fas fa-leaf text-success me-2"></i> Raw Herbs (@Model.FeaturedHerbs.Count)
+            <div class="d-flex flex-wrap align-items-center gap-3">
+                <!-- Tabs -->
+                <ul class="nav nav-pills bg-light p-1 rounded-pill border d-inline-flex" id="featuredTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active rounded-pill px-4 py-2 fw-semibold" id="tab-herbs-btn" data-bs-toggle="pill" data-bs-target="#tab-herbs" type="button" role="tab">
+                            <i class="fas fa-leaf text-success me-2"></i> Raw Herbs (@Model.FeaturedHerbs.Count)
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link rounded-pill px-4 py-2 fw-semibold" id="tab-recipes-btn" data-bs-toggle="pill" data-bs-target="#tab-recipes" type="button" role="tab">
+                            <i class="fas fa-mortar-pestle text-primary me-2"></i> Prepared Recipes (@Model.FeaturedRecipes.Count)
+                        </button>
+                    </li>
+                </ul>
+
+                <!-- Slider Arrows -->
+                <div class="d-flex align-items-center gap-2">
+                    <button type="button" class="slider-nav-btn" id="sliderPrevBtn" title="Previous">
+                        <i class="fas fa-chevron-left"></i>
                     </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link rounded-pill px-4 py-2 fw-semibold" id="tab-recipes-btn" data-bs-toggle="pill" data-bs-target="#tab-recipes" type="button" role="tab">
-                        <i class="fas fa-mortar-pestle text-primary me-2"></i> Prepared Recipes (@Model.FeaturedRecipes.Count)
+                    <button type="button" class="slider-nav-btn" id="sliderNextBtn" title="Next">
+                        <i class="fas fa-chevron-right"></i>
                     </button>
-                </li>
-            </ul>
+                </div>
+            </div>
         </div>
 
         <div class="tab-content" id="featuredTabsContent">
 
-            <!-- 1. HERBS TAB -->
+            <!-- 1. HERBS TAB SLIDER -->
             <div class="tab-pane fade show active" id="tab-herbs" role="tabpanel">
                 @if (!Model.FeaturedHerbs.Any())
                 {
@@ -91,10 +159,10 @@
                 }
                 else
                 {
-                    <div class="row g-4">
+                    <div class="slider-scroll-track" id="herbsScrollTrack">
                         @foreach (var herb in Model.FeaturedHerbs)
                         {
-                            <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3">
+                            <div class="slider-item-herb">
                                 <div class="home-herb-card h-100 d-flex flex-column">
                                     <div class="home-herb-img">
                                         <img src="@herb.ImageUrl" alt="@herb.Name" />
@@ -127,7 +195,7 @@
                 }
             </div>
 
-            <!-- 2. RECIPES TAB -->
+            <!-- 2. RECIPES TAB SLIDER -->
             <div class="tab-pane fade" id="tab-recipes" role="tabpanel">
                 @if (!Model.FeaturedRecipes.Any())
                 {
@@ -137,10 +205,10 @@
                 }
                 else
                 {
-                    <div class="row g-4">
+                    <div class="slider-scroll-track" id="recipesScrollTrack">
                         @foreach (var recipe in Model.FeaturedRecipes)
                         {
-                            <div class="col-md-6 col-lg-4">
+                            <div class="slider-item-recipe">
                                 <div class="home-recipe-card p-4 h-100 d-flex flex-column">
                                     <div class="d-flex justify-content-between align-items-center mb-3">
                                         <span class="badge rounded-pill bg-light text-dark border px-3 py-2 fw-normal d-flex align-items-center">
@@ -153,7 +221,7 @@
                                         </div>
                                     </div>
 
-                                    <h4 class="fw-bold text-dark mb-3" style="font-size: 1.25rem;">
+                                    <h4 class="fw-bold text-dark mb-3 text-truncate" title="@recipe.Name" style="font-size: 1.25rem;">
                                         @recipe.Name
                                     </h4>
 
@@ -161,7 +229,7 @@
                                         <div class="d-flex align-items-center text-danger small fw-semibold mb-2">
                                             <i class="fas fa-heartbeat me-2"></i> Indicated For:
                                         </div>
-                                        <div class="d-flex flex-wrap gap-1">
+                                        <div class="d-flex flex-wrap gap-1" style="min-height: 28px;">
                                             @if (recipe.DiseasesTreated.Any())
                                             {
                                                 @foreach (var dis in recipe.DiseasesTreated)
@@ -191,9 +259,10 @@
                                             <small class="text-muted fw-bold">EGP</small>
                                         </div>
 
-                                        <span class="badge bg-success bg-opacity-10 text-white border border-success border-opacity-25 rounded-pill px-3 py-2 fw-semibold" style="font-size: 0.78rem;">
-                                            <i class="fas fa-certificate me-1"></i> Formulated Blend
-                                        </span>
+                                        <a asp-controller="Recipe" asp-action="Details" asp-route-id="@recipe.Id"
+                                           class="btn btn-outline-success rounded-pill px-3 py-2 btn-sm fw-semibold">
+                                            <i class="fas fa-eye me-1"></i> Details
+                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -205,3 +274,34 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const nextBtn = document.getElementById("sliderNextBtn");
+        const prevBtn = document.getElementById("sliderPrevBtn");
+
+        function getActiveTrack() {
+            return document.querySelector(".tab-pane.active .slider-scroll-track");
+        }
+
+        if (nextBtn && prevBtn) {
+            nextBtn.addEventListener("click", function() {
+                const track = getActiveTrack();
+                if (track) {
+                    const firstItem = track.firstElementChild;
+                    const step = firstItem ? firstItem.offsetWidth + 24 : 320;
+                    track.scrollBy({ left: step, behavior: "smooth" });
+                }
+            });
+
+            prevBtn.addEventListener("click", function() {
+                const track = getActiveTrack();
+                if (track) {
+                    const firstItem = track.firstElementChild;
+                    const step = firstItem ? firstItem.offsetWidth + 24 : 320;
+                    track.scrollBy({ left: -step, behavior: "smooth" });
+                }
+            });
+        }
+    });
+</script>

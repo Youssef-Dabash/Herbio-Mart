@@ -5,98 +5,193 @@
 }
 
 <style>
-    .page-header-top {
-        margin-top: 150px;
+    .my-reviews-wrapper {
+        margin-top: 140px;
+        margin-bottom: 60px;
+    }
+
+    .reviews-table-card {
+        border-radius: 16px;
+        border: 1px solid #e2e8f0;
+        background: #ffffff;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+        overflow: hidden;
+    }
+
+    /* إصلاح أزرار Edit و Delete لتكون أفقية وفي سطر واحد ومحاذاة مضبوطة */
+    .btn-action-pill {
+        display: inline-flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 6px !important;
+        padding: 6px 14px !important;
+        font-size: 0.82rem !important;
+        font-weight: 600 !important;
+        line-height: 1 !important;
+        border-radius: 50rem !important;
+        text-decoration: none !important;
+        white-space: nowrap !important;
+        transition: all 0.2s ease !important;
+    }
+
+        .btn-action-pill i {
+            display: inline-block !important;
+            font-size: 0.85rem !important;
+            margin: 0 !important;
+            line-height: 1 !important;
+        }
+
+    .btn-pill-edit {
+        color: #15803d !important;
+        background-color: #f0fdf4 !important;
+        border: 1px solid #86efac !important;
+    }
+
+        .btn-pill-edit:hover {
+            background-color: #16a34a !important;
+            color: #ffffff !important;
+            border-color: #16a34a !important;
+        }
+
+    .btn-pill-delete {
+        color: #dc2626 !important;
+        background-color: #fef2f2 !important;
+        border: 1px solid #fca5a5 !important;
+    }
+
+        .btn-pill-delete:hover {
+            background-color: #dc2626 !important;
+            color: #ffffff !important;
+            border-color: #dc2626 !important;
+        }
+
+    /* بادج التقييم الصغير والنظيف */
+    .rating-pill-tag {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 4px !important;
+        background-color: #fffbeb !important;
+        border: 1px solid #fef08a !important;
+        padding: 4px 10px !important;
+        border-radius: 50rem !important;
+        color: #854d0e !important;
+        font-weight: 700 !important;
+        font-size: 0.8rem !important;
+        line-height: 1 !important;
+    }
+
+    /* نص التعليق رمادي مريح للعين بدلاً من الأصفر */
+    .review-comment-text {
+        color: #334155 !important;
+        font-size: 0.88rem !important;
+        line-height: 1.5 !important;
+        margin: 0 !important;
     }
 </style>
 
-<div class="container page-header-top py-4">
+<div class="container my-reviews-wrapper py-4">
 
-    <!-- Alerts -->
     @if (TempData["SuccessMessage"] != null)
     {
         <div class="alert alert-success alert-dismissible fade show rounded-4 shadow-sm border-0 mb-4 p-3 d-flex align-items-center" role="alert">
             <i class="fas fa-check-circle fa-lg me-2 text-success"></i>
             <div>@TempData["SuccessMessage"]</div>
-            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
         </div>
     }
 
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
         <div>
             <h2 class="fw-bold text-dark mb-1">My Submitted Reviews</h2>
-            <p class="text-muted mb-0">Manage and edit your feedback on herbal recipes.</p>
+            <p class="text-muted small mb-0">Manage and edit your documented feedback on herbal recipes.</p>
         </div>
-        <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">
-            <i class="fas fa-globe me-1"></i> View All Community Reviews
-        </a>
+        <div class="d-flex gap-2">
+            <a asp-controller="Recipe" asp-action="Index" class="btn btn-success rounded-pill px-4 py-2 fw-semibold shadow-sm text-white">
+                <i class="fas fa-plus me-1"></i> Review More Remedies
+            </a>
+            <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4 py-2 fw-semibold">
+                <i class="fas fa-globe me-1"></i> Community Testimonials
+            </a>
+        </div>
     </div>
 
     @if (!Model.Any())
     {
-        <div class="text-center py-5 bg-light rounded-4 border">
-            <i class="fas fa-pen-alt fa-3x text-muted mb-3"></i>
-            <h5 class="text-dark fw-bold">You haven't reviewed any recipes yet.</h5>
-            <p class="text-muted small">Explore our recipes and share your experience with the community!</p>
-            <a asp-controller="Recipe" asp-action="Index" class="btn btn-success rounded-pill px-4 py-2 mt-2">
-                Browse Recipes
-            </a>
+        <div class="card border-0 shadow-sm rounded-4 p-5 text-center bg-light">
+            <i class="fas fa-feather-alt fa-3x text-muted mb-3 opacity-50"></i>
+            <h4 class="text-dark fw-bold">You haven't reviewed any recipes yet</h4>
+            <p class="text-muted small mb-4">Explore our formulations and share your clinical experience!</p>
+            <div>
+                <a asp-controller="Recipe" asp-action="Index" class="btn btn-success rounded-pill px-4 py-2 fw-semibold shadow-sm">
+                    Browse Recipes
+                </a>
+            </div>
         </div>
     }
     else
     {
-        <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
+        <div class="reviews-table-card">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
-                    <thead class="bg-light text-muted small text-uppercase">
+                    <thead class="table-light text-muted small text-uppercase">
                         <tr>
-                            <th class="ps-4 py-3">Remedy Name</th>
-                            <th class="py-3">Your Rating</th>
-                            <th class="py-3" style="width: 40%;">Your Comment</th>
-                            <th class="py-3">Date</th>
-                            <th class="text-end pe-4 py-3">Actions</th>
+                            <th class="ps-4 py-3" style="font-size: 0.75rem; letter-spacing: 0.5px;">Remedy Name</th>
+                            <th class="py-3" style="font-size: 0.75rem; letter-spacing: 0.5px;">Rating</th>
+                            <th class="py-3" style="width: 40%; font-size: 0.75rem; letter-spacing: 0.5px;">Observations & Comments</th>
+                            <th class="py-3" style="font-size: 0.75rem; letter-spacing: 0.5px;">Date</th>
+                            <th class="text-end pe-4 py-3" style="font-size: 0.75rem; letter-spacing: 0.5px;">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var item in Model)
                         {
                             <tr>
+                                <!-- Remedy Name -->
                                 <td class="ps-4">
-                                    <span class="fw-bold text-dark">@item.Recipe?.RecipeName</span>
-                                </td>
-                                <td>
-                                    <div class="text-warning small d-flex align-items-center">
-                                        @for (int i = 1; i <= 5; i++)
-                                        {
-                                            if (i <= item.RatingValue)
-                                            {
-                                                <i class="fas fa-star text-warning"></i>
-                                            }
-                                            else
-                                            {
-                                                <i class="far fa-star text-muted"></i>
-                                            }
-                                        }
-                                        <span class="ms-2 fw-bold text-dark">@item.RatingValue.ToString("0.0")</span>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="fas fa-mortar-pestle text-success small"></i>
+                                        <a asp-controller="Recipe" asp-action="Details" asp-route-id="@item.RecipeId" class="fw-bold text-dark text-decoration-none">
+                                            @item.Recipe?.RecipeName
+                                        </a>
                                     </div>
                                 </td>
+
+                                <!-- Rating Score -->
                                 <td>
-                                    <p class="text-muted small mb-0 text-truncate" style="max-width: 400px;">
-                                        @(string.IsNullOrWhiteSpace(item.Comment) ? "No written comments." : item.Comment)
+                                    <div class="rating-pill-tag">
+                                        <i class="fas fa-star text-warning small"></i>
+                                        <span>@item.RatingValue.ToString("0.0")</span>
+                                    </div>
+                                </td>
+
+                                <!-- Comment Text -->
+                                <td>
+                                    <p class="review-comment-text text-truncate" style="max-width: 380px;" title="@item.Comment">
+                                        @(string.IsNullOrWhiteSpace(item.Comment) ? "No written remarks." : item.Comment)
                                     </p>
                                 </td>
+
+                                <!-- Date -->
                                 <td class="text-muted small">
                                     @item.RatingDate.ToString("MMM dd, yyyy")
                                 </td>
+
+                                <!-- Action Buttons (Strictly Inline) -->
                                 <td class="text-end pe-4">
-                                    <div class="d-inline-flex gap-2">
-                                        <a asp-action="Create" asp-route-recipeId="@item.RecipeId" class="btn btn-sm btn-outline-primary rounded-pill px-3">
-                                            <i class="fas fa-edit me-1"></i> Edit
+                                    <div class="d-inline-flex align-items-center gap-2">
+                                        <a asp-action="Create" asp-route-recipeId="@item.RecipeId" class="btn-action-pill btn-pill-edit">
+                                            <i class="fas fa-edit"></i>
+                                            <span>Edit</span>
                                         </a>
-                                        <form asp-action="Delete" asp-route-id="@item.FeedbackId" method="post" onsubmit="return confirm('Are you sure you want to delete this review?');" class="d-inline">
+
+                                        <form asp-action="Delete" asp-route-id="@item.FeedbackId" method="post"
+                                              onsubmit="return confirm('Are you sure you want to delete this review?');" class="d-inline m-0 p-0">
                                             @Html.AntiForgeryToken()
-                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">
-                                                <i class="fas fa-trash-alt me-1"></i> Delete
+                                            <button type="submit" class="btn-action-pill btn-pill-delete border-0">
+                                                <i class="fas fa-trash-alt"></i>
+                                                <span>Delete</span>
                                             </button>
                                         </form>
                                     </div>

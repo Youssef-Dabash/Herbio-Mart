@@ -1,81 +1,170 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using HerbioMart.Data;
 using HerbioMart.Services.Interfaces;
+using HerbioMart.ViewModels.Recipes;
 using HerbioMart.ViewModels.Shop;
 
-namespace HerbioMart.Services.Implementations
+namespace HerbioMart.Services.Implementations;
+
+public class ShopService : IShopService
 {
-    public class ShopService : IShopService
+    private readonly AppDbContext _context;
+
+    public ShopService(AppDbContext context)
     {
-        private readonly AppDbContext _context;
+        _context = context;
+    }
 
-        public ShopService(AppDbContext context)
+    public async Task<ShopIndexVM> GetCatalogAsync(string? searchQuery, string? sortBy, string? disease)
+    {
+        // =========================================================================
+        // 1. استعلام الأعشاب (Herbs) + ربط الـ Inventory الخاص بالعطارين (HerbalistHerbs)
+        // =========================================================================
+        var herbsQuery = _context.Herbs
+            .Include(h => h.HerbalistHerbs.Where(hh => hh.IsActive))
+                .ThenInclude(hh => hh.Herbalist)
+                    .ThenInclude(h => h.User)
+            .AsNoTracking()
+            .AsQueryable();
+
+        // تطبيق البحث على الأعشاب
+        if (!string.IsNullOrWhiteSpace(searchQuery))
         {
-            _context = context;
+            var query = searchQuery.Trim().ToLower();
+            herbsQuery = herbsQuery.Where(h =>
+                h.HerbName.ToLower().Contains(query) ||
+                (h.ScientificName != null && h.ScientificName.ToLower().Contains(query)) ||
+                h.Description.ToLower().Contains(query));
         }
 
-        public async Task<ShopIndexVM> GetCatalogAsync(string? searchQuery = null, string? disease = null, string? sortBy = null)
+        var rawHerbs = await herbsQuery.ToListAsync();
+
+        // تحويل البيانات لـ ShopHerbVM مع تعبئة قائمة العطارين المتوفر عندهم العشبة
+        var herbsVM = rawHerbs.Select(h => new ShopHerbVM
         {
-            var herbsQuery = _context.Herbs.AsNoTracking().AsQueryable();
-            var recipesQuery = _context.Recipes.Where(r => r.IsActive).AsNoTracking().AsQueryable();
+            Id = h.HerbId,
+            Name = h.HerbName,
+            ScientificName = h.ScientificName,
+            Description = h.Description,
+            ImageUrl = h.ImageURL,
+            AvailableVendors = h.HerbalistHerbs
+                .Where(hh => hh.IsActive)
+                .Select(hh => new HerbVendorOptionVM
+                {
+                    HerbalistId = hh.HerbalistId,
+                    HerbalistName = hh.Herbalist?.User?.FullName ?? "Unknown Apothecary",
+                    Price = hh.Price
+                })
+                .OrderBy(v => v.Price) // ترتيب العطارين من الأقل سعراً
+                .ToList()
+        }).ToList();
 
-            // فلترة البحث
-            if (!string.IsNullOrWhiteSpace(searchQuery))
-            {
-                var query = searchQuery.Trim().ToLower();
-                herbsQuery = herbsQuery.Where(h => h.HerbName.ToLower().Contains(query) ||
-                                                   (h.Description != null && h.Description.ToLower().Contains(query)));
-
-                recipesQuery = recipesQuery.Where(r => r.RecipeName.ToLower().Contains(query) ||
-                                                       (r.Description != null && r.Description.ToLower().Contains(query)));
-            }
-
-            // الترتيب
-            recipesQuery = sortBy switch
-            {
-                "priceAsc" => recipesQuery.OrderBy(r => r.Price),
-                "priceDesc" => recipesQuery.OrderByDescending(r => r.Price),
-                _ => recipesQuery.OrderByDescending(r => r.RecipeId)
-            };
-
-            herbsQuery = sortBy switch
-            {
-                "priceAsc" => herbsQuery.OrderBy(h => h.HerbalistHerbs.Select(hh => hh.Price).FirstOrDefault()),
-                "priceDesc" => herbsQuery.OrderByDescending(h => h.HerbalistHerbs.Select(hh => hh.Price).FirstOrDefault()),
-                _ => herbsQuery.OrderByDescending(h => h.HerbId)
-            };
-
-            // Mapping الأعشاب
-            var herbsList = await herbsQuery.Select(h => new ShopHerbItemVM
-            {
-                Id = h.HerbId,
-                Name = h.HerbName,
-                ScientificName = h.ScientificName,
-                Price = h.HerbalistHerbs.Select(hh => hh.Price).FirstOrDefault(),
-                ImageUrl = !string.IsNullOrEmpty(h.ImageURL) ? h.ImageURL : "/img/fruite-item-1.jpg",
-                Indication = !string.IsNullOrEmpty(h.Benefits) ? h.Benefits : h.Description,
-                Description = h.Description
-            }).ToListAsync();
-
-            // Mapping الوصفات
-            var recipesList = await recipesQuery.Select(r => new ShopRecipeItemVM
-            {
-                Id = r.RecipeId,
-                Name = r.RecipeName,
-                HerbalistName = r.Herbalist.User != null ? r.Herbalist.User.FullName : "Youssef Mohammed",
-                DiseasesTreated = r.RecipeDiseases.Select(rd => rd.Disease.DiseaseName).ToList(),
-                HerbsCount = r.RecipeHerbs.Count,
-                Price = r.Price,
-                Rating = r.AverageRating,
-                ReviewCount = r.TotalRatings,
-                Description = r.Description
-            }).ToListAsync();
-
-            return new ShopIndexVM
-            {
-                Herbs = herbsList,
-                Recipes = recipesList
-            };
+        // ترتيب الأعشاب حسب السعر إذا تم طلبه
+        if (sortBy == "priceAsc")
+        {
+            herbsVM = herbsVM.OrderBy(h => h.AvailableVendors.Any() ? h.AvailableVendors.Min(v => v.Price) : decimal.MaxValue).ToList();
         }
+        else if (sortBy == "priceDesc")
+        {
+            herbsVM = herbsVM.OrderByDescending(h => h.AvailableVendors.Any() ? h.AvailableVendors.Max(v => v.Price) : 0).ToList();
+        }
+
+        // =========================================================================
+        // 2. استعلام الوصفات (Recipes) + ربط العطار صاحب الوصفة والأمراض المستهدفة
+        // =========================================================================
+        var recipesQuery = _context.Recipes
+            .Include(r => r.Herbalist)
+                .ThenInclude(h => h.User)
+            .Include(r => r.RecipeDiseases)
+                .ThenInclude(rd => rd.Disease)
+            .Include(r => r.RecipeHerbs)
+            .AsNoTracking()
+            .AsQueryable();
+
+        // تطبيق البحث على الوصفات
+        if (!string.IsNullOrWhiteSpace(searchQuery))
+        {
+            var query = searchQuery.Trim().ToLower();
+            recipesQuery = recipesQuery.Where(r =>
+                r.RecipeName.ToLower().Contains(query) ||
+                r.Description.ToLower().Contains(query));
+        }
+
+        // تصفية حسب المرض إذا تم اختياره من الـ Sidebar
+        if (!string.IsNullOrWhiteSpace(disease))
+        {
+            var diseaseQuery = disease.Trim().ToLower();
+            recipesQuery = recipesQuery.Where(r =>
+                r.RecipeDiseases.Any(rd => rd.Disease.DiseaseName.ToLower().Contains(diseaseQuery)));
+        }
+
+        // ترتيب الوصفات
+        recipesQuery = sortBy switch
+        {
+            "priceAsc" => recipesQuery.OrderBy(r => r.Price),
+            "priceDesc" => recipesQuery.OrderByDescending(r => r.Price),
+            _ => recipesQuery.OrderByDescending(r => r.RecipeId) // الأحدث افتراضياً
+        };
+
+        var rawRecipes = await recipesQuery.ToListAsync();
+
+        var recipesVM = rawRecipes.Select(r => new ShopRecipeVM
+        {
+            Id = r.RecipeId,
+            HerbalistId = r.HerbalistId, // حل الإيرور في الكتالوج
+            Name = r.RecipeName,
+            Description = r.Description,
+            Price = r.Price,
+            HerbalistName = r.Herbalist?.User?.FullName ?? "Master Herbalist",
+            Rating = r.AverageRating,
+            ReviewCount = r.TotalRatings,
+            HerbsCount = r.RecipeHerbs?.Count ?? 0,
+            DiseasesTreated = r.RecipeDiseases?
+                .Select(rd => rd.Disease.DiseaseName)
+                .ToList() ?? new List<string>()
+        }).ToList();
+
+        return new ShopIndexVM
+        {
+            Herbs = herbsVM,
+            Recipes = recipesVM
+        };
+    }
+
+    public async Task<RecipeDetailsVM?> GetRecipeDetailsAsync(int recipeId)
+    {
+        var recipe = await _context.Recipes
+            .Include(r => r.Herbalist)
+                .ThenInclude(h => h.User)
+            .Include(r => r.RecipeDiseases)
+                .ThenInclude(rd => rd.Disease)
+            .Include(r => r.RecipeHerbs)
+                .ThenInclude(rh => rh.Herb)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(r => r.RecipeId == recipeId);
+
+        if (recipe == null) return null;
+
+        return new RecipeDetailsVM
+        {
+            RecipeId = recipe.RecipeId,
+            RecipeName = recipe.RecipeName,
+            Description = recipe.Description,
+            Instructions = recipe.Instructions ?? string.Empty,
+            Price = recipe.Price,
+            AverageRating = recipe.AverageRating,
+            TotalRatings = recipe.TotalRatings,
+            CreatedDate = recipe.CreatedDate,
+            HerbalistName = recipe.Herbalist?.User?.FullName ?? "Licensed Apothecary",
+            TargetedDiseases = recipe.RecipeDiseases?
+                .Select(rd => rd.Disease.DiseaseName)
+                .ToList() ?? new List<string>(),
+            Ingredients = recipe.RecipeHerbs?
+                .Select(rh => new RecipeIngredientDetailVM
+                {
+                    HerbName = rh.Herb?.HerbName ?? "Medicinal Botanical",
+                    AmountInGrams = rh.Quantity
+                }).ToList() ?? new List<RecipeIngredientDetailVM>()
+        };
     }
 }

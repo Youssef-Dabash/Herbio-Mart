@@ -1,0 +1,99 @@
+﻿@using HerbioMart.Models.Enums
+@model IEnumerable<HerbioMart.Models.Entities.Order>
+
+@{
+    ViewData["Title"] = "My Orders History";
+}
+
+<!-- Single Page Header start -->
+<div class="container-fluid page-header py-5 mb-4">
+    <h1 class="text-center text-white display-6 fw-bold">My Orders History</h1>
+    <ol class="breadcrumb justify-content-center mb-0">
+        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-white">Home</a></li>
+        <li class="breadcrumb-item active text-white">Orders</li>
+    </ol>
+</div>
+<!-- Single Page Header End -->
+
+<div class="container py-4">
+
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5 bg-light rounded-4 border">
+            <i class="fas fa-clipboard-list fa-3x text-muted mb-3 opacity-50"></i>
+            <h4 class="fw-bold text-dark mb-2">No Past Orders Found</h4>
+            <p class="text-muted small mb-4">You have not placed any herbal remedy orders yet.</p>
+            <a asp-controller="Shop" asp-action="Index" class="btn btn-success rounded-pill px-4 py-2 fw-semibold">
+                <i class="fas fa-store me-1"></i> Explore Remedies
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive bg-white rounded-4 border shadow-sm p-3">
+            <table class="table align-middle mb-0">
+                <thead class="table-light small text-uppercase text-muted">
+                    <tr>
+                        <th>Order Ref</th>
+                        <th>Date Placed</th>
+                        <th>Dispensaries Involved</th>
+                        <th>Total Cost</th>
+                        <th>Order Status</th>
+                        <th class="text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var order in Model)
+                    {
+                        <tr>
+                            <td class="font-monospace fw-bold text-dark">
+                                #@order.OrderId
+                            </td>
+
+                            <td class="small text-muted">
+                                @order.OrderDate.ToString("MMM dd, yyyy - hh:mm tt")
+                            </td>
+
+                            <td class="small">
+                                <span class="badge bg-light text-dark border">
+                                    @order.SubOrders.Count Vendor(s)
+                                </span>
+                            </td>
+
+                            <td class="font-monospace fw-bold text-success">
+                                @order.TotalPrice.ToString("0.00") EGP
+                            </td>
+
+                            <td>
+                                @if (order.OrderStatus == OrderStatus.Completed)
+                                {
+                                    <span class="badge bg-success rounded-pill px-3 py-1">Completed</span>
+                                }
+                                else if (order.OrderStatus == OrderStatus.Processing)
+                                {
+                                    <span class="badge bg-primary rounded-pill px-3 py-1">Processing</span>
+                                }
+                                else if (order.OrderStatus == OrderStatus.Cancelled)
+                                {
+                                    <span class="badge bg-danger rounded-pill px-3 py-1">Cancelled</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning text-dark rounded-pill px-3 py-1">Pending</span>
+                                }
+                            </td>
+
+                            <td class="text-center">
+                                <a asp-controller="Order" asp-action="Details" asp-route-id="@order.OrderId"
+                                   class="btn btn-sm btn-outline-success rounded-pill px-3 fw-semibold">
+                                    <i class="fas fa-search-location me-1"></i> Track Order
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+</div>

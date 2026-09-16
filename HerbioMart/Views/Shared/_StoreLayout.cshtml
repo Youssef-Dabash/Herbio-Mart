@@ -1,10 +1,22 @@
 ﻿@using HerbioMart.Models.Enums
 @using System.Security.Claims
 @inject HerbioMart.Data.AppDbContext _context
+@inject HerbioMart.Services.Interfaces.ICartService _cartService
 
 @{
     int pendingOrdersCount = 0;
     string? profilePic = null;
+    int cartCount = 0;
+
+    try
+    {
+        cartCount = _cartService.GetCartItemsCount();
+    }
+    catch
+    {
+        cartCount = 0;
+    }
+
     var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
     int.TryParse(userIdStr, out var currentUserId);
 
@@ -58,7 +70,6 @@
     <link href="~/css/style.css" rel="stylesheet">
 
     <style>
-            /* ستايل الأفاتار وصورة المستخدم في الـ Navbar */
             .nav-avatar-initial {
                 width: 36px;
                 height: 36px;
@@ -82,6 +93,12 @@
                 border: 2px solid #81c784;
                 box-shadow: 0 2px 4px rgba(0,0,0,0.12);
             }
+
+            .cart-badge {
+                font-size: 0.72rem;
+                padding: 3px 6px;
+                min-width: 18px;
+            }
     </style>
 </head>
 
@@ -91,7 +108,7 @@
         <div class="spinner-grow text-primary" role="status"></div>
     </div>
     <!-- Spinner End -->
-    <!-- Navbar start -->
+    <!-- Navbar Start -->
     <div class="container-fluid fixed-top">
         <div class="container topbar bg-primary d-none d-lg-block">
             <div class="d-flex justify-content-between">
@@ -124,8 +141,10 @@
                         @if (User.IsInRole("Patient"))
                         {
                             <a asp-controller="Shop" asp-action="Index" class="nav-item nav-link">Shop Catalog</a>
-                            <a asp-controller="Cart" asp-action="Index" class="nav-item nav-link">Cart</a>
-                            <a asp-controller="Checkout" asp-action="Index" class="nav-item nav-link">Checkout</a>
+                            @* <a asp-controller="Cart" asp-action="Index" class="nav-item nav-link">Cart</a> *@
+                            @* <a asp-controller="Checkout" asp-action="Index" class="nav-item nav-link">Checkout</a> *@
+                            <a asp-controller="Order" asp-action="Index" class="nav-item nav-link">
+                                <i class="fas fa-box-open me-2 text-primary"></i> My Orders</a>
                         }
                         else if (User.IsInRole("Herbalist"))
                         {
@@ -139,11 +158,17 @@
 
                     <!-- Right Actions Area -->
                     <div class="d-flex m-3 me-0 align-items-center">
-                        <!-- Patient Shopping Bag -->
+
+                        <!-- Patient Shopping Bag with Live Counter Badge -->
                         @if (User.IsInRole("Patient"))
                         {
-                            <a asp-controller="Cart" asp-action="Index" class="position-relative me-4 my-auto text-primary" title="Shopping Cart">
+                            <a asp-controller="Cart" asp-action="Index" class="position-relative me-4 my-auto text-primary text-decoration-none" title="Shopping Cart">
                                 <i class="fa fa-shopping-bag fa-2x"></i>
+                                <span id="navCartCount"
+                                      class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-white cart-badge"
+                                      style="@(cartCount > 0 ? "" : "display: none;")">
+                                    @cartCount
+                                </span>
                             </a>
                         }
 
@@ -156,7 +181,6 @@
                                 {
                                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-white" style="font-size: 0.7rem;">
                                         @pendingOrdersCount
-                                        <span class="visually-hidden">pending orders</span>
                                     </span>
                                 }
                             </a>
@@ -234,7 +258,7 @@
         </div>
     </div>
     <!-- Navbar End -->
-    <!-- Body Render -->
+    <!-- Main Content -->
     <main role="main">
         @RenderBody()
     </main>
@@ -259,7 +283,7 @@
                 <div class="col-lg-4 col-md-6">
                     <div class="footer-item">
                         <h4 class="text-light mb-3">About HerbioMart</h4>
-                        <p class="mb-4">An advanced digital hub organizing traditional herbal treatments and linking them directly with diagnoses and certified practitioners.</p>
+                        <p class="mb-4">An advanced digital platform organizing traditional herbal remedies and linking them directly with diagnoses and certified practitioners.</p>
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6">

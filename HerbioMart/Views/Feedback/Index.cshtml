@@ -5,88 +5,171 @@
 }
 
 <style>
-    .testimonial-avatar-initial {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        background-color: #2e7d32;
-        color: #ffffff;
-        font-size: 1.9rem;
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-transform: uppercase;
-        border: 3px solid #81c784;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-        flex-shrink: 0;
+    /* إلغاء أي تداخل لأزرار القالب القديمة */
+    .testimonial-carousel .owl-nav,
+    .owl-carousel .owl-nav {
+        display: none !important;
     }
 
-    .testimonial-avatar-img {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 3px solid #81c784;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-        flex-shrink: 0;
+    /* البادج العلوي المخصص - منع تحوله لمستطيل مصمت */
+    .custom-section-tag {
+        display: inline-flex !important;
+        align-items: center !important;
+        background-color: #f0fdf4 !important;
+        color: #166534 !important;
+        border: 1px solid #bbf7d0 !important;
+        padding: 5px 14px !important;
+        border-radius: 50rem !important;
+        font-size: 0.75rem !important;
+        font-weight: 700 !important;
+        letter-spacing: 0.5px !important;
+        text-transform: uppercase !important;
+        height: auto !important;
+        width: auto !important;
     }
 
-    .carousel-nav-btn {
-        width: 48px;
-        height: 48px;
-        border-radius: 50%;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border: 2px solid #81c784;
-        background: #ffffff;
-        color: #198754;
-        font-size: 1.2rem;
-        cursor: pointer;
-        transition: all 0.25s ease;
-        box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+    /* كارت التقييم */
+    .custom-feedback-card {
+        background: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 20px !important;
+        padding: 1.75rem !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03) !important;
+        display: flex !important;
+        flex-direction: column !important;
+        height: 100% !important;
+        margin: 0.5rem !important;
     }
 
-        .carousel-nav-btn:hover {
-            background: #198754;
-            color: #ffffff;
-            transform: scale(1.08);
+    /* البادج الخاص باسم الوصفة */
+    .recipe-reference-badge {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        background-color: #f0fdf4 !important;
+        color: #15803d !important;
+        border: 1px solid #bbf7d0 !important;
+        padding: 6px 14px !important;
+        border-radius: 50rem !important;
+        font-size: 0.8rem !important;
+        font-weight: 600 !important;
+        max-width: 60% !important;
+        height: auto !important;
+        width: auto !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+    }
+
+    .recipe-link-btn {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 4px !important;
+        color: #d97706 !important;
+        background-color: #fffbeb !important;
+        border: 1px solid #fde68a !important;
+        padding: 5px 14px !important;
+        border-radius: 50rem !important;
+        font-size: 0.78rem !important;
+        font-weight: 600 !important;
+        text-decoration: none !important;
+        transition: all 0.2s ease !important;
+    }
+
+        .recipe-link-btn:hover {
+            background-color: #f59e0b !important;
+            color: #ffffff !important;
+        }
+
+    /* نص التعليق بلون رمادي داكن مقروء */
+    .testimonial-quote-text {
+        color: #334155 !important;
+        font-size: 0.95rem !important;
+        line-height: 1.6 !important;
+        font-style: italic !important;
+        margin: 0 !important;
+    }
+
+    .testimonial-avatar-circle {
+        width: 52px !important;
+        height: 52px !important;
+        border-radius: 50% !important;
+        object-fit: cover !important;
+        border: 2px solid #bbf7d0 !important;
+        flex-shrink: 0 !important;
+    }
+
+    .testimonial-avatar-fallback {
+        width: 52px !important;
+        height: 52px !important;
+        border-radius: 50% !important;
+        background: #16a34a !important;
+        color: #ffffff !important;
+        font-size: 1.25rem !important;
+        font-weight: 700 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        border: 2px solid #bbf7d0 !important;
+        flex-shrink: 0 !important;
+    }
+
+    /* أزرار السلايدر الدائرية */
+    .nav-arrow-btn {
+        width: 42px !important;
+        height: 42px !important;
+        border-radius: 50% !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        border: 1.5px solid #d1d5db !important;
+        background: #ffffff !important;
+        color: #374151 !important;
+        font-size: 1rem !important;
+        cursor: pointer !important;
+        transition: all 0.2s ease !important;
+    }
+
+        .nav-arrow-btn:hover {
+            background: #16a34a !important;
+            border-color: #16a34a !important;
+            color: #ffffff !important;
         }
 </style>
 
-<!-- Single Page Header start -->
+<!-- Header -->
 <div class="container-fluid page-header py-5">
     <h1 class="text-center text-white display-6">Patient Stories</h1>
     <ol class="breadcrumb justify-content-center mb-0">
         <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-white">Home</a></li>
-        <li class="breadcrumb-item"><a asp-controller="Shop" asp-action="Index" class="text-white">Shop</a></li>
         <li class="breadcrumb-item active text-white">Testimonials</li>
     </ol>
 </div>
-<!-- Single Page Header End -->
-<!-- Testimonial Start -->
-<div class="container-fluid testimonial py-5">
-    <div class="container py-5">
 
-        <!-- Header with Controls -->
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end mb-4 gap-3">
+<!-- Testimonial Section -->
+<div class="container-fluid py-5">
+    <div class="container py-4">
+
+        <!-- Top Row -->
+        <div class="d-flex flex-wrap justify-content-between align-items-end mb-4 gap-3">
             <div>
-                <h4 class="text-primary text-uppercase" style="letter-spacing: 1px;">Verified Feedback</h4>
-                <h1 class="display-5 text-dark fw-bold mb-0">What Our Patients Say!</h1>
+                <div class="custom-section-tag mb-2">
+                    <i class="fas fa-check-circle me-1"></i> Verified Feedback
+                </div>
+                <h2 class="display-6 fw-bold text-dark mb-0">What Our Patients Say</h2>
             </div>
 
             <div class="d-flex align-items-center gap-2">
                 @if (User.IsInRole("Patient"))
                 {
-                    <a asp-action="MyFeedbacks" class="btn btn-outline-success rounded-pill px-3 py-2 fw-semibold me-2">
+                    <a asp-action="MyFeedbacks" class="btn btn-outline-success rounded-pill px-4 py-2 fw-semibold me-2">
                         <i class="fas fa-user-edit me-1"></i> My Reviews
                     </a>
                 }
-                <button type="button" class="carousel-nav-btn" id="customPrevBtn" title="Previous Feedback">
+                <button type="button" class="nav-arrow-btn" id="customPrevBtn" title="Previous">
                     <i class="fas fa-arrow-left"></i>
                 </button>
-                <button type="button" class="carousel-nav-btn" id="customNextBtn" title="Next Feedback">
+                <button type="button" class="nav-arrow-btn" id="customNextBtn" title="Next">
                     <i class="fas fa-arrow-right"></i>
                 </button>
             </div>
@@ -94,13 +177,15 @@
 
         @if (Model == null || !Model.Any())
         {
-            <div class="text-center py-5 bg-light rounded-4 border">
-                <i class="far fa-comments fa-3x text-muted mb-3"></i>
+            <div class="card border-0 shadow-sm rounded-4 p-5 text-center bg-light">
+                <i class="far fa-comments fa-3x text-muted mb-3 opacity-50"></i>
                 <h4 class="text-dark fw-bold">No Feedbacks Yet</h4>
-                <p class="text-muted">Be the first patient to share your experience with our botanical formulations.</p>
-                <a asp-controller="Recipe" asp-action="Index" class="btn btn-success rounded-pill px-4 py-2 mt-2">
-                    Browse Formulations
-                </a>
+                <p class="text-muted small mb-4">Be the first patient to share your experience with our compounded herbal formulations.</p>
+                <div>
+                    <a asp-controller="Recipe" asp-action="Index" class="btn btn-success rounded-pill px-4 py-2 fw-semibold shadow-sm">
+                        Browse Formulations
+                    </a>
+                </div>
             </div>
         }
         else
@@ -112,91 +197,74 @@
                     var userInitial = !string.IsNullOrWhiteSpace(patientName) ? patientName.Trim()[0].ToString().ToUpper() : "P";
                     var userImage = item.Patient?.User?.ImageUrl;
 
-                    <div class="testimonial-item img-border-radius bg-light rounded-4 p-4 position-relative">
-                        <div class="position-relative">
+                    <div class="custom-feedback-card">
 
-                            <i class="fa fa-quote-right fa-2x text-secondary position-absolute" style="bottom: 25px; right: 0; opacity: 0.25;"></i>
+                        <!-- Remedy Tag & View Button -->
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="recipe-reference-badge" title="@item.Recipe?.RecipeName">
+                                <i class="fas fa-mortar-pestle"></i>
+                                <span class="text-truncate">@(item.Recipe?.RecipeName ?? "Therapeutic Blend")</span>
+                            </span>
 
-                            <!-- Remedy Tag & View Button -->
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <span class="badge bg-white text-success border border-success border-opacity-25 px-3 py-2 rounded-pill small fw-semibold text-truncate" style="max-width: 65%;" title="@item.Recipe?.RecipeName">
-                                    <i class="fas fa-mortar-pestle me-1"></i> @(item.Recipe?.RecipeName ?? "Therapeutic Recipe")
-                                </span>
+                            <a asp-controller="Recipe" asp-action="Details" asp-route-id="@item.RecipeId" class="recipe-link-btn">
+                                <span>View Remedy</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
 
-                                <a asp-controller="Recipe" asp-action="Details" asp-route-id="@item.RecipeId"
-                                   class="btn btn-sm btn-outline-success rounded-pill px-3 py-1 fw-semibold d-inline-flex align-items-center gap-1 shadow-sm"
-                                   style="font-size: 0.78rem;">
-                                    <span>View Remedy</span>
-                                    <i class="fas fa-arrow-right"></i>
-                                </a>
+                        <!-- Comment Text -->
+                        <div class="flex-grow-1 mb-4 py-2">
+                            <p class="testimonial-quote-text">
+                                @(string.IsNullOrWhiteSpace(item.Comment) ? "Patient verified this remedy without written observations." : $"\"{item.Comment}\"")
+                            </p>
+                        </div>
+
+                        <!-- Patient Footer -->
+                        <div class="d-flex align-items-center pt-3 border-top mt-auto">
+                            <div class="me-3">
+                                @if (!string.IsNullOrEmpty(userImage))
+                                {
+                                    <img src="@userImage" class="testimonial-avatar-circle" alt="@patientName">
+                                }
+                                else
+                                {
+                                    <div class="testimonial-avatar-fallback">@userInitial</div>
+                                }
                             </div>
 
-                            <!-- Comment Text -->
-                            <div class="mb-4 pb-3 border-bottom border-secondary border-opacity-25" style="min-height: 75px;">
-                                <p class="mb-0 text-dark" style="font-size: 0.95rem; line-height: 1.6;">
-                                    @(string.IsNullOrWhiteSpace(item.Comment) ? "Patient verified the purchase without leaving a written comment." : $"\"{item.Comment}\"")
-                                </p>
+                            <div class="flex-grow-1">
+                                <h6 class="text-dark fw-bold mb-0" style="font-size: 0.95rem;">@patientName</h6>
+                                <small class="text-muted" style="font-size: 0.75rem;">
+                                    <i class="far fa-calendar-alt me-1"></i> @item.RatingDate.ToString("MMM dd, yyyy")
+                                </small>
                             </div>
 
-                            <!-- Patient Info -->
-                            <div class="d-flex align-items-center flex-nowrap">
-
-                                <div class="me-3">
-                                    @if (!string.IsNullOrEmpty(userImage))
-                                    {
-                                        <img src="@userImage" class="testimonial-avatar-img" alt="@patientName">
-                                    }
-                                    else
-                                    {
-                                        <div class="testimonial-avatar-initial">
-                                            @userInitial
-                                        </div>
-                                    }
+                            <div class="text-end">
+                                <div class="d-flex align-items-center text-warning small">
+                                    <i class="fas fa-star me-1"></i>
+                                    <span class="fw-bold text-dark font-monospace" style="font-size: 0.9rem;">@item.RatingValue.ToString("0.0")</span>
                                 </div>
-
-                                <div class="d-block">
-                                    <h5 class="text-dark fw-bold mb-0">@patientName</h5>
-                                    <small class="text-muted d-block mb-1">
-                                        <i class="far fa-calendar-alt me-1"></i> @item.RatingDate.ToString("MMM dd, yyyy")
-                                    </small>
-
-                                    <div class="d-flex align-items-center text-warning small">
-                                        @for (int i = 1; i <= 5; i++)
-                                        {
-                                            if (i <= Math.Round(item.RatingValue))
-                                            {
-                                                <i class="fas fa-star text-warning"></i>
-                                            }
-                                            else
-                                            {
-                                                <i class="far fa-star text-muted opacity-50"></i>
-                                            }
-                                        }
-                                        <span class="ms-2 fw-bold text-dark font-monospace" style="font-size: 0.88rem;">
-                                            @item.RatingValue.ToString("0.0")
-                                        </span>
-                                    </div>
-                                </div>
-
                             </div>
                         </div>
+
                     </div>
                 }
             </div>
         }
+
     </div>
 </div>
-<!-- Testimonial End -->
+
 @section Scripts {
     <script>
         $(document).ready(function() {
             var $carousel = $(".testimonial-carousel");
 
-            $("#customPrevBtn").click(function() {
+            $("#customPrevBtn").on("click", function() {
                 $carousel.trigger("prev.owl.carousel");
             });
 
-            $("#customNextBtn").click(function() {
+            $("#customNextBtn").on("click", function() {
                 $carousel.trigger("next.owl.carousel");
             });
         });

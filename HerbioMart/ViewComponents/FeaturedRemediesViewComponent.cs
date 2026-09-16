@@ -20,7 +20,7 @@ public class FeaturedRemediesViewComponent : ViewComponent
         var herbs = await _context.Herbs
             .AsNoTracking()
             .Take(8)
-            .Select(h => new ShopHerbItemVM
+            .Select(h => new ShopHerbVM
             {
                 Id = h.HerbId,
                 Name = h.HerbName,
@@ -34,7 +34,7 @@ public class FeaturedRemediesViewComponent : ViewComponent
             .Where(r => r.IsActive)
             .AsNoTracking()
             .Take(6)
-            .Select(r => new ShopRecipeItemVM
+            .Select(r => new ShopRecipeVM
             {
                 Id = r.RecipeId,
                 Name = r.RecipeName,

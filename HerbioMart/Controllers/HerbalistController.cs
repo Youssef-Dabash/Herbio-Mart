@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using HerbioMart.Data;
+using HerbioMart.Models.Enums;
+using HerbioMart.Services.Interfaces;
 using HerbioMart.ViewModels.Herbalist;
 
 namespace HerbioMart.Controllers
@@ -14,16 +16,24 @@ namespace HerbioMart.Controllers
     {
         private readonly AppDbContext _context;
         private readonly IWebHostEnvironment _env;
+        private readonly IHerbalistOrderService _herbalistOrderService;
 
-        public HerbalistController(AppDbContext context, IWebHostEnvironment env)
+        public HerbalistController(
+            AppDbContext context,
+            IWebHostEnvironment env,
+            IHerbalistOrderService herbalistOrderService)
         {
             _context = context;
             _env = env;
+            _herbalistOrderService = herbalistOrderService;
         }
+
+        private int CurrentUserId => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
         // ==========================================
         // 1. DASHBOARD OVERVIEW (INDEX)
         // ==========================================
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
             var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -56,7 +66,7 @@ namespace HerbioMart.Controllers
 
                 AddedHerbsCount = await _context.Herbs.CountAsync(h => h.AddedByHerbalistId == herbalist.HerbalistId),
                 FormulatedRecipesCount = await _context.Recipes.CountAsync(r => r.HerbalistId == herbalist.HerbalistId),
-                PendingOrdersCount = await _context.SubOrders.CountAsync(s => s.HerbalistId == herbalist.HerbalistId && s.Status.ToString() == "Pending")
+                PendingOrdersCount = await _context.SubOrders.CountAsync(s => s.HerbalistId == herbalist.HerbalistId && s.Status == SubOrderStatus.Pending)
             };
 
             return View(model);
@@ -183,30 +193,50 @@ namespace HerbioMart.Controllers
         }
 
         // ==========================================
-        // 4. INCOMING ORDERS (SUB-ORDERS)
+        // 4. INCOMING ORDERS (SUB-ORDERS LIST)
         // ==========================================
-        public async Task<IActionResult> Orders()
+        [HttpGet]
+        public async Task<IActionResult> Orders(SubOrderStatus? status = null)
         {
-            var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (!int.TryParse(userIdStr, out var userId))
-                return RedirectToAction("Login", "Account");
+            ViewBag.CurrentFilter = status;
+            var subOrders = await _herbalistOrderService.GetHerbalistSubOrdersAsync(CurrentUserId, status);
+            return View(subOrders);
+        }
 
-            var herbalist = await _context.Herbalists
-                .AsNoTracking()
-                .FirstOrDefaultAsync(h => h.UserId == userId);
+        // ==========================================
+        // 5. SUB-ORDER DETAILS & WEIGHING MANIFEST
+        // ==========================================
+        [HttpGet]
+        public async Task<IActionResult> OrderDetails(int id)
+        {
+            var subOrder = await _herbalistOrderService.GetSubOrderDetailsAsync(id, CurrentUserId);
+            if (subOrder == null)
+            {
+                TempData["ErrorMessage"] = "Order package was not found or access is denied.";
+                return RedirectToAction(nameof(Orders));
+            }
 
-            if (herbalist == null)
-                return NotFound();
+            return View(subOrder);
+        }
 
-            var orders = await _context.SubOrders
-                .Include(s => s.Order)
-                //.Include(s => s.SubOrder)
-                .Where(s => s.HerbalistId == herbalist.HerbalistId)
-                .OrderByDescending(s => s.SubOrderId)
-                .AsNoTracking()
-                .ToListAsync();
+        // ==========================================
+        // 6. UPDATE SUB-ORDER STATUS
+        // ==========================================
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateOrderStatus(int subOrderId, SubOrderStatus status)
+        {
+            var success = await _herbalistOrderService.UpdateSubOrderStatusAsync(subOrderId, status, CurrentUserId);
+            if (success)
+            {
+                TempData["SuccessMessage"] = $"Order package #{subOrderId} status updated to {status}.";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Action not permitted. Orders can only be cancelled while in Pending status.";
+            }
 
-            return View(orders);
+            return RedirectToAction(nameof(OrderDetails), new { id = subOrderId });
         }
     }
 }

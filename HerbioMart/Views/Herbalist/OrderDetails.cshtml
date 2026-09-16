@@ -1,0 +1,260 @@
+﻿@using HerbioMart.Models.Enums
+@model HerbioMart.ViewModels.Herbalist.HerbalistSubOrderDetailsVM
+
+@{
+    ViewData["Title"] = $"Manage Package #SUB-{Model.SubOrderId}";
+}
+
+<style>
+    .status-badge-pending {
+        background-color: #fef3c7 !important;
+        color: #92400e !important;
+        border: 1px solid #fcd34d !important;
+        font-weight: 700 !important;
+        font-size: 0.85rem !important;
+        padding: 6px 16px !important;
+        border-radius: 50rem !important;
+        display: inline-flex !important;
+        align-items: center !important;
+    }
+
+    .status-badge-accepted {
+        background-color: #e0f2fe !important;
+        color: #0369a1 !important;
+        border: 1px solid #7dd3fc !important;
+        font-weight: 700 !important;
+        font-size: 0.85rem !important;
+        padding: 6px 16px !important;
+        border-radius: 50rem !important;
+        display: inline-flex !important;
+        align-items: center !important;
+    }
+
+    .status-badge-shipped {
+        background-color: #dcfce7 !important;
+        color: #15803d !important;
+        border: 1px solid #86efac !important;
+        font-weight: 700 !important;
+        font-size: 0.85rem !important;
+        padding: 6px 16px !important;
+        border-radius: 50rem !important;
+        display: inline-flex !important;
+        align-items: center !important;
+    }
+
+    .status-badge-cancelled {
+        background-color: #fee2e2 !important;
+        color: #991b1b !important;
+        border: 1px solid #fca5a5 !important;
+        font-weight: 700 !important;
+        font-size: 0.85rem !important;
+        padding: 6px 16px !important;
+        border-radius: 50rem !important;
+        display: inline-flex !important;
+        align-items: center !important;
+    }
+
+    .badge-category-herb {
+        background-color: #dcfce7 !important;
+        color: #15803d !important;
+        border: 1px solid #86efac !important;
+        font-weight: 700 !important;
+        font-size: 0.72rem !important;
+        padding: 4px 10px !important;
+        border-radius: 50rem !important;
+        display: inline-flex !important;
+        align-items: center !important;
+    }
+
+    .badge-category-recipe {
+        background-color: #e0f2fe !important;
+        color: #0369a1 !important;
+        border: 1px solid #7dd3fc !important;
+        font-weight: 700 !important;
+        font-size: 0.72rem !important;
+        padding: 4px 10px !important;
+        border-radius: 50rem !important;
+        display: inline-flex !important;
+        align-items: center !important;
+    }
+</style>
+
+<!-- Page Header -->
+<div class="container-fluid page-header py-5 mb-4">
+    <h1 class="text-center text-white display-6 fw-bold">Package Fulfillment</h1>
+    <ol class="breadcrumb justify-content-center mb-0">
+        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-white">Home</a></li>
+        <li class="breadcrumb-item"><a asp-controller="Herbalist" asp-action="Orders" class="text-white">Orders</a></li>
+        <li class="breadcrumb-item active text-white">#SUB-@Model.SubOrderId</li>
+    </ol>
+</div>
+
+<div class="container py-4">
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show rounded-4 shadow-sm mb-4" role="alert">
+            <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show rounded-4 shadow-sm mb-4" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Header Actions Card -->
+    <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-light">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <div>
+                <span class="text-muted small text-uppercase fw-semibold">Dispensary Package</span>
+                <h3 class="fw-bold text-dark mb-0 font-monospace">#SUB-@Model.SubOrderId</h3>
+                <small class="text-muted">Master Order: <strong>#@Model.OrderId</strong> | Placed: @Model.OrderDate.ToString("MMMM dd, yyyy - hh:mm tt")</small>
+            </div>
+
+            <div>
+                @if (Model.Status == SubOrderStatus.Shipped)
+                {
+                    <span class="status-badge-shipped">
+                        <i class="fas fa-check-circle me-1"></i> Shipped (Final State)
+                    </span>
+                }
+                else if (Model.Status == SubOrderStatus.Cancelled)
+                {
+                    <span class="status-badge-cancelled">
+                        <i class="fas fa-times-circle me-1"></i> Cancelled
+                    </span>
+                }
+                else
+                {
+                    <form asp-action="UpdateOrderStatus" method="post" class="d-flex align-items-center gap-2 m-0">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="subOrderId" value="@Model.SubOrderId" />
+
+                        <label class="fw-semibold text-muted small mb-0">Status:</label>
+                        <select name="status" class="form-select rounded-pill px-3 font-monospace fw-bold" style="min-width: 175px;">
+                            @if (Model.Status == SubOrderStatus.Pending)
+                            {
+                                <option value="@SubOrderStatus.Pending" selected>Pending</option>
+                                <option value="@SubOrderStatus.Accepted">Accept & Prepare</option>
+                                <option value="@SubOrderStatus.Cancelled">Cancel Order</option>
+                            }
+                            else if (Model.Status == SubOrderStatus.Accepted)
+                            {
+                                <option value="@SubOrderStatus.Accepted" selected>Accepted / Preparing</option>
+                                <option value="@SubOrderStatus.Shipped">Ship Package</option>
+                            }
+                        </select>
+
+                        <button type="submit" class="btn btn-success rounded-pill px-3 fw-semibold shadow-sm">
+                            <i class="fas fa-save me-1"></i> Update
+                        </button>
+                    </form>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+
+        <!-- Left: Items Manifest -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+                <h5 class="fw-bold text-dark border-bottom pb-3 mb-3">
+                    <i class="fas fa-balance-scale text-success me-2"></i>Medicinal Items to Prepare
+                </h5>
+
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead class="table-light small text-uppercase text-muted">
+                            <tr>
+                                <th>Item Name</th>
+                                <th>Category</th>
+                                <th class="text-center">Dosage / Weight</th>
+                                <th>Unit Rate</th>
+                                <th class="text-end">Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Items)
+                            {
+                                bool isHerb = item.ItemType == "Single Herb";
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="rounded-circle d-flex align-items-center justify-content-center me-2 flex-shrink-0"
+                                                 style="width: 34px; height: 34px; background-color: @(isHerb ? "#16a34a" : "#0284c7"); color: #ffffff !important;">
+                                                <i class="fas @(isHerb ? "fa-leaf" : "fa-mortar-pestle") small text-white"></i>
+                                            </div>
+                                            <h6 class="mb-0 fw-bold text-dark small">@item.ItemName</h6>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        @if (isHerb)
+                                        {
+                                            <span class="badge-category-herb">
+                                                <i class="fas fa-leaf me-1"></i> Herb
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge-category-recipe">
+                                                <i class="fas fa-mortar-pestle me-1"></i> Remedy
+                                            </span>
+                                        }
+                                    </td>
+                                    <td class="text-center font-monospace fw-bold text-dark fs-6">
+                                        @item.Quantity @item.UnitLabel
+                                    </td>
+                                    <td class="small font-monospace text-muted">
+                                        @item.UnitPrice.ToString("0.00") EGP @(isHerb ? "/ Kg" : "/ Unit")
+                                    </td>
+                                    <td class="text-end font-monospace fw-bold text-success fs-6">
+                                        @item.SubTotal.ToString("0.00") EGP
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="border-top pt-3 mt-3 d-flex justify-content-between align-items-center">
+                    <span class="fw-semibold text-muted">Dispensary Revenue:</span>
+                    <span class="fs-4 fw-bold font-monospace text-success">@Model.SubTotal.ToString("0.00") EGP</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Patient Contact -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+                <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">
+                    <i class="fas fa-user-circle text-primary me-2"></i>Patient & Delivery Contact
+                </h6>
+                <div class="mb-2">
+                    <small class="text-muted d-block">Recipient Name:</small>
+                    <span class="fw-bold text-dark">@Model.PatientName</span>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted d-block">Contact Phone:</small>
+                    <span class="fw-bold font-monospace text-dark">@Model.PatientPhone</span>
+                </div>
+                <div class="mb-0">
+                    <small class="text-muted d-block">Shipping Address:</small>
+                    <p class="text-muted small mb-0" style="line-height: 1.6;">
+                        @Model.ShippingAddress
+                    </p>
+                </div>
+            </div>
+
+            <a asp-action="Orders" class="btn btn-outline-secondary rounded-pill py-2 w-100 fw-semibold">
+                <i class="fas fa-arrow-left me-1"></i> Back to Orders Queue
+            </a>
+        </div>
+
+    </div>
+
+</div>

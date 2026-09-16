@@ -10,7 +10,7 @@ public class Order
     public decimal DeliveryFee { get; set; }
     public decimal TotalPrice { get; set; }
     public string ShippingAddress { get; set; } = string.Empty;
-    public OrderStatus OrderStatus { get; set; } = OrderStatus.New;
+    public OrderStatus OrderStatus { get; set; } = OrderStatus.Pending;
     public DateTime OrderDate { get; set; } = DateTime.UtcNow;
 
     // Navigation Properties
