@@ -101,11 +101,16 @@ The platform relies on a relational architecture structured around multi-tenant 
 | ![Herbalist Dashboard](docs/screenshots/dashboard-herbalist.png) | ![Dispensary Orders](docs/screenshots/orders-herbalist.png) |
 
 ---
+## 👨‍🏫 Project Supervision
+
+* **Instructor / Supervisor:** Abdelmonem Anwr [Men3m]
+
+---
 
 ## 👥 Development Team
 
 * **Team Lead:** Youssef Dabash
 * **Team Members:**
-  * [Mohammed Aref]
-  * [Rawda Islam]
-  * [Sarah Mohamed]
+  * Mohammed Aref
+  * Rawda Islam
+  * Sarah Mohamed
