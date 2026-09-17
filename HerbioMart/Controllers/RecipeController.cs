@@ -18,7 +18,6 @@ namespace HerbioMart.Controllers
 
         private int CurrentUserId => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-        // GET: /Recipe (Public Catalog)
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> Index()
@@ -31,7 +30,6 @@ namespace HerbioMart.Controllers
             return View("RecipeList", recipes);
         }
 
-        // GET: /Recipe/MyRecipes (Herbalist's own formulas)
         [HttpGet]
         [Authorize(Roles = "Herbalist")]
         public async Task<IActionResult> MyRecipes()
@@ -44,7 +42,6 @@ namespace HerbioMart.Controllers
             return View("RecipeList", recipes);
         }
 
-        // GET: /Recipe/Create
         [HttpGet]
         [Authorize(Roles = "Herbalist")]
         public async Task<IActionResult> Create()
@@ -53,7 +50,6 @@ namespace HerbioMart.Controllers
             return View(model);
         }
 
-        // POST: /Recipe/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Herbalist")]
@@ -90,7 +86,6 @@ namespace HerbioMart.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
-            // Check if the current user is the owner herbalist OR has an approved order containing this recipe
             var isAuthorized = await _recipeService.CanUserViewRecipeDetailsAsync(id, userId);
             if (!isAuthorized)
             {
@@ -107,24 +102,5 @@ namespace HerbioMart.Controllers
 
             return View(recipe);
         }
-        // GET: /Recipe/Details/{id}
-        //[HttpGet]
-        //public async Task<IActionResult> Details(int id)
-        //{
-        //    var isAuthorized = await _recipeService.CanUserViewRecipeDetailsAsync(id, CurrentUserId);
-        //    if (!isAuthorized)
-        //    {
-        //        TempData["ErrorMessage"] = "You must purchase this proprietary formulation to access its instructions and ingredients monograph.";
-        //        return RedirectToAction(nameof(Index));
-        //    }
-
-        //    var recipe = await _recipeService.GetRecipeDetailsByIdAsync(id);
-        //    if (recipe == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    return View(recipe);
-        //}
     }
 }

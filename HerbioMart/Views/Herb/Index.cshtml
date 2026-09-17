@@ -24,7 +24,6 @@
                 <p class="text-muted small mb-0">Global catalog of certified medicinal plants and botanical specimens.</p>
             </div>
 
-            <!-- الزرار يظهر فقط للعطار المعتمد ولا يظهر للمريض -->
             @if (User.IsInRole("Herbalist"))
             {
                 <a asp-controller="Herb" asp-action="Create" class="btn btn-success rounded-pill px-4 py-2 text-white fw-bold shadow-sm">

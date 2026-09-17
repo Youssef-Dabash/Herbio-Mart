@@ -32,7 +32,6 @@ public class FeedbackController : Controller
         return View(myFeedbacks);
     }
 
-    // صفحة Create (تخدم الجديد والتعديل)
     [Authorize(Roles = "Patient")]
     [HttpGet]
     public async Task<IActionResult> Create(int recipeId)
@@ -43,7 +42,6 @@ public class FeedbackController : Controller
         return View(model);
     }
 
-    // حفظ الـ Upsert
     [Authorize(Roles = "Patient")]
     [HttpPost]
     [ValidateAntiForgeryToken]

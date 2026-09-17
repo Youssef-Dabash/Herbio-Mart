@@ -188,7 +188,6 @@ namespace HerbioMart.Services.Implementations
         }
         public async Task<bool> CanUserViewRecipeDetailsAsync(int recipeId, int userId)
         {
-            // 1. Any verified licensed herbalist can review recipe monographs and compositions
             var isHerbalist = await _context.Herbalists
                 .AsNoTracking()
                 .AnyAsync(h => h.UserId == userId);
@@ -196,7 +195,6 @@ namespace HerbioMart.Services.Implementations
             if (isHerbalist)
                 return true;
 
-            // 2. If patient, they must have an approved order containing this recipe
             var hasPurchased = await _context.OrderRecipes
                 .AsNoTracking()
                 .AnyAsync(or => or.RecipeId == recipeId &&
@@ -205,24 +203,5 @@ namespace HerbioMart.Services.Implementations
 
             return hasPurchased;
         }
-        //public async Task<bool> CanUserViewRecipeDetailsAsync(int recipeId, int userId)
-        //{
-        //    // 1. Check if user is the creator (owner herbalist) of this proprietary formula
-        //    var isOwner = await _context.Recipes
-        //        .AsNoTracking()
-        //        .AnyAsync(r => r.RecipeId == recipeId && r.Herbalist.UserId == userId);
-
-        //    if (isOwner)
-        //        return true;
-
-        //    // 2. Check if user is a patient who has purchased this recipe
-        //    var hasPurchased = await _context.OrderRecipes
-        //        .AsNoTracking()
-        //        .AnyAsync(or => or.RecipeId == recipeId &&
-        //                        or.SubOrder.Order.Patient.UserId == userId &&
-        //                        or.SubOrder.Status != SubOrderStatus.Cancelled);
-
-        //    return hasPurchased;
-        //}
     }
 }

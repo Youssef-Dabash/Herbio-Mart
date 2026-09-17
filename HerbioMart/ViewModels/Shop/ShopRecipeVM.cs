@@ -3,7 +3,7 @@
 public class ShopRecipeVM
 {
     public int Id { get; set; }
-    public int HerbalistId { get; set; } // تم إضافتها لحل إيرور الكتالوج
+    public int HerbalistId { get; set; } 
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public decimal Price { get; set; }

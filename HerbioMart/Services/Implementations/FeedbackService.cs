@@ -36,7 +36,6 @@ public class FeedbackService : IFeedbackService
             .ToListAsync();
     }
 
-    // 1. يجهز الفورم: إذا كان مقيمها قبل كده يرجع بياناته للتعديل، وإلا يرجع فورم جديد
     public async Task<FeedbackFormVM?> GetFeedbackFormAsync(int recipeId, int userId)
     {
         var recipe = await _context.Recipes.FindAsync(recipeId);
@@ -66,26 +65,22 @@ public class FeedbackService : IFeedbackService
         };
     }
 
-    // 2. الـ Upsert: تعديل نفس الـ Row أو إضافة سطر جديد
     public async Task<bool> SaveFeedbackAsync(FeedbackFormVM model, int userId)
     {
         var patient = await _context.Patients.FirstOrDefaultAsync(p => p.UserId == userId);
         if (patient == null) return false;
 
-        // البحث عن التقييم الحالي للمريض على نفس الوصفة
         var feedback = await _context.Feedbacks
             .FirstOrDefaultAsync(f => f.RecipeId == model.RecipeId && f.PatientId == patient.PatientId);
 
         if (feedback != null)
         {
-            // تعديل نفس الـ Row وتحديث تاريخ التعديل
             feedback.RatingValue = model.RatingValue;
             feedback.Comment = model.Comment;
             feedback.RatingDate = DateTime.UtcNow;
         }
         else
         {
-            // إضافة تقييم جديد
             feedback = new Feedback
             {
                 PatientId = patient.PatientId,
@@ -99,7 +94,6 @@ public class FeedbackService : IFeedbackService
 
         await _context.SaveChangesAsync();
 
-        // إعادة حساب المتوسط بدقة رقم عشري واحد وتحديث العدد الإجمالي
         await RecalculateRecipeStatsAsync(model.RecipeId);
         return true;
     }
@@ -120,7 +114,6 @@ public class FeedbackService : IFeedbackService
         return true;
     }
 
-    // الحسبة برقم عشري واحد
     private async Task RecalculateRecipeStatsAsync(int recipeId)
     {
         var recipe = await _context.Recipes.FindAsync(recipeId);

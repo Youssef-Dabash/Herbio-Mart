@@ -91,13 +91,11 @@ public class PatientProfileService : IPatientProfileService
         if (patient == null || patient.User == null)
             return false;
 
-        // 1. معالجة رفع صورة جديدة
         if (model.ProfileImage != null && model.ProfileImage.Length > 0)
         {
             var uploadsFolder = Path.Combine(_env.WebRootPath, "uploads", "users");
             Directory.CreateDirectory(uploadsFolder);
 
-            // حذف الصورة القديمة إذا وُجدت
             if (!string.IsNullOrEmpty(patient.User.ImageUrl))
             {
                 var oldFilePath = Path.Combine(_env.WebRootPath, patient.User.ImageUrl.TrimStart('/'));
@@ -117,12 +115,8 @@ public class PatientProfileService : IPatientProfileService
 
             patient.User.ImageUrl = $"/uploads/users/{uniqueFileName}";
         }
-        // في حالة عدم اختيار صورة جديدة: لا نلمس patient.User.ImageUrl وتظل القديمة كما هي في قاعدة البيانات
-
-        // ضمان تمرير المسار الحالي (سواء القديم أو الجديد) للـ Model لكي يُسجل في الـ Claims
         model.ExistingImageUrl = patient.User.ImageUrl;
 
-        // 2. تحديث بيانات المستخدم
         patient.User.FullName = model.FullName;
         patient.User.Phone = model.Phone;
         patient.User.Street = model.Street ?? string.Empty;

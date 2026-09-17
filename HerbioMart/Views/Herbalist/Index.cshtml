@@ -9,7 +9,6 @@
 }
 
 <style>
-    /* أفاتار وصورة العطار في لوحة التحكم */
     .dashboard-avatar-initial {
         width: 68px;
         height: 68px;
@@ -136,13 +135,6 @@
                     <span class="text-muted fw-semibold">My Catalog Herbs</span>
                 </div>
             </div>
-            @* <div class="col-md-4">
-                <div class="card border-0 shadow-sm rounded-4 p-4 text-center bg-white border-top border-4 border-success">
-                    <i class="fas fa-mortar-pestle fa-3x text-success mb-3"></i>
-                    <h3 class="fw-bold text-dark">@(Model?.FormulatedRecipesCount ?? 0)</h3>
-                    <span class="text-muted fw-semibold">Formulated Recipes</span>
-                </div>
-            </div> *@
             <!-- Formulated Recipes Card -->
             <div class="col-md-4">
                 <a asp-controller="Recipe" asp-action="MyRecipes" class="text-decoration-none">

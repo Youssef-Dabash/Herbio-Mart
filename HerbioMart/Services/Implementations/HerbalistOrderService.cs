@@ -86,7 +86,6 @@ namespace HerbioMart.Services.Implementations
                 ShippingAddress = subOrder.Order.ShippingAddress
             };
 
-            // Add Herb items
             foreach (var h in subOrder.OrderHerbs)
             {
                 vm.Items.Add(new SubOrderItemDetailVM
@@ -100,7 +99,6 @@ namespace HerbioMart.Services.Implementations
                 });
             }
 
-            // Add Recipe items
             foreach (var r in subOrder.OrderRecipes)
             {
                 vm.Items.Add(new SubOrderItemDetailVM
@@ -129,15 +127,11 @@ namespace HerbioMart.Services.Implementations
 
             if (subOrder == null) return false;
 
-            // =========================================================================
-            // Business Rule: Cancellation is strictly prohibited once past Pending
-            // =========================================================================
             if (newStatus == SubOrderStatus.Cancelled && subOrder.Status != SubOrderStatus.Pending)
             {
-                return false; // منع الإلغاء إذا كانت الحالة Accepted أو Shipped
+                return false;
             }
 
-            // منع التعديل لو الطلب انتهى بالفعل (Shipped أو Cancelled)
             if (subOrder.Status == SubOrderStatus.Shipped || subOrder.Status == SubOrderStatus.Cancelled)
             {
                 return false;
@@ -145,23 +139,19 @@ namespace HerbioMart.Services.Implementations
 
             subOrder.Status = newStatus;
 
-            // 2. مزامنة حالة الأوردر الرئيسي (Master Order) بناءً على جميع باقاته
             var parentOrder = subOrder.Order;
             var allSubOrders = parentOrder.SubOrders.ToList();
 
             if (allSubOrders.All(s => s.Status == SubOrderStatus.Cancelled))
             {
-                // إذا تكنسلت كل الباقات يصبح الأوردر بالكامل ملغياً
                 parentOrder.OrderStatus = OrderStatus.Cancelled;
             }
             else if (allSubOrders.Where(s => s.Status != SubOrderStatus.Cancelled).All(s => s.Status == SubOrderStatus.Shipped))
             {
-                // اكتمال كل الباقات غير الملغية
                 parentOrder.OrderStatus = OrderStatus.Completed;
             }
             else if (allSubOrders.Any(s => s.Status == SubOrderStatus.Accepted || s.Status == SubOrderStatus.Shipped))
             {
-                // جاري تحضير أو شحن جزء من الطلب
                 parentOrder.OrderStatus = OrderStatus.Processing;
             }
             else

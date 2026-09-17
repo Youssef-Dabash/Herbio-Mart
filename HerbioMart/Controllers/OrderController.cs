@@ -17,7 +17,6 @@ namespace HerbioMart.Controllers
 
         private int CurrentUserId => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-        // GET: /Order/Index (My Orders List)
         [HttpGet]
         public async Task<IActionResult> Index()
         {
@@ -25,7 +24,6 @@ namespace HerbioMart.Controllers
             return View(orders);
         }
 
-        // GET: /Order/Details/{id} (Live Tracking Page)
         [HttpGet]
         public async Task<IActionResult> Details(int id)
         {

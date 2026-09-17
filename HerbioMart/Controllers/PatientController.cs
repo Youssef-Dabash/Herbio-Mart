@@ -22,7 +22,6 @@ public class PatientController : Controller
 
     private int CurrentUserId => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-    // GET: Patient/Index
     [HttpGet]
     public async Task<IActionResult> Index()
     {
@@ -32,7 +31,6 @@ public class PatientController : Controller
         return View(profile);
     }
 
-    // GET: Patient/Edit
     [HttpGet]
     public async Task<IActionResult> Edit()
     {
@@ -42,7 +40,6 @@ public class PatientController : Controller
         return View(model);
     }
 
-    // POST: Patient/Edit
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(EditPatientProfileVM model)

@@ -1,6 +1,5 @@
 ﻿namespace HerbioMart.Models.Enums;
 
-// النوع للمريض
 public enum Gender
 {
     Male = 0,

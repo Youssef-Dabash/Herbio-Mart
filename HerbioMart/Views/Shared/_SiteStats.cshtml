@@ -281,7 +281,7 @@
         const animateCounters = () => {
             counters.forEach(counter => {
                 const target = +counter.getAttribute('data-count');
-                const duration = 1200; // مدة الأنيميشن بالمللي ثانية
+                const duration = 1200; 
                 const stepTime = 20;
                 const totalSteps = duration / stepTime;
                 const increment = target / totalSteps;
@@ -299,7 +299,6 @@
             });
         };
 
-        // تشغيل الأنيميشن أول ما السكشن يظهر في الشاشة
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting && !animated) {

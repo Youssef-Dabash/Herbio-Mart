@@ -54,10 +54,7 @@ namespace HerbioMart.Services.Implementations
             var recipientPhone = string.IsNullOrWhiteSpace(model.Phone) ? patient.User.Phone : model.Phone;
             var notes = string.IsNullOrWhiteSpace(model.Notes) ? "None" : model.Notes.Trim();
 
-            // Store designated order shipping destination
-            //var shippingDetails = $"{recipientName} | Phone: {recipientPhone} | Delivery Address: {model.ShippingAddress.Trim()} | Notes: {notes}";
             var cleanAddress = model.ShippingAddress?.Trim() ?? string.Empty;
-            // 1. Master Order
             var order = new Order
             {
                 PatientId = patient.PatientId,
@@ -69,7 +66,6 @@ namespace HerbioMart.Services.Implementations
                 TotalPrice = cart.GrandTotal
             };
 
-            // 2. SubOrders grouped by Herbalist
             var vendorGroups = cart.Items.GroupBy(item => item.HerbalistId);
 
             foreach (var group in vendorGroups)

@@ -30,9 +30,6 @@ namespace HerbioMart.Controllers
 
         private int CurrentUserId => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-        // ==========================================
-        // 1. DASHBOARD OVERVIEW (INDEX)
-        // ==========================================
         [HttpGet]
         public async Task<IActionResult> Index()
         {
@@ -72,9 +69,6 @@ namespace HerbioMart.Controllers
             return View(model);
         }
 
-        // ==========================================
-        // 2. EDIT PROFILE (GET)
-        // ==========================================
         [HttpGet]
         public async Task<IActionResult> EditProfile()
         {
@@ -104,9 +98,6 @@ namespace HerbioMart.Controllers
             return View(model);
         }
 
-        // ==========================================
-        // 3. EDIT PROFILE (POST)
-        // ==========================================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditProfile(EditHerbalistProfileVM model)
@@ -192,9 +183,6 @@ namespace HerbioMart.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // ==========================================
-        // 4. INCOMING ORDERS (SUB-ORDERS LIST)
-        // ==========================================
         [HttpGet]
         public async Task<IActionResult> Orders(SubOrderStatus? status = null)
         {
@@ -203,9 +191,6 @@ namespace HerbioMart.Controllers
             return View(subOrders);
         }
 
-        // ==========================================
-        // 5. SUB-ORDER DETAILS & WEIGHING MANIFEST
-        // ==========================================
         [HttpGet]
         public async Task<IActionResult> OrderDetails(int id)
         {
@@ -219,9 +204,6 @@ namespace HerbioMart.Controllers
             return View(subOrder);
         }
 
-        // ==========================================
-        // 6. UPDATE SUB-ORDER STATUS
-        // ==========================================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateOrderStatus(int subOrderId, SubOrderStatus status)

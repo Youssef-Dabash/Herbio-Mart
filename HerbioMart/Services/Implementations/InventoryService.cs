@@ -48,7 +48,6 @@ public class InventoryService : IInventoryService
 
         if (herbalist == null) return new AddToInventoryVM();
 
-        // Get herbs that are NOT already in this herbalist's inventory
         var existingHerbIds = await _context.HerbalistHerbs
             .Where(hh => hh.HerbalistId == herbalist.HerbalistId)
             .Select(hh => hh.HerbId)

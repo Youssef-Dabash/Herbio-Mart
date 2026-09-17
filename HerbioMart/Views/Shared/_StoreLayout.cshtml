@@ -141,8 +141,6 @@
                         @if (User.IsInRole("Patient"))
                         {
                             <a asp-controller="Shop" asp-action="Index" class="nav-item nav-link">Shop Catalog</a>
-                            @* <a asp-controller="Cart" asp-action="Index" class="nav-item nav-link">Cart</a> *@
-                            @* <a asp-controller="Checkout" asp-action="Index" class="nav-item nav-link">Checkout</a> *@
                             <a asp-controller="Order" asp-action="Index" class="nav-item nav-link">
                                 <i class="fas fa-box-open me-2 text-primary"></i> My Orders</a>
                         }

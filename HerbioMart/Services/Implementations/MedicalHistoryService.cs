@@ -28,7 +28,6 @@ public class MedicalHistoryService : IMedicalHistoryService
             .AsNoTracking()
             .FirstOrDefaultAsync(m => m.PatientId == patient.PatientId);
 
-        // If no record exists yet, return an empty VM with default false values
         if (history == null)
         {
             return new MedicalHistoryVM();
@@ -61,7 +60,6 @@ public class MedicalHistoryService : IMedicalHistoryService
 
         if (existingHistory == null)
         {
-            // CREATE: First time adding medical record
             var newHistory = new MedicalHistory
             {
                 PatientId = patient.PatientId,
@@ -79,7 +77,6 @@ public class MedicalHistoryService : IMedicalHistoryService
         }
         else
         {
-            // UPDATE: Mutate existing record to prevent duplicate rows
             existingHistory.Diabetes = model.Diabetes;
             existingHistory.Hypertension = model.Hypertension;
             existingHistory.Asthma = model.Asthma;

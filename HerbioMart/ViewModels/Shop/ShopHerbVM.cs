@@ -8,6 +8,5 @@ public class ShopHerbVM
     public string Description { get; set; } = string.Empty;
     public string? ImageUrl { get; set; }
 
-    // أضف هذا السطر لحل الخطأ فوراً
     public List<HerbVendorOptionVM> AvailableVendors { get; set; } = new();
 }

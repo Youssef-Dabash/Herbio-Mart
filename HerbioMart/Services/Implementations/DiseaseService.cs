@@ -43,7 +43,6 @@ public class DiseaseService : IDiseaseService
 
     public async Task<(bool Success, string Message, int? DiseaseId)> CreateDiseaseAsync(CreateDiseaseVM model)
     {
-        // Check for duplicate disease name across the system
         var normalizedName = model.DiseaseName.Trim().ToLower();
         var exists = await _context.Diseases
             .AnyAsync(d => d.DiseaseName.Trim().ToLower() == normalizedName);
@@ -53,7 +52,6 @@ public class DiseaseService : IDiseaseService
             return (false, $"A health condition with the name '{model.DiseaseName.Trim()}' already exists in the registry.", null);
         }
 
-        // Map and save
         var disease = _mapper.Map<Disease>(model);
         disease.DiseaseName = model.DiseaseName.Trim();
         disease.Description = model.Description.Trim();

@@ -12,15 +12,13 @@ public class ShopController : Controller
         _shopService = shopService;
     }
 
-    // GET: /Shop/ أو /Shop/Index
     [HttpGet]
     public async Task<IActionResult> Index(string? searchQuery, string? sortBy, string? disease)
     {
         var catalog = await _shopService.GetCatalogAsync(searchQuery, sortBy, disease);
-        return View("Catalog", catalog); // يفتح صفحة Catalog.cshtml
+        return View("Catalog", catalog); 
     }
 
-    // GET: /Shop/Details/{id}
     [HttpGet]
     public async Task<IActionResult> Details(int id)
     {

@@ -22,7 +22,6 @@ public class MedicalHistoryController : Controller
         return int.TryParse(userIdClaim, out var id) ? id : 0;
     }
 
-    // GET: MedicalHistory
     [HttpGet]
     public async Task<IActionResult> Index()
     {
@@ -37,7 +36,6 @@ public class MedicalHistoryController : Controller
         return View(history);
     }
 
-    // POST: MedicalHistory
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Index(MedicalHistoryVM model)

@@ -17,9 +17,6 @@ public class ShopService : IShopService
 
     public async Task<ShopIndexVM> GetCatalogAsync(string? searchQuery, string? sortBy, string? disease)
     {
-        // =========================================================================
-        // 1. استعلام الأعشاب (Herbs) + ربط الـ Inventory الخاص بالعطارين (HerbalistHerbs)
-        // =========================================================================
         var herbsQuery = _context.Herbs
             .Include(h => h.HerbalistHerbs.Where(hh => hh.IsActive))
                 .ThenInclude(hh => hh.Herbalist)
@@ -27,7 +24,6 @@ public class ShopService : IShopService
             .AsNoTracking()
             .AsQueryable();
 
-        // تطبيق البحث على الأعشاب
         if (!string.IsNullOrWhiteSpace(searchQuery))
         {
             var query = searchQuery.Trim().ToLower();
@@ -39,7 +35,6 @@ public class ShopService : IShopService
 
         var rawHerbs = await herbsQuery.ToListAsync();
 
-        // تحويل البيانات لـ ShopHerbVM مع تعبئة قائمة العطارين المتوفر عندهم العشبة
         var herbsVM = rawHerbs.Select(h => new ShopHerbVM
         {
             Id = h.HerbId,
@@ -55,11 +50,10 @@ public class ShopService : IShopService
                     HerbalistName = hh.Herbalist?.User?.FullName ?? "Unknown Apothecary",
                     Price = hh.Price
                 })
-                .OrderBy(v => v.Price) // ترتيب العطارين من الأقل سعراً
+                .OrderBy(v => v.Price) 
                 .ToList()
         }).ToList();
 
-        // ترتيب الأعشاب حسب السعر إذا تم طلبه
         if (sortBy == "priceAsc")
         {
             herbsVM = herbsVM.OrderBy(h => h.AvailableVendors.Any() ? h.AvailableVendors.Min(v => v.Price) : decimal.MaxValue).ToList();
@@ -69,9 +63,6 @@ public class ShopService : IShopService
             herbsVM = herbsVM.OrderByDescending(h => h.AvailableVendors.Any() ? h.AvailableVendors.Max(v => v.Price) : 0).ToList();
         }
 
-        // =========================================================================
-        // 2. استعلام الوصفات (Recipes) + ربط العطار صاحب الوصفة والأمراض المستهدفة
-        // =========================================================================
         var recipesQuery = _context.Recipes
             .Include(r => r.Herbalist)
                 .ThenInclude(h => h.User)
@@ -81,7 +72,6 @@ public class ShopService : IShopService
             .AsNoTracking()
             .AsQueryable();
 
-        // تطبيق البحث على الوصفات
         if (!string.IsNullOrWhiteSpace(searchQuery))
         {
             var query = searchQuery.Trim().ToLower();
@@ -90,7 +80,6 @@ public class ShopService : IShopService
                 r.Description.ToLower().Contains(query));
         }
 
-        // تصفية حسب المرض إذا تم اختياره من الـ Sidebar
         if (!string.IsNullOrWhiteSpace(disease))
         {
             var diseaseQuery = disease.Trim().ToLower();
@@ -98,12 +87,11 @@ public class ShopService : IShopService
                 r.RecipeDiseases.Any(rd => rd.Disease.DiseaseName.ToLower().Contains(diseaseQuery)));
         }
 
-        // ترتيب الوصفات
         recipesQuery = sortBy switch
         {
             "priceAsc" => recipesQuery.OrderBy(r => r.Price),
             "priceDesc" => recipesQuery.OrderByDescending(r => r.Price),
-            _ => recipesQuery.OrderByDescending(r => r.RecipeId) // الأحدث افتراضياً
+            _ => recipesQuery.OrderByDescending(r => r.RecipeId) 
         };
 
         var rawRecipes = await recipesQuery.ToListAsync();
@@ -111,7 +99,7 @@ public class ShopService : IShopService
         var recipesVM = rawRecipes.Select(r => new ShopRecipeVM
         {
             Id = r.RecipeId,
-            HerbalistId = r.HerbalistId, // حل الإيرور في الكتالوج
+            HerbalistId = r.HerbalistId, 
             Name = r.RecipeName,
             Description = r.Description,
             Price = r.Price,
